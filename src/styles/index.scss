@@ -1,5 +1,18 @@
+// IMPORTED FONTS
+@import '@fontsource/poppins';
+
 * {
+	font-family: 'Poppins', 'Verdana';
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
+}
+body {
+	@apply bg-gray-100;
+}
+a {
+	@apply text-blue-600;
+	&:hover {
+		@apply underline;
+	}
 }
