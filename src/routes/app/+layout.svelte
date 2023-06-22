@@ -6,16 +6,13 @@
 	// IMPORTED STATES
 	import { isOpen } from '$stores/sidebarStates';
 	import { isSMUp } from '$stores/mediaStates';
-
-	// REACTIVE STATES
-	$: pl = (() => {
-		if ($isSMUp) {
-			return $isOpen ? 300 : 60;
-		} else return 0;
-	})();
 </script>
 
-<div class={`pt-[60px] pl-[${pl}px]`}>
+<div
+	class="layout pt-[60px]"
+	data-is-minimized={!$isOpen && $isSMUp}
+	data-is-maximized={$isOpen && $isSMUp}
+>
 	<Topbar />
 	<Sidebar />
 	<div class="w-full">
@@ -23,3 +20,14 @@
 		<div class="p-4 pt-0"><Footer /></div>
 	</div>
 </div>
+
+<style lang="scss">
+	.layout {
+		&[data-is-minimized='true'] {
+			padding-left: 60px;
+		}
+		&[data-is-maximized='true'] {
+			padding-left: 300px;
+		}
+	}
+</style>

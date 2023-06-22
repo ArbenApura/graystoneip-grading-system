@@ -12,21 +12,18 @@
 	];
 
 	// REACTIVE STATES
-	$: width = (() => {
-		if ($isSMUp) {
-			return $isOpen ? 300 : 60;
-		} else {
-			return $isOpen ? 300 : 0;
-		}
-	})();
+	$: maxWidth = $isSMUp ? ($isOpen ? 300 : 60) : $isOpen ? 300 : 0;
 
 	// UTILS
 	const handleClick = () => $isSMDown && isOpen.set(false);
 </script>
 
-{#if !(!$isOpen && $isSMDown)}
+{#if $isOpen || (!$isOpen && $isSMUp)}
 	<div
-		class={`fixed top-[60px] left-0 bg-white shadow-md max-w-[${width}px] w-full h-full overflow-hidden z-20`}
+		class="sidebar fixed top-[60px] left-0 bg-white shadow-md w-full h-full overflow-hidden z-20"
+		data-is-detached={$isOpen && $isSMDown}
+		data-is-minimized={!$isOpen && $isSMUp}
+		data-is-maximized={$isOpen && $isSMUp}
 	>
 		{#each items as item}
 			<a
@@ -44,3 +41,17 @@
 		{/each}
 	</div>
 {/if}
+
+<style lang="scss">
+	.sidebar {
+		&[data-is-detached='true'] {
+			max-width: 300px;
+		}
+		&[data-is-minimized='true'] {
+			max-width: 60px;
+		}
+		&[data-is-maximized='true'] {
+			max-width: 300px;
+		}
+	}
+</style>
