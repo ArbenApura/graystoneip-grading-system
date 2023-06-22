@@ -5,11 +5,11 @@
 	import { FloatingLabelInput, Button, Badge } from 'flowbite-svelte';
 </script>
 
-<div class="min-h-screen flex items-center justify-center">
-	<div class="grid grid-cols-1 lg:grid-cols-5 gap-8 p-4">
+<div class="min-h-screen lg:flex items-center justify-center p-4">
+	<div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
 		<div class="lg:col-span-3 flex justify-center items-center gap-4 p-4">
-			<img class="w-[50px] md:w-[200px] lg:w-[250px] rounded-full shadow-md" src={LogoPNG} alt="" />
-			<p class="text-base md:text-2xl xl:text-4xl">Graystone Institute of the Philippines</p>
+			<img class="w-[80px] md:w-[180px] lg:w-[250px] rounded-full shadow-md" src={LogoPNG} alt="" />
+			<p class="text-base md:text-3xl xl:text-4xl">Graystone Institute of the Philippines</p>
 		</div>
 		<div class="lg:col-span-2 flex items-center justify-center">
 			<form class="bg-white rounded-md shadow-md p-4 flex flex-col w-full h-fit">
