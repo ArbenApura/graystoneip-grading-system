@@ -21,8 +21,16 @@
 		<p class="text-xs sm:text-sm">Graystone Institute of the Philippines</p>
 	</a>
 	{#if $isSMUp}
-		<div class="h-[60px] p-4 flex items-center">
-			<Button outline size="xs">Logout</Button>
+		<div class="h-[60px] p-4 flex items-center gap-4">
+			<Button class="flex-center gap-2" color="light" size="xs">
+				<i class="ti ti-user" />
+				<small>Admin</small>
+			</Button>
+			<span class="text-gray-300">|</span>
+			<Button class="flex-center gap-2" size="xs">
+				<i class="ti ti-key-off" />
+				<small>Logout</small>
+			</Button>
 		</div>
 	{/if}
 </div>
