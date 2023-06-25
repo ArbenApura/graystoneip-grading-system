@@ -1,5 +1,8 @@
 .flex-center {
-	@apply flex items-center justify-center;
+	@apply flex justify-center items-center;
+}
+.flex-start-center {
+	@apply flex justify-start items-center;
 }
 .text-link {
 	@apply text-blue-600;

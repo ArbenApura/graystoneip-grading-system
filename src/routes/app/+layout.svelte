@@ -1,7 +1,7 @@
 <script lang="ts">
 	// IMPORTED COMPONENTS
 	import Topbar from '$components/layouts/Topbar.svelte';
-	import Sidebar from '$components/layouts/Sidebar.svelte';
+	import Sidebar from '$components/layouts/Sidebar';
 	import Footer from '$components/layouts/Footer.svelte';
 	// IMPORTED STATES
 	import { isOpen } from '$stores/sidebarStates';

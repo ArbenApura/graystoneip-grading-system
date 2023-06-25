@@ -28,7 +28,7 @@
 				<span class="mt-2 mb-4 text-right">
 					<a class="text-xs text-link" href="/">Forgot password?</a>
 				</span>
-				<a href="/app/accounts"><Button class="w-full">Login</Button></a>
+				<a href="/app/dashboard"><Button class="w-full">Login</Button></a>
 			</form>
 		</div>
 	</div>

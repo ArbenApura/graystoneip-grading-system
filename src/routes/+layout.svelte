@@ -19,7 +19,12 @@
 	const handleResize = () => windowWidth.set(window.innerWidth);
 
 	// LIFECYCLES
-	onMount(initializeStores);
+	onMount(() => {
+		initializeStores();
+		// REMOVE LOADER
+		const loaderEl = document.querySelector('#loader');
+		if (loaderEl) loaderEl.remove();
+	});
 </script>
 
 <svelte:window on:resize={handleResize} />

@@ -1,0 +1,30 @@
+{
+	"editor.tabSize": 4,
+	"restoreTerminals.terminals": [
+		{
+			"splitTerminals": [
+				{
+					"name": "DEV SERVER",
+					"commands": ["yarn dev"]
+				}
+			]
+		},
+		{
+			"splitTerminals": [
+				{
+					"name": "NPM",
+					"commands": [""]
+				}
+			]
+		},
+		{
+			"splitTerminals": [
+				{
+					"name": "GIT",
+					"commands": [""]
+				}
+			]
+		}
+	],
+	"scss.lint.unknownAtRules": "ignore"
+}
