@@ -22,13 +22,13 @@
 	</a>
 	{#if $isSMUp}
 		<div class="h-[60px] p-4 flex items-center gap-4">
-			<Button class="flex-center gap-2" color="light" size="xs">
-				<i class="ti ti-user" />
+			<Button class="flex-center gap-2" color="light" size="xs" href="/app/account">
+				<i class="ph-bold ph-user" />
 				<small>Admin</small>
 			</Button>
 			<span class="text-gray-300">|</span>
-			<Button class="flex-center gap-2" size="xs">
-				<i class="ti ti-key-off" />
+			<Button class="flex-center gap-2" size="xs" href="/">
+				<i class="ti ti-logout" />
 				<small>Logout</small>
 			</Button>
 		</div>

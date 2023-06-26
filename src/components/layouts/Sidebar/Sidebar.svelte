@@ -35,20 +35,20 @@
 		},
 		{
 			label: 'Master List',
-			icon: 'ti ti-users-group',
+			icon: 'ph-bold ph-user-list',
 			location: '',
 			isOpen: false,
 			contents: [
 				{
 					label: 'Students',
-					icon: 'ph ph-student',
+					icon: 'ph-bold ph-student',
 					location: '/app/master-list/students',
 					isOpen: false,
 					contents: [],
 				},
 				{
 					label: 'Professors',
-					icon: 'ph ph-chalkboard-teacher',
+					icon: 'ph-bold ph-chalkboard-teacher',
 					location: '/app/master-list/professors',
 					isOpen: false,
 					contents: [],
@@ -79,7 +79,7 @@
 		},
 		{
 			label: 'Admin Controls',
-			icon: 'ti ti-user-cog',
+			icon: 'ti ti-shield-lock',
 			location: '/app/admin-controls',
 			isOpen: false,
 			contents: [],
@@ -101,7 +101,13 @@
 </script>
 
 {#if $isOpen || $isSMUp}
-	<AccountMenu {...{ parentEl, isOpen: isAccountMenuOpen, setIsOpen: setIsAccountMenuOpen }} />
+	<AccountMenu
+		{...{ parentEl, isOpen: isAccountMenuOpen, setIsOpen: setIsAccountMenuOpen, handleClick }}
+	/>
+{/if}
+
+{#if $isOpen && $isSMDown}
+	<button class="fixed top-0 left-0 w-full h-full bg-black opacity-25" on:click={handleClick} />
 {/if}
 
 {#if $isOpen || (!$isOpen && $isSMUp)}
