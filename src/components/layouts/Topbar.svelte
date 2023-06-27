@@ -16,7 +16,7 @@
 			<i class={`ti ti-${$isOpen ? 'x' : 'menu-2'}`} />
 		</Button>
 	</div>
-	<a class="h-[60px] flex items-center gap-2 flex-grow" href="/">
+	<a class="h-[60px] flex items-center gap-2 flex-grow" href="/app/dashboard">
 		<img class=" rounded-full shadow-md w-[36px] h-[36px]" src={LogoPNG} alt="" />
 		<p class="text-xs sm:text-sm">Graystone Institute of the Philippines</p>
 	</a>
