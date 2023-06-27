@@ -39,7 +39,7 @@
 	<a class="item" href="/app/curriculum/programs">
 		<img src={ProgramsPNG} alt="" />
 		<div class="details">
-			<p>30</p>
+			<p>10</p>
 			<p>Programs</p>
 		</div>
 	</a>

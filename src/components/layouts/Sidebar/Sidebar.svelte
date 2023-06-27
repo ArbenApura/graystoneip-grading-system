@@ -40,16 +40,16 @@
 			isOpen: false,
 			contents: [
 				{
-					label: 'Students',
-					icon: 'ph-bold ph-student',
-					location: '/app/master-list/students',
+					label: 'Professors',
+					icon: 'ph-bold ph-chalkboard-teacher',
+					location: '/app/master-list/professors',
 					isOpen: false,
 					contents: [],
 				},
 				{
-					label: 'Professors',
-					icon: 'ph-bold ph-chalkboard-teacher',
-					location: '/app/master-list/professors',
+					label: 'Students',
+					icon: 'ph-bold ph-student',
+					location: '/app/master-list/students',
 					isOpen: false,
 					contents: [],
 				},
@@ -107,7 +107,10 @@
 {/if}
 
 {#if $isOpen && $isSMDown}
-	<button class="fixed top-0 left-0 w-full h-full bg-black opacity-25" on:click={handleClick} />
+	<button
+		class="fixed top-0 left-0 w-full h-full bg-black opacity-25 z-10"
+		on:click={handleClick}
+	/>
 {/if}
 
 {#if $isOpen || (!$isOpen && $isSMUp)}

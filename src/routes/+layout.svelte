@@ -31,6 +31,6 @@
 
 <svelte:window on:resize={handleResize} />
 
-<div class="container mx-auto min-h-screen">
+<div class="container mx-auto min-h-screen min-w-[300px] overflow-auto">
 	<slot />
 </div>
