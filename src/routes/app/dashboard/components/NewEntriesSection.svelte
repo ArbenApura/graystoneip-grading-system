@@ -1,9 +1,6 @@
 <script lang="ts">
-	// IMPORTED STATES
-	import { isMD, isLG, isXL } from '$stores/mediaStates';
-	import { isOpen } from '$stores/sidebarStates';
 	// IMPORTED LIB-COMPONENTS
-	import { Badge, Select, Avatar } from 'flowbite-svelte';
+	import { Badge, Select } from 'flowbite-svelte';
 
 	// STATES
 	const timeSpans = [

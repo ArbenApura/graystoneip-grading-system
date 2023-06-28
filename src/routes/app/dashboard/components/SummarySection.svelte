@@ -11,8 +11,8 @@
 
 <div
 	class="grid grid-cols-1
-        sm:{$isOpen && $isMD ? 'grid-cols-1' : 'grid-cols-2'} 
-        xl:{$isOpen && $isXL ? 'grid-cols-2' : 'grid-cols-4'}
+        {$isOpen && $isMD ? 'sm:grid-cols-1' : 'sm:grid-cols-2'} 
+        {$isOpen && $isXL ? 'xl:grid-cols-2' : 'xl:grid-cols-4'}
         gap-4"
 >
 	<a class="item" href="/app/master-list/professors">

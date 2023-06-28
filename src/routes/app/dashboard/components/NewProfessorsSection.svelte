@@ -31,8 +31,8 @@
 	<hr />
 	<div
 		class="grid grid-cols-1 sm:grid-cols-2
-            md:{$isOpen && $isMD ? 'grid-cols-2' : 'grid-cols-3'} 
-            lg:{$isOpen && ($isLG || $isXL) ? 'grid-cols-3' : 'grid-cols-4'} 
+            {$isOpen && $isMD ? 'md:grid-cols-2' : 'md:grid-cols-3'} 
+            {$isOpen && ($isLG || $isXL) ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} 
             gap-4"
 	>
 		<div class="text-center flex flex-col items-center px-4 py-8 border rounded-md">
