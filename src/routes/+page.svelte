@@ -22,7 +22,7 @@
 						<Badge class="aspect-square p-2"><i class="ti ti-key text-[18px]" /></Badge>
 						<p class="text-lg">Login Panel</p>
 					</div>
-					<FloatingLabelInput style="outlined" type="text" label="Username" />
+					<FloatingLabelInput style="outlined" type="email" label="Email" />
 					<FloatingLabelInput style="outlined" type="password" label="Password" />
 				</div>
 				<span class="mt-2 mb-4 text-right">

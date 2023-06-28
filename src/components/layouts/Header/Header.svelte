@@ -65,7 +65,7 @@
 				</div>
 			{/if}
 		</div>
-		<p class="text-xs">{dateTime}</p>
+		<p class="text-xs hidden sm:block">{dateTime}</p>
 	</div>
 </div>
 
