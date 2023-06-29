@@ -8,7 +8,7 @@
 	import { isOpen } from '$stores/sidebarStates';
 	import { isSMUp, isSMDown } from '$stores/mediaStates';
 	// IMPORTED LIB-COMPONENTS
-	import { Tooltip, Avatar } from 'flowbite-svelte';
+	import { Tooltip } from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
 	import AccountMenu from './AccountMenu.svelte';
 
@@ -220,8 +220,13 @@
 			{$page.route.id?.match('/app/account') ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}"
 				on:click={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
 			>
-				<div class="w-[60px] h-[60px] flex-center" bind:this={parentEl}>
-					<Avatar class="ring-blue-600" src={NoImagePNG} border />
+				<div bind:this={parentEl} class="w-[60px] h-[60px] flex-center">
+					<div class="rounded-full border-[2px] border-blue-600 p-[2px]">
+						<div
+							class="bg-gray-100 w-[35px] h-[35px] rounded-full bg-cover bg-center"
+							style="background-image: url({NoImagePNG})"
+						/>
+					</div>
 				</div>
 				<div class="flex-grow">
 					<p class="text-[10px] leading-none">Admin</p>

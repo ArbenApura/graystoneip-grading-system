@@ -1,10 +1,20 @@
 <script lang="ts">
+	// IMPORTED ASSETS
+	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED TYPES
 	import type { Account } from '$types/index';
 	// IMPORTED UTILS
 	import { formatDate } from '$utils/helpers';
 	// IMPORTED LIB-COMPONENTS
-	import { Button, Modal, FloatingLabelInput, Badge, Label, Select } from 'flowbite-svelte';
+	import {
+		Button,
+		Modal,
+		FloatingLabelInput,
+		Badge,
+		Label,
+		Select,
+		Fileupload,
+	} from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
 	import NotificationModal from '$components/modules/NotificationModal.svelte';
 
@@ -12,7 +22,8 @@
 	export let account: Account, handleClose: () => void;
 
 	// STATES
-	let firstName = account.firstName,
+	let files: FileList,
+		firstName = account.firstName,
 		lastName = account.lastName,
 		middleName = account.middleName,
 		gender = account.gender,
@@ -23,8 +34,20 @@
 		password = account.password,
 		repassword = account.password;
 	let error: string;
+	let selectedImage: string | ArrayBuffer | null = null;
 
 	// UTILS
+	const handleFileChange = (event: Event) => {
+		const target = event.target as HTMLInputElement;
+		const file = target.files && target.files[0];
+		if (file && file.type.startsWith('image/')) {
+			const reader = new FileReader();
+			reader.onload = () => {
+				selectedImage = reader.result;
+			};
+			reader.readAsDataURL(file);
+		}
+	};
 	const handleReset = () => {
 		firstName = account.firstName;
 		lastName = account.lastName;
@@ -41,6 +64,7 @@
 		try {
 			if (
 				[
+					files,
 					firstName,
 					lastName,
 					middleName,
@@ -61,7 +85,7 @@
 	};
 </script>
 
-<Modal open={true} permanent={true} class="w-full" size="md">
+<Modal open={true} permanent={true} class="w-full" size="lg">
 	<svelte:fragment slot="header">
 		<div class="w-full flex items-center gap-4">
 			<Badge class="aspect-plus p-2"><i class="ti ti-edit text-[18px]" /></Badge>
@@ -71,90 +95,108 @@
 			</button>
 		</div>
 	</svelte:fragment>
-	<form class="flex flex-col gap-4" on:submit|preventDefault={handleProceed}>
-		<Label>Basic Info</Label>
-		<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-			<FloatingLabelInput
-				bind:value={lastName}
-				style="outlined"
-				type="text"
-				label="Last Name"
-				required
-			/>
-			<FloatingLabelInput
-				bind:value={firstName}
-				style="outlined"
-				type="text"
-				label="First Name"
-				required
-			/>
-			<FloatingLabelInput
-				bind:value={middleName}
-				style="outlined"
-				type="text"
-				label="Middle Name"
+	<form class="grid grid-cols-1 lg:grid-cols-2 gap-4" on:submit|preventDefault={handleProceed}>
+		<div class="flex flex-col justify-between gap-8">
+			<Label>Avatar</Label>
+			<div class="mx-auto p-1 rounded-full border-[2px] border-blue-600">
+				<div
+					class="bg-gray-100 w-[200px] h-[200px] rounded-full bg-cover bg-center"
+					style="background-image: url({selectedImage || NoImagePNG})"
+				/>
+			</div>
+			<Fileupload
+				bind:files
+				on:change={handleFileChange}
+				inputClass="h-[48px] p-0 flex-center rounded-none border-b bg-transparent"
+				accept="image/*"
 				required
 			/>
 		</div>
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-			<Select
-				bind:value={gender}
-				placeholder="Select Gender"
-				items={[
-					{ name: 'Male', value: 'male' },
-					{ name: 'Female', value: 'female' },
-				]}
-			/>
-			<FloatingLabelInput
-				bind:value={birthDate}
-				style="outlined"
-				type="date"
-				label="Birth Date"
-				required
-			/>
-		</div>
+		<div class="flex flex-col gap-4">
+			<Label>Basic Info</Label>
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+				<FloatingLabelInput
+					bind:value={lastName}
+					style="outlined"
+					type="text"
+					label="Last Name"
+					required
+				/>
+				<FloatingLabelInput
+					bind:value={firstName}
+					style="outlined"
+					type="text"
+					label="First Name"
+					required
+				/>
+				<FloatingLabelInput
+					bind:value={middleName}
+					style="outlined"
+					type="text"
+					label="Middle Name"
+					required
+				/>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<Select
+					bind:value={gender}
+					placeholder="Select Gender"
+					items={[
+						{ name: 'Male', value: 'male' },
+						{ name: 'Female', value: 'female' },
+					]}
+				/>
+				<FloatingLabelInput
+					bind:value={birthDate}
+					style="outlined"
+					type="date"
+					label="Birth Date"
+					required
+				/>
+			</div>
 
-		<Label>Contact Info</Label>
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-			<FloatingLabelInput
-				bind:value={contactNo}
-				style="outlined"
-				type="text"
-				label="Contact No."
-				required
-			/>
-			<FloatingLabelInput
-				bind:value={address}
-				style="outlined"
-				type="text"
-				label="Address"
-				required
-			/>
-		</div>
+			<Label>Contact Info</Label>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<FloatingLabelInput
+					bind:value={contactNo}
+					style="outlined"
+					type="text"
+					label="Contact No."
+					required
+				/>
+				<FloatingLabelInput
+					bind:value={address}
+					style="outlined"
+					type="text"
+					label="Address"
+					required
+				/>
+			</div>
 
-		<Label>Access Info</Label>
-		<FloatingLabelInput
-			bind:value={email}
-			style="outlined"
-			type="email"
-			label="Email"
-			disabled
-		/>
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+			<Label>Access Info</Label>
 			<FloatingLabelInput
-				bind:value={password}
+				bind:value={email}
 				style="outlined"
-				type="password"
-				label="Password"
+				type="email"
+				label="Email"
 				required
 			/>
-			<FloatingLabelInput
-				bind:value={repassword}
-				style="outlined"
-				type="password"
-				label="Repeat Password"
-				required
-			/>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<FloatingLabelInput
+					bind:value={password}
+					style="outlined"
+					type="password"
+					label="Password"
+					required
+				/>
+				<FloatingLabelInput
+					bind:value={repassword}
+					style="outlined"
+					type="password"
+					label="Repeat Password"
+					required
+				/>
+			</div>
 		</div>
 		<button type="submit" hidden />
 	</form>
