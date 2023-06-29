@@ -4,12 +4,18 @@
 	// IMPORTED STATES
 	import { isSMDown } from '$stores/mediaStates';
 	// IMPORTED LIB-COMPONENTS
-	import { FloatingLabelInput, Button } from 'flowbite-svelte';
+	import {
+		FloatingLabelInput,
+		Button,
+		TableHeadCell,
+		TableBodyRow,
+		TableBodyCell,
+	} from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
 	import AdminAdderModal from './components/AdminAdderModal.svelte';
 	import AdminEditorModal from './components/AdminEditorModal.svelte';
-	import AdminTable from './components/AdminTable.svelte';
+	import Table from '$components/modules/Table.svelte';
 
 	// STATES
 	let admins: Account[] = [
@@ -98,6 +104,8 @@
 			dateCreated: Date.now(),
 		},
 	];
+	let filteredItems: Account[];
+	let startingItem = 0;
 	let modals = { adder: false, editor: false };
 	let target: Account | null = null;
 
@@ -146,7 +154,42 @@
 			<i class="ti ti-plus text-xl" />
 		</Button>
 	</div>
-	<AdminTable {...{ admins, openEditorModal }} />
+	<Table items={admins} bind:filteredItems bind:startingItem>
+		<svelte:fragment slot="table-head">
+			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
+			<TableHeadCell>Last Name</TableHeadCell>
+			<TableHeadCell>First Name</TableHeadCell>
+			<TableHeadCell>Middle Name</TableHeadCell>
+			<TableHeadCell>Gender</TableHeadCell>
+			<TableHeadCell>Contact No.</TableHeadCell>
+			<TableHeadCell>Email</TableHeadCell>
+			<TableHeadCell class="rounded-r-md">Tools</TableHeadCell>
+		</svelte:fragment>
+		<svelte:fragment slot="table-body">
+			{#if filteredItems && filteredItems.length}
+				{#each filteredItems as item, i}
+					<TableBodyRow>
+						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
+						<TableBodyCell>{item.lastName}</TableBodyCell>
+						<TableBodyCell>{item.firstName}</TableBodyCell>
+						<TableBodyCell>{item.middleName}</TableBodyCell>
+						<TableBodyCell class="capitalize">{item.gender}</TableBodyCell>
+						<TableBodyCell>{item.contactNo}</TableBodyCell>
+						<TableBodyCell>{item.email}</TableBodyCell>
+						<TableBodyCell class="flex gap-2">
+							<Button
+								class="w-[25px] h-[25px] flex-center"
+								color="green"
+								on:click={() => openEditorModal(item)}
+							>
+								<i class="ti ti-pencil text-sm" />
+							</Button>
+						</TableBodyCell>
+					</TableBodyRow>
+				{/each}
+			{/if}
+		</svelte:fragment>
+	</Table>
 </div>
 
 <style lang="scss">
