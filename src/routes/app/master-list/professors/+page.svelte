@@ -31,7 +31,7 @@
 			accountType: 'professor',
 			email: 'john.doe@example.com',
 			password: 'qwerty123',
-			dateCreated: Date.now(),
+			createdAt: Date.now(),
 		},
 		{
 			id: '3',
@@ -45,7 +45,7 @@
 			accountType: 'professor',
 			email: 'jane.smith@example.com',
 			password: 'abcd1234',
-			dateCreated: Date.now(),
+			createdAt: Date.now(),
 		},
 		{
 			id: '4',
@@ -59,7 +59,7 @@
 			accountType: 'professor',
 			email: 'david.johnson@example.com',
 			password: 'password456',
-			dateCreated: Date.now(),
+			createdAt: Date.now(),
 		},
 		{
 			id: '5',
@@ -73,7 +73,7 @@
 			accountType: 'professor',
 			email: 'emily.davis@example.com',
 			password: 'pass1234',
-			dateCreated: Date.now(),
+			createdAt: Date.now(),
 		},
 		{
 			id: '6',
@@ -87,7 +87,7 @@
 			accountType: 'professor',
 			email: 'michael.brown@example.com',
 			password: 'abcd1234',
-			dateCreated: Date.now(),
+			createdAt: Date.now(),
 		},
 		{
 			id: '7',
@@ -101,7 +101,7 @@
 			accountType: 'professor',
 			email: 'sarah.wilson@example.com',
 			password: 'password789',
-			dateCreated: Date.now(),
+			createdAt: Date.now(),
 		},
 	];
 	let filteredItems: Account[];
@@ -160,6 +160,7 @@
 			<TableHeadCell>Gender</TableHeadCell>
 			<TableHeadCell>Contact No.</TableHeadCell>
 			<TableHeadCell>Email</TableHeadCell>
+			<TableHeadCell>Created At</TableHeadCell>
 			<TableHeadCell class="rounded-r-md">Tools</TableHeadCell>
 		</svelte:fragment>
 		<svelte:fragment slot="table-body">
@@ -173,6 +174,7 @@
 						<TableBodyCell class="capitalize">{item.gender}</TableBodyCell>
 						<TableBodyCell>{item.contactNo}</TableBodyCell>
 						<TableBodyCell>{item.email}</TableBodyCell>
+						<TableBodyCell>{new Date(item.createdAt).toDateString()}</TableBodyCell>
 						<TableBodyCell class="flex gap-2">
 							<Button
 								class="w-[25px] h-[25px] flex-center"

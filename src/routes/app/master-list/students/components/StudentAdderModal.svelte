@@ -10,7 +10,6 @@
 		Badge,
 		Select,
 		Label,
-		Avatar,
 	} from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
 	import NotificationModal from '$components/modules/NotificationModal.svelte';

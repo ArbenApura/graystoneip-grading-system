@@ -11,5 +11,5 @@ export type Account = {
 	accountType: AccountType;
 	email: string;
 	password: string;
-	dateCreated: number;
+	createdAt: number;
 };
