@@ -35,9 +35,9 @@
 </script>
 
 {#if isOpen}
-	<button class="fixed top-0 left-0 w-full h-full z-30" on:click={() => setIsOpen(false)} />
+	<button class="fixed top-0 left-0 w-full h-full z-40" on:click={() => setIsOpen(false)} />
 	<div
-		class="bg-white rounded-md shadow-md py-0 w-full max-w-[300px] z-30 overflow-hidden"
+		class="bg-white rounded-md shadow-md py-0 w-full max-w-[300px] z-40 overflow-hidden"
 		bind:this={childEl}
 	>
 		<a

@@ -10,7 +10,7 @@
 	import { isOpen } from '$stores/sidebarStates';
 </script>
 
-<div class="bg-white shadow-md fixed top-0 left-0 w-full h-[60px] flex items-center z-30">
+<div class="bg-white shadow-md fixed top-0 left-0 w-full h-[60px] flex items-center z-40">
 	<div class="box-center">
 		<Button pill={true} outline={true} class="!p-2" size="xl" on:click={toggleSidebar}>
 			<i class={`ti ti-${$isOpen ? 'x' : 'menu-2'}`} />

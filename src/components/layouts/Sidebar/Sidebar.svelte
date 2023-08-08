@@ -108,14 +108,14 @@
 
 {#if $isOpen && $isSMDown}
 	<button
-		class="fixed top-0 left-0 w-full h-full bg-black opacity-25 z-10"
+		class="fixed top-0 left-0 w-full h-full bg-black opacity-25 z-30"
 		on:click={handleClick}
 	/>
 {/if}
 
 {#if $isOpen || (!$isOpen && $isSMUp)}
 	<div
-		class="sidebar fixed top-[60px] left-0 bg-white shadow-md w-full h-full flex flex-col z-20"
+		class="sidebar fixed top-[60px] left-0 bg-white shadow-md w-full h-full flex flex-col z-30"
 		data-is-detached={$isOpen && $isSMDown}
 		data-is-minimized={!$isOpen && $isSMUp}
 		data-is-maximized={$isOpen && $isSMUp}
