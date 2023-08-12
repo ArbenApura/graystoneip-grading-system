@@ -1,6 +1,9 @@
 // IMPORTED LIB-UTILS
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
+// IMPORTED UTILS
 import { updateMedia } from './utils';
+// IMPORTED STATES
+import { isInitialized } from '..';
 
 // STATES
 export const windowWidth = writable<number>(0);
@@ -35,8 +38,12 @@ export const mediaStates = {
 	isSMUp,
 	isMDUp,
 	isLGUp,
-	isXLUp
+	isXLUp,
 };
 
 // SUBSCRIPTIONS
-windowWidth.subscribe(updateMedia);
+windowWidth.subscribe(() => {
+	try {
+		if (get(isInitialized)) updateMedia();
+	} catch {}
+});

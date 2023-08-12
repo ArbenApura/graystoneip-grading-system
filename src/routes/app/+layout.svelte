@@ -6,6 +6,7 @@
 	// IMPORTED STATES
 	import { isOpen } from '$stores/sidebarStates';
 	import { isSMUp } from '$stores/mediaStates';
+	import { isLogined } from '$stores/authStates';
 </script>
 
 <div

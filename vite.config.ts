@@ -11,9 +11,9 @@ const config: UserConfig = {
 			$components: path.resolve('./src/components'),
 			$utils: path.resolve('./src/utils'),
 			$stores: path.resolve('./src/stores'),
-			$assets: path.resolve('./src/assets')
-		}
-	}
+			$assets: path.resolve('./src/assets'),
+		},
+	},
 };
 
 export default config;

@@ -5,9 +5,18 @@
 	import { Button } from 'flowbite-svelte';
 	// IMPORTED UTILS
 	import { toggleSidebar } from '$stores/sidebarStates';
+	import { createConfirmationModal } from '$stores/modalStates';
+	import { account, logout } from '$stores/authStates';
 	// IMPORTED STATES
 	import { isSMUp } from '$stores/mediaStates';
 	import { isOpen } from '$stores/sidebarStates';
+
+	// UTILS
+	const handleLogout = () =>
+		createConfirmationModal({
+			message: 'Are you sure you want to logout?',
+			handleProceed: logout,
+		});
 </script>
 
 <div class="bg-white shadow-md fixed top-0 left-0 w-full h-[60px] flex items-center z-40">
@@ -24,10 +33,10 @@
 		<div class="h-[60px] p-4 flex items-center gap-4">
 			<Button class="flex-center gap-2" color="light" size="xs" href="/app/account">
 				<i class="ph-bold ph-user" />
-				<small>Admin</small>
+				<small class="capitalize">{$account.account_type}</small>
 			</Button>
 			<span class="text-gray-300">|</span>
-			<Button class="flex-center gap-2" size="xs" href="/">
+			<Button class="flex-center gap-2" size="xs" on:click={handleLogout}>
 				<i class="ti ti-logout" />
 				<small>Logout</small>
 			</Button>

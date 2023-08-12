@@ -3,10 +3,8 @@
 	import type { Item } from '.';
 	// IMPORTED LIB-UTILS
 	import { page } from '$app/stores';
-	// IMPORTED UTILS
-	import { isMD } from '$stores/mediaStates';
-	// IMPORTED COMPONENTS
-	import Tooltip from '$components/modules/Tooltip.svelte';
+	// IMPORTED LIB-COMPONENTS
+	import { Tooltip } from 'flowbite-svelte';
 
 	// PROPS
 	export let item: Item, handleClick: () => void;
@@ -19,7 +17,6 @@
 	const setIsTooltipOpen = (isOpen: boolean) => (isTooltipOpen = isOpen);
 </script>
 
-<!-- {#if $isMD} -->
 <Tooltip
 	{...{
 		parentEl,
@@ -29,7 +26,6 @@
 		placement: 'right',
 	}}
 />
-<!-- {/if} -->
 
 {#if item.contents.length}
 	<div class="min-w-[300px] flex flex-col">

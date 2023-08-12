@@ -1,43 +1,55 @@
 <script lang="ts">
 	// IMPORTED TYPES
-	import type { Course } from '$types/index';
+	import type { Course } from '$types/curriculum';
+	// IMPORTED UTILS
+	import { createErrorModal, createSuccessModal } from '$stores/modalStates';
+	import { updateCourse } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
-	import { Button, Modal, FloatingLabelInput, Badge } from 'flowbite-svelte';
-	// IMPORTED COMPONENTS
-	import NotificationModal from '$components/modules/NotificationModal.svelte';
+	import { Button, Modal, FloatingLabelInput, Badge, Spinner } from 'flowbite-svelte';
 
 	// PROPS
-	export let course: Course, handleClose: () => void;
+	export let course: Course, handleClose: () => void, handleSearch: () => Promise<void>;
 
 	// STATES
 	let code = course.code,
-		prerequisite = course.prerequisite,
 		description = course.description,
 		hours = course.hours,
 		units = course.units;
-	let error: string;
+	let isLoading = false;
 
 	// UTILS
 	const handleReset = () => {
 		code = course.code;
-		prerequisite = course.prerequisite;
 		description = course.description;
 		hours = course.hours;
 		units = course.units;
 	};
-	const handleProceed = () => {
+	const handleProceed = async () => {
+		isLoading = true;
 		try {
-			if ([code, description].some((v) => !v)) throw new Error('Form is incomplete!');
-		} catch (err: any) {
-			error = err.message;
+			if ([code, description].some((v) => !v)) throw new Error('The form is incomplete!');
+			await updateCourse({
+				id: course.id,
+				code,
+				description,
+				units: units || 0,
+				hours: hours || 0,
+				created_at: course.created_at,
+			});
+			await handleSearch();
+			handleClose();
+			createSuccessModal({ message: 'Course was created successfully!' });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
 		}
+		isLoading = false;
 	};
 </script>
 
 <Modal open={true} permanent={true} class="w-full" size="md">
 	<svelte:fragment slot="header">
 		<div class="w-full flex items-center gap-4">
-			<Badge class="aspect-plus p-2"><i class="ti ti-edit text-[18px]" /></Badge>
+			<Badge class="aspect-plus p-2"><i class="ti ti-plus text-[18px]" /></Badge>
 			<p class="text-xl text-black flex-grow">Edit Course</p>
 			<button class="w-[34px] flex-center" on:click={handleClose}>
 				<i class="ti ti-x text-xl cursor-pointer hover:text-black" />
@@ -54,19 +66,13 @@
 				required
 			/>
 			<FloatingLabelInput
-				bind:value={prerequisite}
+				bind:value={description}
 				style="outlined"
 				type="text"
-				label="Prerequisite"
+				label="Description"
+				required
 			/>
 		</div>
-		<FloatingLabelInput
-			bind:value={description}
-			style="outlined"
-			type="text"
-			label="Description"
-			required
-		/>
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 			<FloatingLabelInput
 				bind:value={units}
@@ -87,13 +93,19 @@
 	</form>
 	<svelte:fragment slot="footer">
 		<div class="w-full flex items-center justify-end gap-4">
-			<Button size="sm" color="alternative" on:click={handleReset}>Reset</Button>
-			<Button size="sm" color="red" on:click={handleClose}>Cancel</Button>
-			<Button size="sm" color="green" on:click={handleProceed}>Proceed</Button>
+			<Button size="sm" color="alternative" disabled={isLoading} on:click={handleReset}>
+				Reset
+			</Button>
+			<Button size="sm" color="red" disabled={isLoading} on:click={handleClose}>
+				Cancel
+			</Button>
+			<Button size="sm" color="green" disabled={isLoading} on:click={handleProceed}>
+				{#if isLoading}
+					<Spinner class="mr-3" size="4" color="white" />Loading
+				{:else}
+					Proceed
+				{/if}
+			</Button>
 		</div>
 	</svelte:fragment>
 </Modal>
-
-{#if error}
-	<NotificationModal message={error} handleClose={() => (error = '')} />
-{/if}

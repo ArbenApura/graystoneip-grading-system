@@ -1,8 +1,21 @@
 <script lang="ts">
 	// IMPORTED TYPES
 	import type { Account } from '$types/index';
-	// IMPORTED STATES
-	import { isSMDown } from '$stores/mediaStates';
+	// IMPORTED LIB-UTILS
+	import { onMount } from 'svelte';
+	// IMPORTED UTILS
+	import { generateId } from '$utils/helpers';
+	import {
+		createConfirmationModal,
+		createCustomModal,
+		createErrorModal,
+		createLoadingModal,
+		createSuccessModal,
+		createVerificationModal,
+		removeCustomModal,
+		removeModal,
+	} from '$stores/modalStates';
+	import { deleteAccount, selectAccounts } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		FloatingLabelInput,
@@ -16,131 +29,108 @@
 	import StudentAdderModal from './components/StudentAdderModal.svelte';
 	import StudentEditorModal from './components/StudentEditorModal.svelte';
 	import Table from '$components/modules/Table.svelte';
+	// IMPORTED STATES
+	import { isSMDown } from '$stores/mediaStates';
+
+	// PROPS
+	export let data: any;
 
 	// STATES
-	let students: Account[] = [
-		{
-			id: '2',
-			firstName: 'John',
-			lastName: 'Doe',
-			middleName: 'Duck',
-			gender: 'male',
-			birthDate: 946684800000, // January 1, 2000
-			address: '456 Elm Street',
-			contactNo: '9876543210',
-			accountType: 'student',
-			email: 'john.doe@example.com',
-			password: 'qwerty123',
-			createdAt: Date.now(),
-		},
-		{
-			id: '3',
-			firstName: 'Jane',
-			lastName: 'Smith',
-			middleName: 'Lee',
-			gender: 'female',
-			birthDate: 978307200000, // January 1, 2001
-			address: '789 Oak Avenue',
-			contactNo: '5551234567',
-			accountType: 'student',
-			email: 'jane.smith@example.com',
-			password: 'abcd1234',
-			createdAt: Date.now(),
-		},
-		{
-			id: '4',
-			firstName: 'David',
-			lastName: 'Johnson',
-			middleName: 'Robert',
-			gender: 'male',
-			birthDate: 961113600000, // March 1, 2000
-			address: '321 Pine Road',
-			contactNo: '8889876543',
-			accountType: 'student',
-			email: 'david.johnson@example.com',
-			password: 'password456',
-			createdAt: Date.now(),
-		},
-		{
-			id: '5',
-			firstName: 'Emily',
-			lastName: 'Davis',
-			middleName: 'Ann',
-			gender: 'female',
-			birthDate: 972518400000, // October 1, 2000
-			address: '567 Cedar Lane',
-			contactNo: '2223334444',
-			accountType: 'student',
-			email: 'emily.davis@example.com',
-			password: 'pass1234',
-			createdAt: Date.now(),
-		},
-		{
-			id: '6',
-			firstName: 'Michael',
-			lastName: 'Brown',
-			middleName: 'Thomas',
-			gender: 'male',
-			birthDate: 954892800000, // April 1, 2000
-			address: '789 Elmwood Avenue',
-			contactNo: '9998887777',
-			accountType: 'student',
-			email: 'michael.brown@example.com',
-			password: 'abcd1234',
-			createdAt: Date.now(),
-		},
-		{
-			id: '7',
-			firstName: 'Sarah',
-			lastName: 'Wilson',
-			middleName: 'Jane',
-			gender: 'female',
-			birthDate: 968304000000, // November 1, 2000
-			address: '987 Oakwood Drive',
-			contactNo: '1112223333',
-			accountType: 'student',
-			email: 'sarah.wilson@example.com',
-			password: 'password789',
-			createdAt: Date.now(),
-		},
-	];
+	let students: Account[] = [];
 	let filteredItems: Account[];
 	let startingItem = 0;
+	let search = '';
+	let isLoading = false;
+
+	// MODAL STATES
+	let modalId = generateId();
 	let modals = { adder: false, editor: false };
 	let target: Account | null = null;
 
-	// UTILS
-	const openAdderModal = () => (modals.adder = true);
-	const closeAdderModal = () => (modals.adder = false);
+	// MODAL UTILS
+	const openAdderModal = () => {
+		modals.adder = true;
+		createCustomModal(modalId);
+	};
+	const closeAdderModal = () => {
+		modals.adder = false;
+		removeCustomModal(modalId);
+	};
 	const openEditorModal = (account: Account) => {
+		createCustomModal(modalId);
 		modals.editor = true;
 		target = account;
 	};
-	const closeEditorModal = () => (modals.editor = false);
+	const closeEditorModal = () => {
+		modals.editor = false;
+		removeCustomModal(modalId);
+	};
+
+	// UTILS
+	const handleSearch = async () => {
+		isLoading = true;
+		try {
+			students = await selectAccounts({ type: 'student', search });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		isLoading = false;
+	};
+	const handleDelete = async (id: string) => {
+		isLoading = true;
+		const modalId = createLoadingModal({ message: 'Deleting student account...' });
+		try {
+			await deleteAccount(id);
+			await handleSearch();
+			createSuccessModal({ message: 'Student account was deleted successfully!' });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		removeModal(modalId);
+		isLoading = false;
+	};
+
+	// LIFECYCLES
+	onMount(() => {
+		if (data.students) students = data.students;
+	});
 </script>
 
 <Header
 	breadcrumbItems={[
-		{ icon: 'ph-bold ph-user-list', label: 'Master List', href: '' },
-		{ label: 'Students', href: '/app/master-list/students' },
+		{
+			icon: 'ti ti-shield-lock',
+			label: 'Student Controls',
+			href: '/app/student-controls',
+		},
 	]}
 />
 
 {#if modals.adder}
-	<StudentAdderModal handleClose={closeAdderModal} />
+	<StudentAdderModal handleClose={closeAdderModal} {handleSearch} />
 {/if}
 {#if target}
 	{#if modals.editor}
-		<StudentEditorModal account={target} handleClose={closeEditorModal} />
+		<StudentEditorModal account={target} handleClose={closeEditorModal} {handleSearch} />
 	{/if}
 {/if}
 
 <div class="p-4 pt-0 flex flex-col gap-4">
 	<div class="flex items-center justify-between">
-		<div class="search w-full md:w-[50%] bg-white rounded-md shadow-md p-2 flex gap-2">
-			<FloatingLabelInput style="outlined" type="text" label="Search..." />
-			<Button class="w-[48px] h-[48px]"><i class="ti ti-search text-xl" /></Button>
-		</div>
+		<form
+			class="search w-full md:w-[50%] bg-white rounded-md shadow-md p-2 flex gap-2"
+			on:submit|preventDefault={handleSearch}
+		>
+			<FloatingLabelInput
+				style="outlined"
+				type="text"
+				label="Search Names..."
+				bind:value={search}
+			/>
+			<Button class="w-[48px] h-[48px]" type="submit" disabled={isLoading}>
+				<i class="ti ti-search text-xl" />
+			</Button>
+		</form>
 		<Button
 			class={`w-[48px] h-[48px] shadow-md ${
 				$isSMDown && 'fixed bottom-[16px] right-[16px] z-20'
@@ -160,7 +150,6 @@
 			<TableHeadCell>Gender</TableHeadCell>
 			<TableHeadCell>Contact No.</TableHeadCell>
 			<TableHeadCell>Email</TableHeadCell>
-			<TableHeadCell>Created At</TableHeadCell>
 			<TableHeadCell class="rounded-r-md">Tools</TableHeadCell>
 		</svelte:fragment>
 		<svelte:fragment slot="table-body">
@@ -168,13 +157,12 @@
 				{#each filteredItems as item, i}
 					<TableBodyRow>
 						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
-						<TableBodyCell>{item.lastName}</TableBodyCell>
-						<TableBodyCell>{item.firstName}</TableBodyCell>
-						<TableBodyCell>{item.middleName}</TableBodyCell>
+						<TableBodyCell>{item.last_name}</TableBodyCell>
+						<TableBodyCell>{item.first_name}</TableBodyCell>
+						<TableBodyCell>{item.middle_name}</TableBodyCell>
 						<TableBodyCell class="capitalize">{item.gender}</TableBodyCell>
-						<TableBodyCell>{item.contactNo}</TableBodyCell>
+						<TableBodyCell>{item.contact_number}</TableBodyCell>
 						<TableBodyCell>{item.email}</TableBodyCell>
-						<TableBodyCell>{new Date(item.createdAt).toDateString()}</TableBodyCell>
 						<TableBodyCell class="flex gap-2">
 							<Button
 								class="w-[25px] h-[25px] flex-center"
@@ -182,6 +170,21 @@
 								on:click={() => openEditorModal(item)}
 							>
 								<i class="ti ti-pencil text-sm" />
+							</Button>
+							<Button
+								class="w-[25px] h-[25px] flex-center"
+								color="red"
+								on:click={() =>
+									createConfirmationModal({
+										message:
+											'Are you sure you want to delete this student account?',
+										handleProceed: () =>
+											createVerificationModal({
+												handleProceed: () => handleDelete(item.id),
+											}),
+									})}
+							>
+								<i class="ti ti-trash text-sm" />
 							</Button>
 						</TableBodyCell>
 					</TableBodyRow>

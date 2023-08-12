@@ -2,55 +2,52 @@
 	// IMPORTED ASSETS
 	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED TYPES
-	import type { Account } from '$types/credentials';
 	import type { BreadcrumbItem } from '$components/layouts/Header';
+	// IMPORTED STATES
+	import { account, login } from '$stores/authStates';
 	// IMPORTED UTILS
-	import { formatDate } from '$utils/helpers';
+	import { formatDate, validateEmail } from '$utils/helpers';
+	import {
+		createConfirmationModal,
+		createErrorModal,
+		createSuccessModal,
+		createVerificationModal,
+	} from '$stores/modalStates';
+	import { deleteAvatar, updateAccount, uploadAvatar } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
-	import { Button, FloatingLabelInput, Fileupload, Select, Label } from 'flowbite-svelte';
+	import {
+		Button,
+		FloatingLabelInput,
+		Fileupload,
+		Select,
+		Label,
+		Spinner,
+	} from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
-	import VerificationModal from '$components/modules/VerificationModal.svelte';
-	import NotificationModal from '$components/modules/NotificationModal.svelte';
 
 	// BREADCRUMBS STATES
 	const breadcrumbItems: BreadcrumbItem[] = [
 		{ icon: 'ph-bold ph-user', label: 'Account', href: '/app/account' },
 	];
 
-	// TEMPORARY STATES
-	const account: Account = {
-		id: '2',
-		firstName: 'John',
-		lastName: 'Doe',
-		middleName: 'Duck',
-		gender: 'male',
-		birthDate: 946684800000, // January 1, 2000
-		address: '456 Elm Street',
-		contactNo: '9876543210',
-		accountType: 'admin',
-		email: 'john.doe@example.com',
-		password: 'qwerty123',
-		createdAt: Date.now(),
-	};
-
 	// STATES
 	let files: FileList,
-		firstName = account.firstName,
-		lastName = account.lastName,
-		middleName = account.middleName,
-		gender = account.gender,
-		birthDate = formatDate(new Date(account.birthDate)),
-		contactNo = account.contactNo,
-		address = account.address,
-		email = account.email,
-		password = account.password,
-		repassword = account.password;
-	let error: string;
-	let selectedImage: string | ArrayBuffer | null = null;
-	let modals = {
-		confirmation: false,
-	};
+		first_name = $account.first_name,
+		last_name = $account.last_name,
+		middle_name = $account.middle_name,
+		gender = $account.gender,
+		birth_date = formatDate(new Date($account.birth_date)),
+		contact_number = $account.contact_number,
+		address = $account.address,
+		email = $account.email,
+		password = $account.password,
+		repassword = $account.password;
+	let selectedImage: string | ArrayBuffer | null = $account.avatar || NoImagePNG;
+	let isLoading = false;
+
+	// REACTIVE STATES
+	$: full_name = first_name + ' ' + middle_name + ' ' + last_name;
 
 	// UTILS
 	const handleFileChange = (event: Event) => {
@@ -65,53 +62,81 @@
 		}
 	};
 	const handleReset = () => {
-		firstName = account.firstName;
-		lastName = account.lastName;
-		middleName = account.middleName;
-		gender = account.gender;
-		birthDate = formatDate(new Date(account.birthDate));
-		contactNo = account.contactNo;
-		address = account.address;
-		email = account.email;
-		password = account.password;
-		repassword = account.password;
+		first_name = $account.first_name;
+		last_name = $account.last_name;
+		middle_name = $account.middle_name;
+		gender = $account.gender;
+		birth_date = formatDate(new Date($account.birth_date));
+		contact_number = $account.contact_number;
+		address = $account.address;
+		email = $account.email;
+		password = $account.password;
+		repassword = $account.password;
 	};
 	const handleSave = async () => {
+		isLoading = true;
+		try {
+			let avatar = $account.avatar;
+			if (files && files.length) {
+				await deleteAvatar(avatar);
+				avatar = await uploadAvatar(files[0]);
+			}
+			await updateAccount({
+				id: $account.id,
+				last_name,
+				first_name,
+				middle_name,
+				full_name,
+				gender,
+				birth_date: new Date(birth_date).getTime(),
+				contact_number,
+				address,
+				account_type: $account.account_type,
+				avatar,
+				email,
+				password,
+				created_at: $account.created_at,
+			});
+			await login(email, password);
+			createSuccessModal({ message: 'Your account was edited successfully!' });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		isLoading = false;
+	};
+	const handleSubmit = async () => {
 		try {
 			if (
 				[
-					files,
-					firstName,
-					lastName,
-					middleName,
+					last_name,
+					first_name,
+					middle_name,
 					gender,
-					birthDate,
-					contactNo,
+					birth_date,
+					contact_number,
 					address,
 					email,
 					password,
 					repassword,
 				].some((v) => !v)
 			)
-				throw new Error('Form is incomplete!');
-			if (password !== repassword) throw new Error('Password does not match!');
-		} catch (err: any) {
-			error = err.message;
+				throw new Error('The form is incomplete!');
+			if (password !== repassword) throw new Error('The provided password does not match!');
+			if (!validateEmail(email)) throw new Error('The provided email is invalid!');
+			if (email === $account.email && password === $account.password)
+				createConfirmationModal({
+					message: 'Are you sure you want to save the changes?',
+					handleProceed: handleSave,
+				});
+			else createVerificationModal({ handleProceed: handleSave });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+			isLoading = false;
 		}
 	};
 </script>
 
 <Header {breadcrumbItems} />
-
-{#if modals.confirmation}
-	<VerificationModal
-		{...{ handleProceed: handleSave, handleClose: () => (modals.confirmation = false) }}
-	/>
-{/if}
-
-{#if error}
-	<NotificationModal message={error} handleClose={() => (error = '')} />
-{/if}
 
 <div class="p-4 pt-0">
 	<form
@@ -139,21 +164,21 @@
 				<Label>Basic Info</Label>
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 					<FloatingLabelInput
-						bind:value={lastName}
+						bind:value={last_name}
 						style="outlined"
 						type="text"
 						label="Last Name"
 						required
 					/>
 					<FloatingLabelInput
-						bind:value={firstName}
+						bind:value={first_name}
 						style="outlined"
 						type="text"
 						label="First Name"
 						required
 					/>
 					<FloatingLabelInput
-						bind:value={middleName}
+						bind:value={middle_name}
 						style="outlined"
 						type="text"
 						label="Middle Name"
@@ -170,7 +195,7 @@
 						]}
 					/>
 					<FloatingLabelInput
-						bind:value={birthDate}
+						bind:value={birth_date}
 						style="outlined"
 						type="date"
 						label="Birth Date"
@@ -181,7 +206,7 @@
 				<Label>Contact Info</Label>
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<FloatingLabelInput
-						bind:value={contactNo}
+						bind:value={contact_number}
 						style="outlined"
 						type="text"
 						label="Contact No."
@@ -225,7 +250,13 @@
 		<hr />
 		<div class="flex items-center justify-end gap-4">
 			<Button size="sm" color="alternative" on:click={handleReset}>Reset</Button>
-			<Button size="sm" on:click={() => (modals.confirmation = true)}>Save</Button>
+			<Button size="sm" disabled={isLoading} on:click={handleSubmit}>
+				{#if isLoading}
+					<Spinner class="mr-3" size="4" color="white" />Saving
+				{:else}
+					Save
+				{/if}
+			</Button>
 		</div>
 	</form>
 </div>

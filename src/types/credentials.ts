@@ -1,15 +1,18 @@
+// TYPES
 export type AccountType = 'admin' | 'professor' | 'student';
 export type Account = {
 	id: string;
-	firstName: string;
-	lastName: string;
-	middleName: string;
+	last_name: string;
+	first_name: string;
+	middle_name: string;
+	full_name: string;
 	gender: string;
-	birthDate: number;
+	birth_date: number;
 	address: string;
-	contactNo: string;
-	accountType: AccountType;
+	contact_number: string;
+	account_type: AccountType;
+	avatar: string;
 	email: string;
 	password: string;
-	createdAt: number;
+	created_at: number;
 };

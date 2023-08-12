@@ -1,8 +1,21 @@
 <script lang="ts">
 	// IMPORTED TYPES
 	import type { Program } from '$types/index';
-	// IMPORTED STATES
-	import { isSMDown } from '$stores/mediaStates';
+	// IMPORTED LIB-UTILS
+	import { onMount } from 'svelte';
+	// IMPORTED UTILS
+	import { generateId } from '$utils/helpers';
+	import {
+		createConfirmationModal,
+		createCustomModal,
+		createErrorModal,
+		createLoadingModal,
+		createSuccessModal,
+		createVerificationModal,
+		removeCustomModal,
+		removeModal,
+	} from '$stores/modalStates';
+	import { deleteProgram, selectPrograms } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		FloatingLabelInput,
@@ -16,59 +29,71 @@
 	import ProgramAdderModal from './components/ProgramAdderModal.svelte';
 	import ProgramEditorModal from './components/ProgramEditorModal.svelte';
 	import Table from '$components/modules/Table.svelte';
+	// IMPORTED STATES
+	import { isSMDown } from '$stores/mediaStates';
+
+	// PROPS
+	export let data: any;
 
 	// STATES
-	let programs: Program[] = [
-		{
-			id: '1',
-			code: 'BSIT',
-			description: 'Bachelor of Science in Information Technology',
-			createdAt: Date.now(),
-		},
-		{
-			id: '2',
-			code: 'BSA',
-			description: 'Bachelor of Science in Accountancy',
-			createdAt: Date.now(),
-		},
-		{
-			id: '3',
-			code: 'BSED',
-			description: 'Bachelor in Secondary Education',
-			createdAt: Date.now(),
-		},
-		{
-			id: '4',
-			code: 'BEED',
-			description: 'Bachelor in Elementary Education',
-			createdAt: Date.now(),
-		},
-		{
-			id: '5',
-			code: 'BSN',
-			description: 'Bachelor of Science in Nursing',
-			createdAt: Date.now(),
-		},
-		{
-			id: '6',
-			code: 'BSCE',
-			description: 'Bachelor of Science in Civil Engineering',
-			createdAt: Date.now(),
-		},
-	];
+	let programs: Program[] = [];
 	let filteredItems: Program[];
 	let startingItem = 0;
+	let search = '';
+	let isLoading = false;
+
+	// MODAL STATES
+	let modalId = generateId();
 	let modals = { adder: false, editor: false };
 	let target: Program | null = null;
 
-	// UTILS
-	const openAdderModal = () => (modals.adder = true);
-	const closeAdderModal = () => (modals.adder = false);
+	// MODAL UTILS
+	const openAdderModal = () => {
+		modals.adder = true;
+		createCustomModal(modalId);
+	};
+	const closeAdderModal = () => {
+		modals.adder = false;
+		removeCustomModal(modalId);
+	};
 	const openEditorModal = (program: Program) => {
+		createCustomModal(modalId);
 		modals.editor = true;
 		target = program;
 	};
-	const closeEditorModal = () => (modals.editor = false);
+	const closeEditorModal = () => {
+		modals.editor = false;
+		removeCustomModal(modalId);
+	};
+
+	// UTILS
+	const handleSearch = async () => {
+		isLoading = true;
+		try {
+			programs = await selectPrograms(search);
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		isLoading = false;
+	};
+	const handleDelete = async (id: string) => {
+		isLoading = true;
+		const modalId = createLoadingModal({ message: 'Deleting program...' });
+		try {
+			await deleteProgram(id);
+			await handleSearch();
+			createSuccessModal({ message: 'Program was deleted successfully!' });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		removeModal(modalId);
+		isLoading = false;
+	};
+
+	// LIFECYCLES
+	onMount(() => {
+		if (data.programs) programs = data.programs;
+	});
 </script>
 
 <Header
@@ -77,22 +102,31 @@
 		{ label: 'Programs', href: '/app/curriculum/programs' },
 	]}
 />
-
 {#if modals.adder}
-	<ProgramAdderModal handleClose={closeAdderModal} />
+	<ProgramAdderModal handleClose={closeAdderModal} {handleSearch} />
 {/if}
 {#if target}
 	{#if modals.editor}
-		<ProgramEditorModal program={target} handleClose={closeEditorModal} />
+		<ProgramEditorModal program={target} handleClose={closeEditorModal} {handleSearch} />
 	{/if}
 {/if}
 
 <div class="p-4 pt-0 flex flex-col gap-4">
 	<div class="flex items-center justify-between">
-		<div class="search w-full md:w-[50%] bg-white rounded-md shadow-md p-2 flex gap-2">
-			<FloatingLabelInput style="outlined" type="text" label="Search..." />
-			<Button class="w-[48px] h-[48px]"><i class="ti ti-search text-xl" /></Button>
-		</div>
+		<form
+			class="search w-full md:w-[50%] bg-white rounded-md shadow-md p-2 flex gap-2"
+			on:submit|preventDefault={handleSearch}
+		>
+			<FloatingLabelInput
+				style="outlined"
+				type="text"
+				label="Search Codes..."
+				bind:value={search}
+			/>
+			<Button class="w-[48px] h-[48px]" type="submit" disabled={isLoading}>
+				<i class="ti ti-search text-xl" />
+			</Button>
+		</form>
 		<Button
 			class={`w-[48px] h-[48px] shadow-md ${
 				$isSMDown && 'fixed bottom-[16px] right-[16px] z-20'
@@ -118,7 +152,7 @@
 						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
 						<TableBodyCell>{item.code}</TableBodyCell>
 						<TableBodyCell>{item.description}</TableBodyCell>
-						<TableBodyCell>{new Date(item.createdAt).toDateString()}</TableBodyCell>
+						<TableBodyCell>{new Date(item.created_at).toDateString()}</TableBodyCell>
 						<TableBodyCell class="flex gap-2">
 							<Button
 								class="w-[25px] h-[25px] flex-center"
@@ -126,6 +160,20 @@
 								on:click={() => openEditorModal(item)}
 							>
 								<i class="ti ti-pencil text-sm" />
+							</Button>
+							<Button
+								class="w-[25px] h-[25px] flex-center"
+								color="red"
+								on:click={() =>
+									createConfirmationModal({
+										message: 'Are you sure you want to delete this program?',
+										handleProceed: () =>
+											createVerificationModal({
+												handleProceed: () => handleDelete(item.id),
+											}),
+									})}
+							>
+								<i class="ti ti-trash text-sm" />
 							</Button>
 						</TableBodyCell>
 					</TableBodyRow>

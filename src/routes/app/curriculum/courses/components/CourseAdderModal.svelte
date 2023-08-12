@@ -1,30 +1,46 @@
 <script lang="ts">
+	// IMPORTED UTILS
+	import { createErrorModal, createSuccessModal } from '$stores/modalStates';
+	import { generateId } from '$utils/helpers';
+	import { insertCourse } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
-	import { Button, Modal, FloatingLabelInput, Badge } from 'flowbite-svelte';
-	// IMPORTED COMPONENTS
-	import NotificationModal from '$components/modules/NotificationModal.svelte';
+	import { Button, Modal, FloatingLabelInput, Badge, Spinner } from 'flowbite-svelte';
 
 	// PROPS
-	export let handleClose: () => void;
+	export let handleClose: () => void, handleSearch: () => Promise<void>;
 
 	// STATES
-	let code: string, prerequisite: string, description: string, units: number, hours: number;
-	let error: string;
+	let code: string, description: string, units: number, hours: number;
+	let isLoading = false;
 
 	// UTILS
 	const handleReset = () => {
 		code = '';
-		prerequisite = '';
 		description = '';
 		units = 0;
 		hours = 0;
 	};
-	const handleProceed = () => {
+	const handleProceed = async () => {
+		isLoading = true;
 		try {
-			if ([code, description].some((v) => !v)) throw new Error('Form is incomplete!');
-		} catch (err: any) {
-			error = err.message;
+			if ([code, description].some((v) => !v)) throw new Error('The form is incomplete!');
+			const id = generateId();
+			const created_at = Date.now();
+			await insertCourse({
+				id,
+				code,
+				description,
+				units: units || 0,
+				hours: hours || 0,
+				created_at,
+			});
+			await handleSearch();
+			handleClose();
+			createSuccessModal({ message: 'Course was created successfully!' });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
 		}
+		isLoading = false;
 	};
 </script>
 
@@ -48,19 +64,13 @@
 				required
 			/>
 			<FloatingLabelInput
-				bind:value={prerequisite}
+				bind:value={description}
 				style="outlined"
 				type="text"
-				label="Prerequisite"
+				label="Description"
+				required
 			/>
 		</div>
-		<FloatingLabelInput
-			bind:value={description}
-			style="outlined"
-			type="text"
-			label="Description"
-			required
-		/>
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 			<FloatingLabelInput
 				bind:value={units}
@@ -81,13 +91,19 @@
 	</form>
 	<svelte:fragment slot="footer">
 		<div class="w-full flex items-center justify-end gap-4">
-			<Button size="sm" color="alternative" on:click={handleReset}>Reset</Button>
-			<Button size="sm" color="red" on:click={handleClose}>Cancel</Button>
-			<Button size="sm" color="green" on:click={handleProceed}>Proceed</Button>
+			<Button size="sm" color="alternative" disabled={isLoading} on:click={handleReset}>
+				Reset
+			</Button>
+			<Button size="sm" color="red" disabled={isLoading} on:click={handleClose}>
+				Cancel
+			</Button>
+			<Button size="sm" color="green" disabled={isLoading} on:click={handleProceed}>
+				{#if isLoading}
+					<Spinner class="mr-3" size="4" color="white" />Loading
+				{:else}
+					Proceed
+				{/if}
+			</Button>
 		</div>
 	</svelte:fragment>
 </Modal>
-
-{#if error}
-	<NotificationModal message={error} handleClose={() => (error = '')} />
-{/if}

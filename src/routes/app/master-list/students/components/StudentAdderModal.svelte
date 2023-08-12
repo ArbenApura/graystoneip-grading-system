@@ -1,6 +1,14 @@
 <script lang="ts">
 	// IMPORTED ASSETS
 	import NoImagePNG from '$assets/images/no-image.png';
+	// IMPORTED UTILS
+	import {
+		createErrorModal,
+		createSuccessModal,
+		createVerificationModal,
+	} from '$stores/modalStates';
+	import { generateId, validateEmail } from '$utils/helpers';
+	import { insertAccount, uploadAvatar } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		Button,
@@ -10,27 +18,29 @@
 		Badge,
 		Select,
 		Label,
+		Spinner,
 	} from 'flowbite-svelte';
-	// IMPORTED COMPONENTS
-	import NotificationModal from '$components/modules/NotificationModal.svelte';
 
 	// PROPS
-	export let handleClose: () => void;
+	export let handleClose: () => void, handleSearch: () => Promise<void>;
 
 	// STATES
 	let files: FileList,
-		firstName: string,
-		lastName: string,
-		middleName: string,
+		last_name: string,
+		first_name: string,
+		middle_name: string,
 		gender: string,
-		birthDate: string,
-		contactNo: string,
+		birth_date: string,
+		contact_number: string,
 		address: string,
 		email: string,
 		password: string,
 		repassword: string;
-	let error: string;
 	let selectedImage: string | ArrayBuffer | null = null;
+	let isLoading = false;
+
+	// REACTIVE STATES
+	$: full_name = first_name + ' ' + middle_name + ' ' + last_name;
 
 	// UTILS
 	const handleFileChange = (event: Event) => {
@@ -45,38 +55,71 @@
 		}
 	};
 	const handleReset = () => {
-		firstName = '';
-		lastName = '';
-		middleName = '';
+		last_name = '';
+		first_name = '';
+		middle_name = '';
 		gender = '';
-		birthDate = '';
-		contactNo = '';
+		birth_date = '';
+		contact_number = '';
 		address = '';
 		email = '';
 		password = '';
 		repassword = '';
 	};
-	const handleProceed = () => {
+	const handleSave = async () => {
+		isLoading = true;
+		try {
+			const id = generateId();
+			const created_at = Date.now();
+			let avatar = '';
+			if (files && files.length) avatar = await uploadAvatar(files[0]);
+			await insertAccount({
+				id,
+				last_name,
+				first_name,
+				middle_name,
+				full_name,
+				gender,
+				birth_date: new Date(birth_date).getTime(),
+				contact_number,
+				address,
+				account_type: 'student',
+				avatar,
+				email,
+				password,
+				created_at,
+			});
+			await handleSearch();
+			handleClose();
+			createSuccessModal({ message: 'Student account was created successfully!' });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		isLoading = false;
+	};
+	const handleProceed = async () => {
 		try {
 			if (
 				[
-					files,
-					firstName,
-					lastName,
-					middleName,
+					last_name,
+					first_name,
+					middle_name,
 					gender,
-					birthDate,
-					contactNo,
+					birth_date,
+					contact_number,
 					address,
 					email,
 					password,
 					repassword,
 				].some((v) => !v)
 			)
-				throw new Error('Form is incomplete!');
-			if (password !== repassword) throw new Error('Password does not match!');
-		} catch (err: any) {
-			error = err.message;
+				throw new Error('The form is incomplete!');
+			if (password !== repassword) throw new Error('The provided password does not match!');
+			if (!validateEmail(email)) throw new Error('The provided email is invalid!');
+			createVerificationModal({ handleProceed: handleSave });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+			isLoading = false;
 		}
 	};
 </script>
@@ -105,28 +148,27 @@
 				on:change={handleFileChange}
 				inputClass="h-[48px] p-0 flex-center rounded-none border-b bg-transparent"
 				accept="image/*"
-				required
 			/>
 		</div>
 		<div class="flex flex-col gap-4">
 			<Label>Basic Info</Label>
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 				<FloatingLabelInput
-					bind:value={lastName}
+					bind:value={last_name}
 					style="outlined"
 					type="text"
 					label="Last Name"
 					required
 				/>
 				<FloatingLabelInput
-					bind:value={firstName}
+					bind:value={first_name}
 					style="outlined"
 					type="text"
 					label="First Name"
 					required
 				/>
 				<FloatingLabelInput
-					bind:value={middleName}
+					bind:value={middle_name}
 					style="outlined"
 					type="text"
 					label="Middle Name"
@@ -143,7 +185,7 @@
 					]}
 				/>
 				<FloatingLabelInput
-					bind:value={birthDate}
+					bind:value={birth_date}
 					style="outlined"
 					type="date"
 					label="Birth Date"
@@ -154,7 +196,7 @@
 			<Label>Contact Info</Label>
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 				<FloatingLabelInput
-					bind:value={contactNo}
+					bind:value={contact_number}
 					style="outlined"
 					type="text"
 					label="Contact No."
@@ -198,13 +240,19 @@
 	</form>
 	<svelte:fragment slot="footer">
 		<div class="w-full flex items-center justify-end gap-4">
-			<Button size="sm" color="alternative" on:click={handleReset}>Reset</Button>
-			<Button size="sm" color="red" on:click={handleClose}>Cancel</Button>
-			<Button size="sm" color="green" on:click={handleProceed}>Proceed</Button>
+			<Button size="sm" color="alternative" disabled={isLoading} on:click={handleReset}>
+				Reset
+			</Button>
+			<Button size="sm" color="red" disabled={isLoading} on:click={handleClose}>
+				Cancel
+			</Button>
+			<Button size="sm" color="green" disabled={isLoading} on:click={handleProceed}>
+				{#if isLoading}
+					<Spinner class="mr-3" size="4" color="white" />Loading
+				{:else}
+					Proceed
+				{/if}
+			</Button>
 		</div>
 	</svelte:fragment>
 </Modal>
-
-{#if error}
-	<NotificationModal message={error} handleClose={() => (error = '')} />
-{/if}

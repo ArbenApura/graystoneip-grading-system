@@ -1,12 +1,13 @@
 <script lang="ts">
 	// IMPORTED ASSETS
-	import NoImagePNG from '$assets/images/elon.png';
-	// IMPORTED LIB-UTILS
-	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
+	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED STATES
 	import { isOpen } from '$stores/sidebarStates';
 	import { isSMUp, isSMDown } from '$stores/mediaStates';
+	import { account } from '$stores/authStates';
+	// IMPORTED LIB-UTILS
+	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	// IMPORTED LIB-COMPONENTS
 	import { Tooltip } from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
@@ -19,6 +20,7 @@
 		location: string;
 		contents: Item[];
 		isOpen: boolean;
+		isVisible: boolean;
 	};
 
 	// REFS
@@ -31,6 +33,7 @@
 			icon: 'ti ti-layout-dashboard',
 			location: '/app/dashboard',
 			isOpen: false,
+			isVisible: true,
 			contents: [],
 		},
 		{
@@ -38,12 +41,14 @@
 			icon: 'ph-bold ph-user-list',
 			location: '',
 			isOpen: false,
+			isVisible: $account.account_type === 'admin',
 			contents: [
 				{
 					label: 'Professors',
 					icon: 'ph-bold ph-chalkboard-teacher',
 					location: '/app/master-list/professors',
 					isOpen: false,
+					isVisible: true,
 					contents: [],
 				},
 				{
@@ -51,6 +56,7 @@
 					icon: 'ph-bold ph-student',
 					location: '/app/master-list/students',
 					isOpen: false,
+					isVisible: true,
 					contents: [],
 				},
 			],
@@ -60,12 +66,14 @@
 			icon: 'ti ti-list-details',
 			location: '',
 			isOpen: false,
+			isVisible: $account.account_type === 'admin',
 			contents: [
 				{
 					label: 'Courses',
 					icon: 'ti ti-books',
 					location: '/app/curriculum/courses',
 					isOpen: false,
+					isVisible: true,
 					contents: [],
 				},
 				{
@@ -73,6 +81,7 @@
 					icon: 'ti ti-school',
 					location: '/app/curriculum/programs',
 					isOpen: false,
+					isVisible: true,
 					contents: [],
 				},
 			],
@@ -82,6 +91,7 @@
 			icon: 'ti ti-shield-lock',
 			location: '/app/admin-controls',
 			isOpen: false,
+			isVisible: $account.account_type === 'admin',
 			contents: [],
 		},
 	];
@@ -108,7 +118,7 @@
 
 {#if $isOpen && $isSMDown}
 	<button
-		class="fixed top-0 left-0 w-full h-full bg-black opacity-25 z-30"
+		class="fixed top-0 left-0 w-full h-screen bg-black opacity-25 z-30"
 		on:click={handleClick}
 	/>
 {/if}
@@ -123,92 +133,94 @@
 		<div class="h-full max-h-[calc(100vh-120px)] overflow-y-auto">
 			<div class="flex flex-col flex-grow">
 				{#each items as item}
-					{#if item.contents.length}
-						<div class="w-full overflow-hidden">
-							<div class="min-w-[300px] flex flex-col">
-								<button
-									class="flex items-center gap-4 cursor-pointer {item.isOpen
-										? 'bg-slate-100'
-										: 'hover:bg-slate-100'}"
-									on:click={() => (item.isOpen = !item.isOpen)}
+					{#if item.isVisible}
+						{#if item.contents.length}
+							<div class="w-full overflow-hidden">
+								<div class="min-w-[300px] flex flex-col">
+									<button
+										class="flex items-center gap-4 cursor-pointer {item.isOpen
+											? 'bg-slate-100'
+											: 'hover:bg-slate-100'}"
+										on:click={() => (item.isOpen = !item.isOpen)}
+									>
+										<div class="w-[60px] h-[60px] flex-center">
+											<i class="{item.icon} text-xl" />
+										</div>
+										<p class="flex-grow">{item.label}</p>
+										<div class="w-[60px] h-[60px] flex-center">
+											<i
+												class="ti ti-chevron-{item.isOpen
+													? 'up'
+													: 'down'} text-xl"
+											/>
+										</div>
+									</button>
+								</div>
+							</div>
+							{#if !$isOpen && $isSMUp}
+								<Tooltip
+									class="text-xs whitespace-nowrap"
+									color="light"
+									placement="right"
+								>
+									{item.label}
+								</Tooltip>
+							{/if}
+							{#if item.isOpen}
+								{#each item.contents as content}
+									<div class="w-full overflow-hidden">
+										<a
+											class="min-w-[300px] flex items-center gap-4 cursor-pointer {$page.route.id?.match(
+												content.location,
+											)
+												? 'bg-blue-600 text-white'
+												: 'bg-gray-200 hover:bg-gray-300'}"
+											href={content.location}
+											on:click={handleClick}
+										>
+											<div class="w-[60px] h-[60px] flex-center">
+												<i class="{content.icon} text-xl" />
+											</div>
+											<p>{content.label}</p>
+										</a>
+									</div>
+									{#if !$isOpen && $isSMUp}
+										<Tooltip
+											class="text-xs whitespace-nowrap"
+											color="light"
+											placement="right"
+										>
+											{content.label}
+										</Tooltip>
+									{/if}
+								{/each}
+							{/if}
+						{:else}
+							<div class="w-full overflow-hidden">
+								<a
+									class="min-w-[300px] flex items-center gap-4 cursor-pointer {$page.route.id?.match(
+										item.location,
+									)
+										? 'bg-blue-600 text-white'
+										: 'hover:bg-gray-100'}"
+									href={item.location}
+									on:click={handleClick}
 								>
 									<div class="w-[60px] h-[60px] flex-center">
 										<i class="{item.icon} text-xl" />
 									</div>
-									<p class="flex-grow">{item.label}</p>
-									<div class="w-[60px] h-[60px] flex-center">
-										<i
-											class="ti ti-chevron-{item.isOpen
-												? 'up'
-												: 'down'} text-xl"
-										/>
-									</div>
-								</button>
+									<p>{item.label}</p>
+								</a>
 							</div>
-						</div>
-						{#if !$isOpen && $isSMUp}
-							<Tooltip
-								class="text-xs whitespace-nowrap"
-								color="light"
-								placement="right"
-							>
-								{item.label}
-							</Tooltip>
-						{/if}
-						{#if item.isOpen}
-							{#each item.contents as content}
-								<div class="w-full overflow-hidden">
-									<a
-										class="min-w-[300px] flex items-center gap-4 cursor-pointer {$page.route.id?.match(
-											content.location,
-										)
-											? 'bg-blue-600 text-white'
-											: 'bg-gray-200 hover:bg-gray-300'}"
-										href={content.location}
-										on:click={handleClick}
-									>
-										<div class="w-[60px] h-[60px] flex-center">
-											<i class="{content.icon} text-xl" />
-										</div>
-										<p>{content.label}</p>
-									</a>
-								</div>
-								{#if !$isOpen && $isSMUp}
-									<Tooltip
-										class="text-xs whitespace-nowrap"
-										color="light"
-										placement="right"
-									>
-										{content.label}
-									</Tooltip>
-								{/if}
-							{/each}
-						{/if}
-					{:else}
-						<div class="w-full overflow-hidden">
-							<a
-								class="min-w-[300px] flex items-center gap-4 cursor-pointer {$page.route.id?.match(
-									item.location,
-								)
-									? 'bg-blue-600 text-white'
-									: 'hover:bg-gray-100'}"
-								href={item.location}
-								on:click={handleClick}
-							>
-								<div class="w-[60px] h-[60px] flex-center">
-									<i class="{item.icon} text-xl" />
-								</div>
-								<p>{item.label}</p>
-							</a>
-						</div>
-						{#if !$isOpen && $isSMUp}
-							<Tooltip
-								class="text-xs whitespace-nowrap"
-								color="light"
-								placement="right"
-							>
-								{item.label}
-							</Tooltip>
+							{#if !$isOpen && $isSMUp}
+								<Tooltip
+									class="text-xs whitespace-nowrap"
+									color="light"
+									placement="right"
+								>
+									{item.label}
+								</Tooltip>
+							{/if}
 						{/if}
 					{/if}
 				{/each}
@@ -221,16 +233,24 @@
 				on:click={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
 			>
 				<div bind:this={parentEl} class="w-[60px] h-[60px] flex-center">
-					<div class="rounded-full border-[2px] border-blue-600 p-[2px]">
+					<div
+						class="rounded-full border-[2px] p-[2px] {$page.route.id?.match(
+							'/app/account',
+						)
+							? 'border-white'
+							: 'border-blue-600'}"
+					>
 						<div
 							class="bg-gray-100 w-[35px] h-[35px] rounded-full bg-cover bg-center"
-							style="background-image: url({NoImagePNG})"
+							style="background-image: url({$account.avatar || NoImagePNG})"
 						/>
 					</div>
 				</div>
 				<div class="flex-grow">
-					<p class="text-[10px] leading-none">Admin</p>
-					<p>Elon Musk</p>
+					<p class="text-[10px] leading-none capitalize">{$account.account_type}</p>
+					<p class="text-ellipsis overflow-hidden whitespace-nowrap max-w-[140px]">
+						{$account.full_name}
+					</p>
 				</div>
 				<div class="w-[60px] h-[60px] flex-center">
 					<i class="ti ti-dots" />

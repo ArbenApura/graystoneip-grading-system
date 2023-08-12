@@ -8,6 +8,8 @@ import { mediaStates } from './states';
 
 // UTILS
 export const updateMedia = () => {
+	if (get(isInitialized)) return;
+
 	const winWidth = window.innerWidth;
 
 	mediaStates.isXS.set(winWidth < breakpoints.sm);

@@ -4,6 +4,8 @@
 	import StudentsPNG from '$assets/storysets/Learning-cuate.png';
 	import CoursesPNG from '$assets/storysets/Learning-rafiki.png';
 	import ProgramsPNG from '$assets/storysets/Learning-bro.png';
+	// IMPORTED LIB-UTILS
+	import { page } from '$app/stores';
 	// IMPORTED STATES
 	import { isMD, isXL } from '$stores/mediaStates';
 	import { isOpen } from '$stores/sidebarStates';
@@ -18,28 +20,28 @@
 	<a class="item" href="/app/master-list/professors">
 		<img src={ProgessorsPNG} alt="" />
 		<div class="details">
-			<p>12</p>
+			<p>{$page.data.professorsCount || 0}</p>
 			<p>Professors</p>
 		</div>
 	</a>
 	<a class="item" href="/app/master-list/students">
 		<img src={StudentsPNG} alt="" />
 		<div class="details">
-			<p>100</p>
+			<p>{$page.data.studentsCount || 0}</p>
 			<p>Students</p>
 		</div>
 	</a>
 	<a class="item" href="/app/curriculum/courses">
 		<img src={CoursesPNG} alt="" />
 		<div class="details">
-			<p>30</p>
+			<p>{$page.data.coursesCount || 0}</p>
 			<p>Courses</p>
 		</div>
 	</a>
 	<a class="item" href="/app/curriculum/programs">
 		<img src={ProgramsPNG} alt="" />
 		<div class="details">
-			<p>10</p>
+			<p>{$page.data.programsCount || 0}</p>
 			<p>Programs</p>
 		</div>
 	</a>

@@ -1,8 +1,21 @@
 <script lang="ts">
 	// IMPORTED TYPES
 	import type { Course } from '$types/index';
-	// IMPORTED STATES
-	import { isSMDown } from '$stores/mediaStates';
+	// IMPORTED LIB-UTILS
+	import { onMount } from 'svelte';
+	// IMPORTED UTILS
+	import { generateId } from '$utils/helpers';
+	import {
+		createConfirmationModal,
+		createCustomModal,
+		createErrorModal,
+		createLoadingModal,
+		createSuccessModal,
+		createVerificationModal,
+		removeCustomModal,
+		removeModal,
+	} from '$stores/modalStates';
+	import { deleteCourse, selectCourses } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		FloatingLabelInput,
@@ -16,77 +29,71 @@
 	import CourseAdderModal from './components/CourseAdderModal.svelte';
 	import CourseEditorModal from './components/CourseEditorModal.svelte';
 	import Table from '$components/modules/Table.svelte';
+	// IMPORTED STATES
+	import { isSMDown } from '$stores/mediaStates';
+
+	// PROPS
+	export let data: any;
 
 	// STATES
-	let courses: Course[] = [
-		{
-			id: '1',
-			code: 'IT 102',
-			prerequisite: '',
-			description: 'Introduction to Computing',
-			hours: 3,
-			units: 3,
-			createdAt: Date.now(),
-		},
-		{
-			id: '2',
-			code: 'IT 103',
-			prerequisite: '',
-			description: 'Computer Programming 1',
-			hours: 5,
-			units: 3,
-			createdAt: Date.now(),
-		},
-		{
-			id: '3',
-			code: 'IT 104',
-			prerequisite: '',
-			description: 'Hardware System and Servicing',
-			hours: 5,
-			units: 3,
-			createdAt: Date.now(),
-		},
-		{
-			id: '4',
-			code: 'RPH 101',
-			prerequisite: '',
-			description: 'Reading in Philippine History',
-			hours: 3,
-			units: 3,
-			createdAt: Date.now(),
-		},
-		{
-			id: '5',
-			code: 'AAP 101',
-			prerequisite: '',
-			description: 'Art Appreciation',
-			hours: 3,
-			units: 3,
-			createdAt: Date.now(),
-		},
-		{
-			id: '6',
-			code: 'STS 101',
-			prerequisite: '',
-			description: 'Science, Technology and Society',
-			hours: 3,
-			units: 3,
-			createdAt: Date.now(),
-		},
-	];
+	let courses: Course[] = [];
 	let filteredItems: Course[];
 	let startingItem = 0;
+	let search = '';
+	let isLoading = false;
+
+	// MODAL STATES
+	let modalId = generateId();
 	let modals = { adder: false, editor: false };
 	let target: Course | null = null;
 
-	// UTILS
-	const openAdderModal = () => (modals.adder = true);
-	const closeAdderModal = () => (modals.adder = false);
+	// MODAL UTILS
+	const openAdderModal = () => {
+		modals.adder = true;
+		createCustomModal(modalId);
+	};
+	const closeAdderModal = () => {
+		modals.adder = false;
+		removeCustomModal(modalId);
+	};
 	const openEditorModal = (course: Course) => {
+		createCustomModal(modalId);
 		modals.editor = true;
 		target = course;
 	};
-	const closeEditorModal = () => (modals.editor = false);
+	const closeEditorModal = () => {
+		modals.editor = false;
+		removeCustomModal(modalId);
+	};
+
+	// UTILS
+	const handleSearch = async () => {
+		isLoading = true;
+		try {
+			courses = await selectCourses(search);
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		isLoading = false;
+	};
+	const handleDelete = async (id: string) => {
+		isLoading = true;
+		const modalId = createLoadingModal({ message: 'Deleting course...' });
+		try {
+			await deleteCourse(id);
+			await handleSearch();
+			createSuccessModal({ message: 'Course was deleted successfully!' });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		removeModal(modalId);
+		isLoading = false;
+	};
+
+	// LIFECYCLES
+	onMount(() => {
+		if (data.courses) courses = data.courses;
+	});
 </script>
 
 <Header
@@ -95,22 +102,31 @@
 		{ label: 'Courses', href: '/app/curriculum/courses' },
 	]}
 />
-
 {#if modals.adder}
-	<CourseAdderModal handleClose={closeAdderModal} />
+	<CourseAdderModal handleClose={closeAdderModal} {handleSearch} />
 {/if}
 {#if target}
 	{#if modals.editor}
-		<CourseEditorModal course={target} handleClose={closeEditorModal} />
+		<CourseEditorModal course={target} handleClose={closeEditorModal} {handleSearch} />
 	{/if}
 {/if}
 
 <div class="p-4 pt-0 flex flex-col gap-4">
 	<div class="flex items-center justify-between">
-		<div class="search w-full md:w-[50%] bg-white rounded-md shadow-md p-2 flex gap-2">
-			<FloatingLabelInput style="outlined" type="text" label="Search..." />
-			<Button class="w-[48px] h-[48px]"><i class="ti ti-search text-xl" /></Button>
-		</div>
+		<form
+			class="search w-full md:w-[50%] bg-white rounded-md shadow-md p-2 flex gap-2"
+			on:submit|preventDefault={handleSearch}
+		>
+			<FloatingLabelInput
+				style="outlined"
+				type="text"
+				label="Search Codes..."
+				bind:value={search}
+			/>
+			<Button class="w-[48px] h-[48px]" type="submit" disabled={isLoading}>
+				<i class="ti ti-search text-xl" />
+			</Button>
+		</form>
 		<Button
 			class={`w-[48px] h-[48px] shadow-md ${
 				$isSMDown && 'fixed bottom-[16px] right-[16px] z-20'
@@ -125,7 +141,6 @@
 		<svelte:fragment slot="table-head">
 			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
 			<TableHeadCell>Code</TableHeadCell>
-			<TableHeadCell>Prerequisite</TableHeadCell>
 			<TableHeadCell>Description</TableHeadCell>
 			<TableHeadCell>Units</TableHeadCell>
 			<TableHeadCell>Hours</TableHeadCell>
@@ -138,11 +153,10 @@
 					<TableBodyRow>
 						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
 						<TableBodyCell>{item.code}</TableBodyCell>
-						<TableBodyCell>{item.prerequisite || 'None'}</TableBodyCell>
 						<TableBodyCell>{item.description}</TableBodyCell>
 						<TableBodyCell>{item.units}</TableBodyCell>
 						<TableBodyCell>{item.hours}</TableBodyCell>
-						<TableBodyCell>{new Date(item.createdAt).toDateString()}</TableBodyCell>
+						<TableBodyCell>{new Date(item.created_at).toDateString()}</TableBodyCell>
 						<TableBodyCell class="flex gap-2">
 							<Button
 								class="w-[25px] h-[25px] flex-center"
@@ -150,6 +164,20 @@
 								on:click={() => openEditorModal(item)}
 							>
 								<i class="ti ti-pencil text-sm" />
+							</Button>
+							<Button
+								class="w-[25px] h-[25px] flex-center"
+								color="red"
+								on:click={() =>
+									createConfirmationModal({
+										message: 'Are you sure you want to delete this course?',
+										handleProceed: () =>
+											createVerificationModal({
+												handleProceed: () => handleDelete(item.id),
+											}),
+									})}
+							>
+								<i class="ti ti-trash text-sm" />
 							</Button>
 						</TableBodyCell>
 					</TableBodyRow>
