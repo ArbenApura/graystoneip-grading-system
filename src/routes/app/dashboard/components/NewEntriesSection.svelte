@@ -1,13 +1,40 @@
 <script lang="ts">
 	// IMPORTED LIB-COMPONENTS
 	import { Badge, Select } from 'flowbite-svelte';
+	// IMPORTED LIB-UTILS
+	import { page } from '$app/stores';
+	// IMPORTED UTILS
+	import { createErrorModal } from '$stores/modalStates';
+	import {
+		getCoursesCount,
+		getProfessorsCount,
+		getProgramsCount,
+		getStudentsCount,
+	} from '$utils/supabase';
 
 	// STATES
-	const timeSpans = [
-		{ name: 'This week', value: 'week' },
-		{ name: 'This month', value: 'month' },
-		{ name: 'This year', value: 'year' },
-	];
+	let span = 'week';
+	let professors = $page.data.professorsCountWeek;
+	let students = $page.data.studentsCountWeek;
+	let courses = $page.data.coursesCountWeek;
+	let programs = $page.data.programsCountWeek;
+	let isLoading = false;
+
+	// UTILS
+	const handleChange = async () => {
+		isLoading = true;
+		try {
+			await Promise.all([
+				(professors = await getProfessorsCount(span)),
+				(students = await getStudentsCount(span)),
+				(courses = await getCoursesCount(span)),
+				(programs = await getProgramsCount(span)),
+			]);
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		isLoading = false;
+	};
 </script>
 
 <div class="bg-white rounded-md shadow-md w-full p-4 flex flex-col gap-4">
@@ -19,10 +46,16 @@
 			<p class="text-sm whitespace-nowrap">New Entries</p>
 		</div>
 		<Select
+			bind:value={span}
+			on:change={handleChange}
 			class="max-w-[150px]"
 			placeholder="Choose time span..."
-			items={timeSpans}
-			value="month"
+			items={[
+				{ name: 'This week', value: 'week' },
+				{ name: 'This month', value: 'month' },
+				{ name: 'This year', value: 'year' },
+			]}
+			disabled={isLoading}
 		/>
 	</div>
 	<hr />
@@ -33,7 +66,7 @@
 			</Badge>
 			<div class="details">
 				<p>New Professors</p>
-				<p>+ 12</p>
+				<p>+ {professors}</p>
 			</div>
 		</a>
 		<a class="item bg-red-500 hover:bg-red-600" href="/app/master-list/students">
@@ -42,7 +75,7 @@
 			</Badge>
 			<div class="details">
 				<p>New Students</p>
-				<p>+ 100</p>
+				<p>+ {students}</p>
 			</div>
 		</a>
 		<a class="item bg-yellow-300 hover:bg-yellow-400" href="/app/curriculum/courses">
@@ -51,7 +84,7 @@
 			</Badge>
 			<div class="details">
 				<p>New Courses</p>
-				<p>+ 30</p>
+				<p>+ {courses}</p>
 			</div>
 		</a>
 		<a class="item bg-green-500 hover:bg-green-600" href="/app/curriculum/programs">
@@ -60,7 +93,7 @@
 			</Badge>
 			<div class="details">
 				<p>New Programs</p>
-				<p>+ 10</p>
+				<p>+ {programs}</p>
 			</div>
 		</a>
 	</div>

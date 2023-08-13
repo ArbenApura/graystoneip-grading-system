@@ -130,7 +130,7 @@
 		data-is-minimized={!$isOpen && $isSMUp}
 		data-is-maximized={$isOpen && $isSMUp}
 	>
-		<div class="h-full max-h-[calc(100vh-120px)] overflow-y-auto">
+		<div class="h-full max-h-[calc(100%-120px)] overflow-y-auto">
 			<div class="flex flex-col flex-grow">
 				{#each items as item}
 					{#if item.isVisible}

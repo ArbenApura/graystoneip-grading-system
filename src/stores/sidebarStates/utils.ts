@@ -23,7 +23,7 @@ export const loadData = async () => {
 	if (!encrypted) return;
 	const decrypted = decrypt(encrypted);
 	if (!decrypted) return;
-	const { isOpen } = decrypted;
+	const { isOpen } = JSON.parse(decrypted);
 	sidebarStates.isOpen.set(isOpen);
 };
 export const initializeSidebarStates = () => {

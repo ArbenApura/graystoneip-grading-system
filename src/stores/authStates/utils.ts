@@ -9,7 +9,6 @@ import { selectAccountByEmailAndPassword } from '$utils/supabase';
 import { decrypt, encrypt } from '$utils/helpers';
 // IMPORTED STATES
 import { DEFAULT_ACCOUNT, authStates } from './states';
-import { isInitialized } from '..';
 
 // UTILS
 export const login = async (email: string, password: string) => {
@@ -27,17 +26,26 @@ export const logout = async () => {
 };
 export const saveData = () => {
 	if (typeof localStorage === 'undefined') return;
-	const account = get(authStates.account);
-	const authHash = encrypt(account);
-	localStorage.setItem('authHash', authHash);
+	const encrypted = encrypt(
+		JSON.stringify({
+			account: get(authStates.account),
+		}),
+	);
+	localStorage.setItem('authStates', encrypted);
 };
 export const loadData = async () => {
-	if (typeof localStorage === 'undefined') return;
-	const authHash = localStorage.getItem('authHash');
-	if (!authHash) return;
-	const { email, password } = decrypt(authHash) as Account;
-	if (!email || !password) return;
-	await login(email, password);
+	try {
+		if (typeof localStorage === 'undefined') return;
+		const encrypted = localStorage.getItem('authStates');
+		if (!encrypted) return;
+		const decrypted = decrypt(encrypted);
+		if (!decrypted) return;
+		const { account } = JSON.parse(decrypted);
+		if (!account) return;
+		await login(account.email, account.password);
+	} catch {
+		await logout();
+	}
 };
 export const observeRoute = async () => {
 	const isLogined = get(authStates.isLogined);

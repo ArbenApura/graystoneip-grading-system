@@ -6,7 +6,7 @@
 	import NProgress from 'nprogress';
 	// IMPORTED UTILS
 	import { initializeStores, isInitialized } from '$stores/index';
-	import { account, isLogined } from '$stores/authStates';
+	import { account, isLogined, observeRoute } from '$stores/authStates';
 	import { updateMedia, windowWidth } from '$stores/mediaStates';
 	// IMPORTED COMPONENTS
 	import ModalContainer from '$components/layouts/ModalContainer.svelte';
@@ -25,6 +25,7 @@
 	// LIFECYCLES
 	onMount(async () => {
 		await initializeStores();
+		await observeRoute();
 		setTimeout(() => {
 			updateMedia();
 			const loaderEl = document.querySelector('#loader');

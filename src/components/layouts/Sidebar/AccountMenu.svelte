@@ -2,6 +2,9 @@
 	// IMPORTED LIB-UTILS
 	import { onDestroy } from 'svelte';
 	import { createPopper } from '@popperjs/core';
+	// IMPORTED UTILS
+	import { createConfirmationModal } from '$stores/modalStates';
+	import { logout } from '$stores/authStates';
 
 	// PROPS
 	export let parentEl: HTMLElement,
@@ -26,6 +29,13 @@
 	const handleMenuClick = () => {
 		handleClick();
 		setIsOpen(false);
+	};
+	const handleLogout = () => {
+		handleClick();
+		createConfirmationModal({
+			message: 'Are you sure you want to logout?',
+			handleProceed: logout,
+		});
 	};
 
 	// LIFECYCLES
@@ -53,7 +63,7 @@
 		<a
 			class="w-full flex items-center gap-4 cursor-pointer hover:bg-gray-100"
 			href="/"
-			on:click={handleMenuClick}
+			on:click={handleLogout}
 		>
 			<div class="w-[60px] h-[60px] flex-center">
 				<i class="ti ti-logout text-xl" />

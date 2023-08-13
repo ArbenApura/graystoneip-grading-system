@@ -10,11 +10,9 @@ export const isInitialized = writable<boolean>(false);
 export const stores = { isInitialized };
 
 // UTILS
-export const initializeStores = async (isSSR = false) => {
+export const initializeStores = async () => {
 	await initializeAuthStates();
 	initializeMediaStates();
 	initializeSidebarStates();
-	setTimeout(() => {
-		if (!isSSR) isInitialized.set(true);
-	}, 500);
+	setTimeout(() => isInitialized.set(true), 500);
 };
