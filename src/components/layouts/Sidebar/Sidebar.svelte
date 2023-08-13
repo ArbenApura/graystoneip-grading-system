@@ -91,7 +91,7 @@
 			icon: 'ti ti-archive',
 			location: '',
 			isOpen: false,
-			isVisible: true,
+			isVisible: $account.account_type === 'admin',
 			contents: [
 				{
 					label: 'Professors',
