@@ -234,7 +234,11 @@
 										on:click={() => (item.isOpen = !item.isOpen)}
 									>
 										<div class="w-[60px] h-[60px] flex-center">
-											<i class="{item.icon} text-xl" />
+											<i
+												class="{item.isOpen
+													? 'ti ti-x'
+													: item.icon} text-xl"
+											/>
 										</div>
 										<p class="flex-grow">{item.label}</p>
 										<div class="w-[60px] h-[60px] flex-center">

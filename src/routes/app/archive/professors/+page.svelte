@@ -1,4 +1,6 @@
 <script lang="ts">
+	// IMPORTED ASSETS
+	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED TYPES
 	import type { Account } from '$types/index';
 	// IMPORTED LIB-UTILS
@@ -92,6 +94,7 @@
 	<Table items={professors} bind:filteredItems bind:startingItem>
 		<svelte:fragment slot="table-head">
 			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
+			<TableHeadCell>Avatar</TableHeadCell>
 			<TableHeadCell>Last Name</TableHeadCell>
 			<TableHeadCell>First Name</TableHeadCell>
 			<TableHeadCell>Middle Name</TableHeadCell>
@@ -105,6 +108,14 @@
 				{#each filteredItems as item, i}
 					<TableBodyRow>
 						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
+						<TableBodyCell>
+							<div class="rounded-full border-[2px] p-[2px] w-fit border-blue-600">
+								<div
+									class="bg-gray-100 w-[35px] h-[35px] rounded-full bg-cover bg-center"
+									style="background-image: url({item.avatar || NoImagePNG})"
+								/>
+							</div>
+						</TableBodyCell>
 						<TableBodyCell>{item.last_name}</TableBodyCell>
 						<TableBodyCell>{item.first_name}</TableBodyCell>
 						<TableBodyCell>{item.middle_name}</TableBodyCell>
