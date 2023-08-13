@@ -496,4 +496,7 @@
 	* {
 		@apply leading-loose;
 	}
+	p {
+		@apply text-sm;
+	}
 </style>
