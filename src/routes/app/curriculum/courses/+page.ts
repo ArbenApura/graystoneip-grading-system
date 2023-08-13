@@ -4,6 +4,6 @@ import type { PageLoad } from './$types';
 import { selectCourses } from '$utils/supabase';
 
 export const load = (async () => {
-	const courses = await selectCourses();
+	const courses = await selectCourses({});
 	return { courses };
 }) satisfies PageLoad;

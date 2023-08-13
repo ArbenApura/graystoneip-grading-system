@@ -4,6 +4,6 @@ import type { PageLoad } from './$types';
 import { selectPrograms } from '$utils/supabase';
 
 export const load = (async () => {
-	const programs = await selectPrograms({});
+	const programs = await selectPrograms({ is_archived: true });
 	return { programs };
 }) satisfies PageLoad;

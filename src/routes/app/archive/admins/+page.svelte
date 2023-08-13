@@ -4,18 +4,15 @@
 	// IMPORTED LIB-UTILS
 	import { onMount } from 'svelte';
 	// IMPORTED UTILS
-	import { generateId } from '$utils/helpers';
 	import {
 		createConfirmationModal,
-		createCustomModal,
 		createErrorModal,
 		createLoadingModal,
 		createSuccessModal,
 		createVerificationModal,
-		removeCustomModal,
 		removeModal,
 	} from '$stores/modalStates';
-	import { archiveAccount, selectAccounts } from '$utils/supabase';
+	import { unarchiveAccount, selectAccounts } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		FloatingLabelInput,
@@ -26,63 +23,35 @@
 	} from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
-	import StudentAdderModal from './components/StudentAdderModal.svelte';
-	import StudentEditorModal from './components/StudentEditorModal.svelte';
 	import Table from '$components/modules/Table.svelte';
-	// IMPORTED STATES
-	import { isSMDown } from '$stores/mediaStates';
 
 	// PROPS
 	export let data: any;
 
 	// STATES
-	let students: Account[] = [];
+	let admins: Account[] = [];
 	let filteredItems: Account[];
 	let startingItem = 0;
 	let search = '';
 	let isLoading = false;
 
-	// MODAL STATES
-	let modalId = generateId();
-	let modals = { adder: false, editor: false };
-	let target: Account | null = null;
-
-	// MODAL UTILS
-	const openAdderModal = () => {
-		modals.adder = true;
-		createCustomModal(modalId);
-	};
-	const closeAdderModal = () => {
-		modals.adder = false;
-		removeCustomModal(modalId);
-	};
-	const openEditorModal = (account: Account) => {
-		createCustomModal(modalId);
-		modals.editor = true;
-		target = account;
-	};
-	const closeEditorModal = () => {
-		modals.editor = false;
-		removeCustomModal(modalId);
-	};
-
 	// UTILS
 	const handleSearch = async () => {
 		isLoading = true;
 		try {
-			students = await selectAccounts({ type: 'student', search });
+			admins = await selectAccounts({ type: 'admin', search, is_archived: true });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
 		isLoading = false;
 	};
-	const handleArchive = async (id: string) => {
+	const handleRecover = async (id: string) => {
 		isLoading = true;
-		const modalId = createLoadingModal({ message: 'Deleting student account...' });
+		const modalId = createLoadingModal({ message: 'Unarchiving admin account...' });
 		try {
-			await archiveAccount(id);
+			await unarchiveAccount(id);
 			await handleSearch();
-			createSuccessModal({ message: 'Student account was archived successfully!' });
+			createSuccessModal({ message: 'Admin account was unarchived successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -92,25 +61,16 @@
 
 	// LIFECYCLES
 	onMount(() => {
-		if (data.students) students = data.students;
+		if (data.admins) admins = data.admins;
 	});
 </script>
 
 <Header
 	breadcrumbItems={[
-		{ icon: 'ph-bold ph-user-list', label: 'Master List', href: '' },
-		{ label: 'Students', href: '/app/master-list/students' },
+		{ icon: 'ti ti-archive', label: 'Archive', href: '' },
+		{ label: 'Admins', href: '/app/archive/admins' },
 	]}
 />
-
-{#if modals.adder}
-	<StudentAdderModal handleClose={closeAdderModal} {handleSearch} />
-{/if}
-{#if target}
-	{#if modals.editor}
-		<StudentEditorModal account={target} handleClose={closeEditorModal} {handleSearch} />
-	{/if}
-{/if}
 
 <div class="p-4 pt-0 flex flex-col gap-4">
 	<div class="flex items-center justify-between">
@@ -128,17 +88,8 @@
 				<i class="ti ti-search text-xl" />
 			</Button>
 		</form>
-		<Button
-			class={`w-[48px] h-[48px] shadow-md ${
-				$isSMDown && 'fixed bottom-[16px] right-[16px] z-20'
-			}`}
-			pill={true}
-			on:click={openAdderModal}
-		>
-			<i class="ti ti-plus text-xl" />
-		</Button>
 	</div>
-	<Table items={students} bind:filteredItems bind:startingItem>
+	<Table items={admins} bind:filteredItems bind:startingItem>
 		<svelte:fragment slot="table-head">
 			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
 			<TableHeadCell>Last Name</TableHeadCell>
@@ -163,25 +114,17 @@
 						<TableBodyCell class="flex gap-2">
 							<Button
 								class="w-[25px] h-[25px] flex-center"
-								color="green"
-								on:click={() => openEditorModal(item)}
-							>
-								<i class="ti ti-pencil text-sm" />
-							</Button>
-							<Button
-								class="w-[25px] h-[25px] flex-center"
-								color="red"
 								on:click={() =>
 									createConfirmationModal({
 										message:
-											'Are you sure you want to archive this student account?',
+											'Are you sure you want to unarchive this admin account?',
 										handleProceed: () =>
 											createVerificationModal({
-												handleProceed: () => handleArchive(item.id),
+												handleProceed: () => handleRecover(item.id),
 											}),
 									})}
 							>
-								<i class="ti ti-archive text-sm" />
+								<i class="ti ti-archive-off text-sm" />
 							</Button>
 						</TableBodyCell>
 					</TableBodyRow>

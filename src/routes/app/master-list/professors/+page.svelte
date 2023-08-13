@@ -15,7 +15,7 @@
 		removeCustomModal,
 		removeModal,
 	} from '$stores/modalStates';
-	import { deleteAccount, selectAccounts } from '$utils/supabase';
+	import { archiveAccount, selectAccounts } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		FloatingLabelInput,
@@ -76,13 +76,13 @@
 		}
 		isLoading = false;
 	};
-	const handleDelete = async (id: string) => {
+	const handleArchive = async (id: string) => {
 		isLoading = true;
 		const modalId = createLoadingModal({ message: 'Deleting professor account...' });
 		try {
-			await deleteAccount(id);
+			await archiveAccount(id);
 			await handleSearch();
-			createSuccessModal({ message: 'Professor account was deleted successfully!' });
+			createSuccessModal({ message: 'Professor account was archived successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -174,14 +174,14 @@
 								on:click={() =>
 									createConfirmationModal({
 										message:
-											'Are you sure you want to delete this professor account?',
+											'Are you sure you want to archive this professor account?',
 										handleProceed: () =>
 											createVerificationModal({
-												handleProceed: () => handleDelete(item.id),
+												handleProceed: () => handleArchive(item.id),
 											}),
 									})}
 							>
-								<i class="ti ti-trash text-sm" />
+								<i class="ti ti-archive text-sm" />
 							</Button>
 						</TableBodyCell>
 					</TableBodyRow>

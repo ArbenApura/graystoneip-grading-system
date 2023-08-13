@@ -4,18 +4,15 @@
 	// IMPORTED LIB-UTILS
 	import { onMount } from 'svelte';
 	// IMPORTED UTILS
-	import { generateId } from '$utils/helpers';
 	import {
 		createConfirmationModal,
-		createCustomModal,
 		createErrorModal,
 		createLoadingModal,
 		createSuccessModal,
 		createVerificationModal,
-		removeCustomModal,
 		removeModal,
 	} from '$stores/modalStates';
-	import { archiveProgram, selectPrograms } from '$utils/supabase';
+	import { unarchiveProgram, selectPrograms } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		FloatingLabelInput,
@@ -26,11 +23,7 @@
 	} from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
-	import ProgramAdderModal from './components/ProgramAdderModal.svelte';
-	import ProgramEditorModal from './components/ProgramEditorModal.svelte';
 	import Table from '$components/modules/Table.svelte';
-	// IMPORTED STATES
-	import { isSMDown } from '$stores/mediaStates';
 
 	// PROPS
 	export let data: any;
@@ -42,35 +35,11 @@
 	let search = '';
 	let isLoading = false;
 
-	// MODAL STATES
-	let modalId = generateId();
-	let modals = { adder: false, editor: false };
-	let target: Program | null = null;
-
-	// MODAL UTILS
-	const openAdderModal = () => {
-		modals.adder = true;
-		createCustomModal(modalId);
-	};
-	const closeAdderModal = () => {
-		modals.adder = false;
-		removeCustomModal(modalId);
-	};
-	const openEditorModal = (program: Program) => {
-		createCustomModal(modalId);
-		modals.editor = true;
-		target = program;
-	};
-	const closeEditorModal = () => {
-		modals.editor = false;
-		removeCustomModal(modalId);
-	};
-
 	// UTILS
 	const handleSearch = async () => {
 		isLoading = true;
 		try {
-			programs = await selectPrograms({ search });
+			programs = await selectPrograms({ search, is_archived: true });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -78,11 +47,11 @@
 	};
 	const handleArchive = async (id: string) => {
 		isLoading = true;
-		const modalId = createLoadingModal({ message: 'Archiving program...' });
+		const modalId = createLoadingModal({ message: 'Unarchiving program...' });
 		try {
-			await archiveProgram(id);
+			await unarchiveProgram(id);
 			await handleSearch();
-			createSuccessModal({ message: 'Program was archived successfully!' });
+			createSuccessModal({ message: 'Program was unarchived successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -98,18 +67,10 @@
 
 <Header
 	breadcrumbItems={[
-		{ icon: 'ti ti-list-details', label: 'Curriculum', href: '' },
-		{ label: 'Programs', href: '/app/curriculum/programs' },
+		{ icon: 'ti ti-archive', label: 'Archive', href: '' },
+		{ label: 'Programs', href: '/app/archive/programs' },
 	]}
 />
-{#if modals.adder}
-	<ProgramAdderModal handleClose={closeAdderModal} {handleSearch} />
-{/if}
-{#if target}
-	{#if modals.editor}
-		<ProgramEditorModal program={target} handleClose={closeEditorModal} {handleSearch} />
-	{/if}
-{/if}
 
 <div class="p-4 pt-0 flex flex-col gap-4">
 	<div class="flex items-center justify-between">
@@ -127,15 +88,6 @@
 				<i class="ti ti-search text-xl" />
 			</Button>
 		</form>
-		<Button
-			class={`w-[48px] h-[48px] shadow-md ${
-				$isSMDown && 'fixed bottom-[16px] right-[16px] z-20'
-			}`}
-			pill={true}
-			on:click={openAdderModal}
-		>
-			<i class="ti ti-plus text-xl" />
-		</Button>
 	</div>
 	<Table items={programs} bind:filteredItems bind:startingItem>
 		<svelte:fragment slot="table-head">
@@ -156,17 +108,9 @@
 						<TableBodyCell class="flex gap-2">
 							<Button
 								class="w-[25px] h-[25px] flex-center"
-								color="green"
-								on:click={() => openEditorModal(item)}
-							>
-								<i class="ti ti-pencil text-sm" />
-							</Button>
-							<Button
-								class="w-[25px] h-[25px] flex-center"
-								color="red"
 								on:click={() =>
 									createConfirmationModal({
-										message: 'Are you sure you want to archive this program?',
+										message: 'Are you sure you want to unarchive this program?',
 										handleProceed: () =>
 											createVerificationModal({
 												handleProceed: () => handleArchive(item.id),

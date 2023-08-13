@@ -22,6 +22,7 @@ export interface Database {
           full_name: string | null
           gender: string | null
           id: string
+          is_archived: boolean | null
           last_name: string | null
           middle_name: string | null
           password: string | null
@@ -38,6 +39,7 @@ export interface Database {
           full_name?: string | null
           gender?: string | null
           id: string
+          is_archived?: boolean | null
           last_name?: string | null
           middle_name?: string | null
           password?: string | null
@@ -54,6 +56,7 @@ export interface Database {
           full_name?: string | null
           gender?: string | null
           id?: string
+          is_archived?: boolean | null
           last_name?: string | null
           middle_name?: string | null
           password?: string | null
@@ -67,6 +70,7 @@ export interface Database {
           description: string | null
           hours: number | null
           id: string
+          is_archived: boolean | null
           units: number | null
         }
         Insert: {
@@ -75,6 +79,7 @@ export interface Database {
           description?: string | null
           hours?: number | null
           id: string
+          is_archived?: boolean | null
           units?: number | null
         }
         Update: {
@@ -83,6 +88,7 @@ export interface Database {
           description?: string | null
           hours?: number | null
           id?: string
+          is_archived?: boolean | null
           units?: number | null
         }
         Relationships: []
@@ -93,18 +99,21 @@ export interface Database {
           created_at: number
           description: string | null
           id: string
+          is_archived: boolean | null
         }
         Insert: {
           code?: string | null
           created_at: number
           description?: string | null
           id: string
+          is_archived?: boolean | null
         }
         Update: {
           code?: string | null
           created_at?: number
           description?: string | null
           id?: string
+          is_archived?: boolean | null
         }
         Relationships: []
       }

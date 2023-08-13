@@ -10,15 +10,28 @@ export const insertProgram = async (program: Program) => {
 	const { error } = await supabase.from('programs').insert(program);
 	if (error) throw new Error(error.message);
 };
-export const selectPrograms = async (search: string = '') => {
-	let query = supabase.from('programs').select();
+export const selectPrograms = async ({
+	search,
+	is_archived,
+}: {
+	search?: string;
+	is_archived?: boolean;
+}) => {
+	let query = supabase
+		.from('programs')
+		.select()
+		.eq('is_archived', typeof is_archived === 'undefined' ? false : is_archived);
 	if (search) query.ilike('code', `%${search}%`);
 	const { data, error } = await query;
 	if (error) throw new Error(error.message);
 	return (data as Program[]) || [];
 };
-export const deleteProgram = async (id: string) => {
-	const { error } = await supabase.from('programs').delete().eq('id', id);
+export const archiveProgram = async (id: string) => {
+	const { error } = await supabase.from('programs').update({ is_archived: true }).eq('id', id);
+	if (error) throw new Error(error.message);
+};
+export const unarchiveProgram = async (id: string) => {
+	const { error } = await supabase.from('programs').update({ is_archived: false }).eq('id', id);
 	if (error) throw new Error(error.message);
 };
 export const updateProgram = async (program: Program) => {
@@ -28,22 +41,25 @@ export const updateProgram = async (program: Program) => {
 	if (error) throw new Error(error.message);
 };
 export const isProgramCodeTaken = async (code: string) => {
-	const { data } = await supabase
+	const { count } = await supabase
 		.from('programs')
 		.select('*', { count: 'exact', head: true })
 		.eq('code', code);
-	return !!data;
+	return !!count;
 };
 export const isProgramCodeOverwrite = async (id: string, code: string) => {
-	const { data } = await supabase
+	const { count } = await supabase
 		.from('programs')
 		.select('*', { count: 'exact', head: true })
 		.eq('code', code)
 		.neq('id', id);
-	return !!data;
+	return !!count;
 };
 export const getProgramsCount = async (span: string = 'all') => {
-	const query = supabase.from('programs').select('*', { count: 'exact', head: true });
+	const query = supabase
+		.from('programs')
+		.select('*', { count: 'exact', head: true })
+		.eq('is_archived', false);
 	if (span === 'week') query.gt('created_at', Date.now() - WEEK);
 	else if (span === 'month') query.gt('created_at', Date.now() - MONTH);
 	else if (span === 'year') query.gt('created_at', Date.now() - YEAR);

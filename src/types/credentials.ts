@@ -14,5 +14,6 @@ export type Account = {
 	avatar: string;
 	email: string;
 	password: string;
+	is_archived?: boolean;
 	created_at: number;
 };

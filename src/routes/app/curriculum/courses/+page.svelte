@@ -15,7 +15,7 @@
 		removeCustomModal,
 		removeModal,
 	} from '$stores/modalStates';
-	import { deleteCourse, selectCourses } from '$utils/supabase';
+	import { archiveCourse, selectCourses } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		FloatingLabelInput,
@@ -70,19 +70,19 @@
 	const handleSearch = async () => {
 		isLoading = true;
 		try {
-			courses = await selectCourses(search);
+			courses = await selectCourses({ search });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
 		isLoading = false;
 	};
-	const handleDelete = async (id: string) => {
+	const handleArchive = async (id: string) => {
 		isLoading = true;
-		const modalId = createLoadingModal({ message: 'Deleting course...' });
+		const modalId = createLoadingModal({ message: 'Archiving course...' });
 		try {
-			await deleteCourse(id);
+			await archiveCourse(id);
 			await handleSearch();
-			createSuccessModal({ message: 'Course was deleted successfully!' });
+			createSuccessModal({ message: 'Course was archived successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -170,14 +170,14 @@
 								color="red"
 								on:click={() =>
 									createConfirmationModal({
-										message: 'Are you sure you want to delete this course?',
+										message: 'Are you sure you want to archive this course?',
 										handleProceed: () =>
 											createVerificationModal({
-												handleProceed: () => handleDelete(item.id),
+												handleProceed: () => handleArchive(item.id),
 											}),
 									})}
 							>
-								<i class="ti ti-trash text-sm" />
+								<i class="ti ti-archive text-sm" />
 							</Button>
 						</TableBodyCell>
 					</TableBodyRow>

@@ -15,7 +15,7 @@
 		removeCustomModal,
 		removeModal,
 	} from '$stores/modalStates';
-	import { deleteAccount, selectAccounts } from '$utils/supabase';
+	import { archiveAccount, selectAccounts } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		FloatingLabelInput,
@@ -76,13 +76,13 @@
 		}
 		isLoading = false;
 	};
-	const handleDelete = async (id: string) => {
+	const handleArchive = async (id: string) => {
 		isLoading = true;
 		const modalId = createLoadingModal({ message: 'Deleting admin account...' });
 		try {
-			await deleteAccount(id);
+			await archiveAccount(id);
 			await handleSearch();
-			createSuccessModal({ message: 'Admin account was deleted successfully!' });
+			createSuccessModal({ message: 'Admin account was archived successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -177,14 +177,14 @@
 								on:click={() =>
 									createConfirmationModal({
 										message:
-											'Are you sure you want to delete this admin account?',
+											'Are you sure you want to archive this admin account?',
 										handleProceed: () =>
 											createVerificationModal({
-												handleProceed: () => handleDelete(item.id),
+												handleProceed: () => handleArchive(item.id),
 											}),
 									})}
 							>
-								<i class="ti ti-trash text-sm" />
+								<i class="ti ti-archive text-sm" />
 							</Button>
 						</TableBodyCell>
 					</TableBodyRow>
