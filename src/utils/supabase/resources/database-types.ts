@@ -96,7 +96,6 @@ export interface Database {
       enrollees: {
         Row: {
           account_id: string | null
-          course_id: string | null
           created_at: number
           id: string
           is_archived: boolean | null
@@ -110,7 +109,6 @@ export interface Database {
         }
         Insert: {
           account_id?: string | null
-          course_id?: string | null
           created_at: number
           id: string
           is_archived?: boolean | null
@@ -124,7 +122,6 @@ export interface Database {
         }
         Update: {
           account_id?: string | null
-          course_id?: string | null
           created_at?: number
           id?: string
           is_archived?: boolean | null

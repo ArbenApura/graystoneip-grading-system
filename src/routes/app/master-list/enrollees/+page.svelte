@@ -163,7 +163,6 @@
 			<TableHeadCell>Contact No.</TableHeadCell>
 			<TableHeadCell>Email</TableHeadCell>
 			<TableHeadCell>Program</TableHeadCell>
-			<TableHeadCell>Course</TableHeadCell>
 			<TableHeadCell>Year</TableHeadCell>
 			<TableHeadCell>Section</TableHeadCell>
 			<TableHeadCell>Semester</TableHeadCell>
@@ -193,7 +192,6 @@
 						<TableBodyCell>{item.account.contact_number}</TableBodyCell>
 						<TableBodyCell>{item.account.email}</TableBodyCell>
 						<TableBodyCell>{item.program.code}</TableBodyCell>
-						<TableBodyCell>{item.course.code}</TableBodyCell>
 						<TableBodyCell>{item.enrollee.year}</TableBodyCell>
 						<TableBodyCell>{item.enrollee.section}</TableBodyCell>
 						<TableBodyCell>{item.enrollee.semester}</TableBodyCell>

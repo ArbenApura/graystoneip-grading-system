@@ -35,7 +35,6 @@ export const selectEnrollees = async ({
 			enrollees.push({
 				account: await selectAccount(enrollee.account_id),
 				program: await selectProgram(enrollee.program_id),
-				course: await selectCourse(enrollee.course_id),
 				enrollee,
 			}),
 		),
@@ -60,11 +59,10 @@ export const isAlreadyEnrolled = async ({
 	semester,
 	school_year,
 	program_id,
-	course_id,
 }: Enrollee) => {
 	const { count } = await supabase
 		.from('enrollees')
 		.select('*', { count: 'exact', head: true })
-		.match({ account_id, semester, school_year, program_id, course_id });
+		.match({ account_id, semester, school_year, program_id });
 	return !!count;
 };

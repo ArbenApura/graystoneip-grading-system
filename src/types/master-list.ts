@@ -24,7 +24,6 @@ export type Enrollee = {
 	id: string;
 	account_id: string;
 	program_id: string;
-	course_id: string;
 	student_number: string;
 	year: number;
 	section: string;
@@ -37,6 +36,5 @@ export type Enrollee = {
 export type EnrolleeData = {
 	account: Account;
 	program: Program;
-	course: Course;
 	enrollee: Enrollee;
 };

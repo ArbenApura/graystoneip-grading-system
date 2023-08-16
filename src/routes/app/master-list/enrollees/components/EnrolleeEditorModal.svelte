@@ -23,7 +23,6 @@
 	// STATES
 	let student_number = enrollee.student_number,
 		program_id = enrollee.program_id,
-		course_id = enrollee.course_id,
 		year = enrollee.year,
 		section = enrollee.section,
 		semester = enrollee.semester,
@@ -44,17 +43,11 @@
 				(program: Program) => program.id === program_id,
 		  )[0] as Program)
 		: null;
-	$: course = $page.data.courses
-		? (($page.data.courses || []).filter(
-				(course: Course) => course.id === course_id,
-		  )[0] as Course)
-		: null;
 
 	// UTILS
 	const handleReset = () => {
 		student_number = enrollee.student_number;
 		program_id = enrollee.program_id;
-		course_id = enrollee.course_id;
 		year = enrollee.year;
 		section = enrollee.section;
 		semester = enrollee.semester;
@@ -63,12 +56,11 @@
 	const handleSave = async () => {
 		isLoading = true;
 		try {
-			const search_key = `${account.full_name} ${student_number} ${program?.code} ${course?.code} ${school_year}`;
+			const search_key = `${account.full_name} ${student_number} ${program?.code} ${school_year}`;
 			await updateEnrollee({
 				id: enrollee.id,
 				account_id: account.id,
 				program_id,
-				course_id,
 				student_number,
 				year,
 				section,
@@ -88,17 +80,9 @@
 	const handleProceed = async () => {
 		try {
 			if (
-				[
-					student_number,
-					program_id,
-					course_id,
-					year,
-					section,
-					semester,
-					school_year,
-					program,
-					course,
-				].some((v) => !v)
+				[student_number, program_id, year, section, semester, school_year, program].some(
+					(v) => !v,
+				)
 			)
 				throw new Error('The form is incomplete!');
 			createConfirmationModal({
@@ -132,25 +116,14 @@
 				bind:value={student_number}
 			/>
 		</div>
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-			<div>
-				<Label class="mb-2">Program</Label>
-				<Select
-					placeholder="Select Program"
-					items={programItems}
-					required
-					bind:value={program_id}
-				/>
-			</div>
-			<div>
-				<Label class="mb-2">Select Course</Label>
-				<Select
-					placeholder="Select School Year"
-					items={courseItems}
-					required
-					bind:value={course_id}
-				/>
-			</div>
+		<div>
+			<Label class="mb-2">Program</Label>
+			<Select
+				placeholder="Select Program"
+				items={programItems}
+				required
+				bind:value={program_id}
+			/>
 		</div>
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 			<div>
