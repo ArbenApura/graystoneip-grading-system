@@ -58,9 +58,9 @@
 				account_id: account.id,
 				program_id,
 				student_number,
-				year: parseInt(year),
+				year,
 				section,
-				semester: parseInt(semester),
+				semester,
 				school_year,
 				search_key,
 				created_at,
@@ -128,10 +128,10 @@
 					placeholder="Select Year"
 					required
 					items={[
-						{ name: '1st', value: 1 },
-						{ name: '2nd', value: 2 },
-						{ name: '3rd', value: 3 },
-						{ name: '4th', value: 4 },
+						{ name: '1st', value: '1st' },
+						{ name: '2nd', value: '2nd' },
+						{ name: '3rd', value: '3rd' },
+						{ name: '4th', value: '4th' },
 					]}
 					bind:value={year}
 				/>

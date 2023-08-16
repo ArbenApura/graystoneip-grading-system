@@ -1,7 +1,7 @@
 // IMPORTED TYPES
 import type { Enrollee, EnrolleeData } from '$types/master-list';
 // IMPORTED UTILS
-import { selectAccount, selectCourse, selectProgram, supabase } from '..';
+import { selectAccount, selectProgram, supabase } from '..';
 
 // UTILS
 export const insertEnrollee = async (enrollee: Enrollee) => {

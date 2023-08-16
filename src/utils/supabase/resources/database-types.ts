@@ -63,6 +63,36 @@ export interface Database {
         }
         Relationships: []
       }
+      classes: {
+        Row: {
+          course_id: string | null
+          created_at: number
+          id: string
+          name: string | null
+          professor_id: string | null
+          school_year: string | null
+          semester: string | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at: number
+          id: string
+          name?: string | null
+          professor_id?: string | null
+          school_year?: string | null
+          semester?: string | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: number
+          id?: string
+          name?: string | null
+          professor_id?: string | null
+          school_year?: string | null
+          semester?: string | null
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           code: string | null
@@ -103,9 +133,9 @@ export interface Database {
           school_year: string | null
           search_key: string | null
           section: string | null
-          semester: number | null
+          semester: string | null
           student_number: string | null
-          year: number | null
+          year: string | null
         }
         Insert: {
           account_id?: string | null
@@ -116,9 +146,9 @@ export interface Database {
           school_year?: string | null
           search_key?: string | null
           section?: string | null
-          semester?: number | null
+          semester?: string | null
           student_number?: string | null
-          year?: number | null
+          year?: string | null
         }
         Update: {
           account_id?: string | null
@@ -129,9 +159,9 @@ export interface Database {
           school_year?: string | null
           search_key?: string | null
           section?: string | null
-          semester?: number | null
+          semester?: string | null
           student_number?: string | null
-          year?: number | null
+          year?: string | null
         }
         Relationships: []
       }

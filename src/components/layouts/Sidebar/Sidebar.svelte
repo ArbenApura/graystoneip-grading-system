@@ -37,6 +37,14 @@
 			contents: [],
 		},
 		{
+			label: 'Classes',
+			icon: 'ph-bold ph-chalkboard',
+			location: `/app/classes/${$account.id}`,
+			isOpen: false,
+			isVisible: $account.account_type === 'professor',
+			contents: [],
+		},
+		{
 			label: 'Master List',
 			icon: 'ph-bold ph-user-list',
 			location: '',
@@ -194,7 +202,9 @@
 	// LIFECYCLE
 	onMount(() => {
 		items = items.map((item) => {
-			item.isOpen = item.contents.some((content) => $page.route.id?.match(content.location));
+			item.isOpen = item.contents.some((content) =>
+				$page.url.pathname?.match(content.location),
+			);
 			return item;
 		});
 	});
@@ -264,7 +274,7 @@
 								{#each item.contents as content}
 									<div class="w-full overflow-hidden">
 										<a
-											class="min-w-[300px] flex items-center gap-4 cursor-pointer {$page.route.id?.match(
+											class="min-w-[300px] flex items-center gap-4 cursor-pointer {$page.url.pathname?.match(
 												content.location,
 											)
 												? 'bg-blue-600 text-white'
@@ -292,7 +302,7 @@
 						{:else}
 							<div class="w-full overflow-hidden">
 								<a
-									class="min-w-[300px] flex items-center gap-4 cursor-pointer {$page.route.id?.match(
+									class="min-w-[300px] flex items-center gap-4 cursor-pointer {$page.url.pathname?.match(
 										item.location,
 									)
 										? 'bg-blue-600 text-white'
@@ -323,12 +333,12 @@
 		<div class="w-full overflow-hidden">
 			<button
 				class="min-w-[300px] flex items-center gap-4 cursor-pointer border-t
-			{$page.route.id?.match('/app/account') ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}"
+			{$page.url.pathname?.match('/app/account') ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}"
 				on:click={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
 			>
 				<div bind:this={parentEl} class="w-[60px] h-[60px] flex-center">
 					<div
-						class="rounded-full border-[2px] p-[2px] {$page.route.id?.match(
+						class="rounded-full border-[2px] p-[2px] {$page.url.pathname?.match(
 							'/app/account',
 						)
 							? 'border-white'

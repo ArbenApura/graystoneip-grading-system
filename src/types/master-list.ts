@@ -25,9 +25,9 @@ export type Enrollee = {
 	account_id: string;
 	program_id: string;
 	student_number: string;
-	year: number;
+	year: string;
 	section: string;
-	semester: number;
+	semester: string;
 	school_year: string;
 	search_key: string;
 	is_archived?: boolean;

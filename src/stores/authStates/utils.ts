@@ -1,5 +1,3 @@
-// IMPORTED TYPES
-import type { Account } from '$types/master-list';
 // IMPORTED LIB-UTILS
 import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
@@ -50,7 +48,7 @@ export const loadData = async () => {
 export const observeRoute = async () => {
 	const isLogined = get(authStates.isLogined);
 	const account = get(authStates.account);
-	const { route } = get(page);
+	const { route, params } = get(page);
 	if (!route || !route.id) return;
 	else if (isLogined && route.id === '/') await goto('/app/dashboard');
 	else if (!isLogined && route.id.match('/app/')) await goto('/');

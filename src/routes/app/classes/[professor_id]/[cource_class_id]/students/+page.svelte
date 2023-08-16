@@ -3,8 +3,11 @@
 	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED TYPES
 	import type { EnrolleeData } from '$types/index';
+	// IMPORTED STATES
+	import { isSMDown } from '$stores/mediaStates';
 	// IMPORTED LIB-UTILS
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	// IMPORTED UTILS
 	import {
 		createConfirmationModal,
@@ -29,41 +32,38 @@
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
 	import Table from '$components/modules/Table.svelte';
-	import EnrolleeEditorModal from './components/EnrolleeEditorModal.svelte';
 
 	// PROPS
 	export let data: any;
 
 	// STATES
-	let semester = '1st',
-		school_year = '2023-2024';
 	let enrollees: EnrolleeData[] = [];
 	let filteredItems: EnrolleeData[];
 	let startingItem = 0;
 	let search = '';
 	let isLoading = false;
 
-	// MODAL STATES
-	let modalId = generateId();
-	let modals = { editor: false };
-	let target: EnrolleeData | null = null;
+	// // MODAL STATES
+	// let modalId = generateId();
+	// let modals = { editor: false };
+	// let target: EnrolleeData | null = null;
 
-	// MODAL UTILS
-	const openEditorModal = (enrollee: EnrolleeData) => {
-		createCustomModal(modalId);
-		modals.editor = true;
-		target = enrollee;
-	};
-	const closeEditorModal = () => {
-		modals.editor = false;
-		removeCustomModal(modalId);
-	};
+	// // MODAL UTILS
+	// const openEditorModal = (enrollee: EnrolleeData) => {
+	// 	createCustomModal(modalId);
+	// 	modals.editor = true;
+	// 	target = enrollee;
+	// };
+	// const closeEditorModal = () => {
+	// 	modals.editor = false;
+	// 	removeCustomModal(modalId);
+	// };
 
 	// UTILS
 	const handleSearch = async () => {
 		isLoading = true;
 		try {
-			enrollees = await selectEnrollees({ search, semester, school_year });
+			enrollees = await selectEnrollees({ search });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -91,12 +91,16 @@
 
 <Header
 	breadcrumbItems={[
-		{ icon: 'ph-bold ph-user-list', label: 'Master List', href: '' },
-		{ label: 'Enrollees', href: '/app/master-list/enrollees' },
+		{
+			icon: 'ph-bold ph-chalkboard',
+			label: 'Classes',
+			href: '/app/classes/' + $page.params.professor_id,
+		},
+		{ label: $page.data.courseClass.name, href: '' },
 	]}
 />
 
-{#if target}
+<!-- {#if target}
 	{#if modals.editor}
 		<EnrolleeEditorModal
 			enrollee={target.enrollee}
@@ -105,7 +109,7 @@
 			{handleSearch}
 		/>
 	{/if}
-{/if}
+{/if} -->
 
 <div class="p-4 pt-0 flex flex-col gap-4">
 	<div class="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -123,33 +127,14 @@
 				<i class="ti ti-search text-xl" />
 			</Button>
 		</form>
-		<div class="w-full md:w-fit bg-white rounded-md shadow-md p-2 flex gap-2">
-			<Select
-				placeholder="Select Semester"
-				items={[
-					{ name: '1st', value: '1st' },
-					{ name: '2nd', value: '2nd' },
-				]}
-				disabled={isLoading}
-				bind:value={semester}
-				on:change={handleSearch}
-			/>
-			<Select
-				placeholder="Select School Year"
-				items={[
-					{ name: '2023-2024', value: '2023-2024' },
-					{ name: '2024-2025', value: '2024-2025' },
-					{ name: '2025-2026', value: '2025-2026' },
-					{ name: '2026-2027', value: '2026-2027' },
-					{ name: '2027-2028', value: '2027-2028' },
-					{ name: '2028-2029', value: '2028-2029' },
-					{ name: '2029-2030', value: '2029-2030' },
-				]}
-				disabled={isLoading}
-				bind:value={school_year}
-				on:change={handleSearch}
-			/>
-		</div>
+		<Button
+			class={`w-[48px] h-[48px] shadow-md ${
+				$isSMDown && 'fixed bottom-[16px] right-[16px] z-20'
+			}`}
+			pill={true}
+		>
+			<i class="ti ti-plus text-xl" />
+		</Button>
 	</div>
 	<Table items={enrollees} bind:filteredItems bind:startingItem>
 		<svelte:fragment slot="table-head">
@@ -201,13 +186,13 @@
 						</TableBodyCell>
 						<TableBodyCell>
 							<div class="flex gap-2">
-								<Button
+								<!-- <Button
 									class="w-[25px] h-[25px] flex-center"
 									color="green"
 									on:click={() => openEditorModal(item)}
 								>
 									<i class="ti ti-pencil text-sm" />
-								</Button>
+								</Button> -->
 								<Button
 									class="w-[25px] h-[25px] flex-center"
 									color="red"

@@ -1,10 +1,12 @@
 <script lang="ts">
-	// IMPORTED ASSETS
-	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED TYPES
-	import type { EnrolleeData } from '$types/index';
+	import type { CourseClassData } from '$types/index';
+	// IMPORTED STATES
+	import { isMDDown, isSMDown } from '$stores/mediaStates';
+	import { isOpen } from '$stores/sidebarStates';
 	// IMPORTED LIB-UTILS
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	// IMPORTED UTILS
 	import {
 		createConfirmationModal,
@@ -15,7 +17,7 @@
 		removeCustomModal,
 		removeModal,
 	} from '$stores/modalStates';
-	import { archiveEnrollee, selectEnrollees } from '$utils/supabase';
+	import { deleteCourseClass, selectCourseClasses } from '$utils/supabase';
 	import { generateId } from '$utils/helpers';
 	// IMPORTED LIB-COMPONENTS
 	import {
@@ -29,7 +31,8 @@
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
 	import Table from '$components/modules/Table.svelte';
-	import EnrolleeEditorModal from './components/EnrolleeEditorModal.svelte';
+	import CourseClassAdderModal from './components/CourseClassAdderModal.svelte';
+	import CourseClassEditorModal from './components/CourseClassEditorModal.svelte';
 
 	// PROPS
 	export let data: any;
@@ -37,19 +40,27 @@
 	// STATES
 	let semester = '1st',
 		school_year = '2023-2024';
-	let enrollees: EnrolleeData[] = [];
-	let filteredItems: EnrolleeData[];
+	let courseClasses: CourseClassData[] = [];
+	let filteredItems: CourseClassData[];
 	let startingItem = 0;
 	let search = '';
 	let isLoading = false;
 
 	// MODAL STATES
 	let modalId = generateId();
-	let modals = { editor: false };
-	let target: EnrolleeData | null = null;
+	let modals = { adder: false, editor: false };
+	let target: CourseClassData | null = null;
 
 	// MODAL UTILS
-	const openEditorModal = (enrollee: EnrolleeData) => {
+	const openAdderModal = () => {
+		modals.adder = true;
+		createCustomModal(modalId);
+	};
+	const closeAdderModal = () => {
+		modals.adder = false;
+		removeCustomModal(modalId);
+	};
+	const openEditorModal = (enrollee: CourseClassData) => {
 		createCustomModal(modalId);
 		modals.editor = true;
 		target = enrollee;
@@ -63,19 +74,19 @@
 	const handleSearch = async () => {
 		isLoading = true;
 		try {
-			enrollees = await selectEnrollees({ search, semester, school_year });
+			courseClasses = await selectCourseClasses({ search, semester, school_year });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
 		isLoading = false;
 	};
-	const handleArchive = async (id: string) => {
+	const handleDelete = async (id: string) => {
 		isLoading = true;
-		const modalId = createLoadingModal({ message: 'Archiving enrollee...' });
+		const modalId = createLoadingModal({ message: 'Deleting class...' });
 		try {
-			await archiveEnrollee(id);
+			await deleteCourseClass(id);
 			await handleSearch();
-			createSuccessModal({ message: 'Enrollee was archived successfully!' });
+			createSuccessModal({ message: 'Class was deleted successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -85,22 +96,19 @@
 
 	// LIFECYCLES
 	onMount(() => {
-		if (data.enrollees) enrollees = data.enrollees;
+		if (data.courseClasses) courseClasses = data.courseClasses;
 	});
 </script>
 
-<Header
-	breadcrumbItems={[
-		{ icon: 'ph-bold ph-user-list', label: 'Master List', href: '' },
-		{ label: 'Enrollees', href: '/app/master-list/enrollees' },
-	]}
-/>
+<Header breadcrumbItems={[{ icon: 'ph-bold ph-chalkboard', label: 'Classes', href: '' }]} />
 
+{#if modals.adder}
+	<CourseClassAdderModal handleClose={closeAdderModal} {handleSearch} />
+{/if}
 {#if target}
 	{#if modals.editor}
-		<EnrolleeEditorModal
-			enrollee={target.enrollee}
-			account={target.account}
+		<CourseClassEditorModal
+			courseClass={target.courseClass}
 			handleClose={closeEditorModal}
 			{handleSearch}
 		/>
@@ -150,21 +158,23 @@
 				on:change={handleSearch}
 			/>
 		</div>
+		<Button
+			class={`w-[48px] h-[48px] shadow-md ${
+				($isSMDown || ($isMDDown && $isOpen)) && 'fixed bottom-[16px] right-[16px] z-20'
+			}`}
+			pill={true}
+			disabled={isLoading}
+			on:click={openAdderModal}
+		>
+			<i class="ti ti-plus text-xl" />
+		</Button>
 	</div>
-	<Table items={enrollees} bind:filteredItems bind:startingItem>
+	<Table items={courseClasses} bind:filteredItems bind:startingItem>
 		<svelte:fragment slot="table-head">
 			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
-			<TableHeadCell>Avatar</TableHeadCell>
-			<TableHeadCell>Student No.</TableHeadCell>
-			<TableHeadCell>Last Name</TableHeadCell>
-			<TableHeadCell>First Name</TableHeadCell>
-			<TableHeadCell>Middle Name</TableHeadCell>
-			<TableHeadCell>Gender</TableHeadCell>
-			<TableHeadCell>Contact No.</TableHeadCell>
-			<TableHeadCell>Email</TableHeadCell>
-			<TableHeadCell>Program</TableHeadCell>
-			<TableHeadCell>Year</TableHeadCell>
-			<TableHeadCell>Section</TableHeadCell>
+			<TableHeadCell>Name</TableHeadCell>
+			<TableHeadCell>Professor</TableHeadCell>
+			<TableHeadCell>Students</TableHeadCell>
 			<TableHeadCell>Semester</TableHeadCell>
 			<TableHeadCell>School Year</TableHeadCell>
 			<TableHeadCell>Created At</TableHeadCell>
@@ -175,32 +185,22 @@
 				{#each filteredItems as item, i}
 					<TableBodyRow>
 						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
+						<TableBodyCell>{item.courseClass.name}</TableBodyCell>
+						<TableBodyCell>{item.professor.full_name}</TableBodyCell>
+						<TableBodyCell>{0}</TableBodyCell>
+						<TableBodyCell>{item.courseClass.semester}</TableBodyCell>
+						<TableBodyCell>{item.courseClass.school_year}</TableBodyCell>
 						<TableBodyCell>
-							<div class="rounded-full border-[2px] p-[2px] w-fit border-blue-600">
-								<div
-									class="bg-gray-100 w-[35px] h-[35px] rounded-full bg-cover bg-center"
-									style="background-image: url({item.account.avatar ||
-										NoImagePNG})"
-								/>
-							</div>
-						</TableBodyCell>
-						<TableBodyCell>{item.enrollee.student_number}</TableBodyCell>
-						<TableBodyCell>{item.account.last_name}</TableBodyCell>
-						<TableBodyCell>{item.account.first_name}</TableBodyCell>
-						<TableBodyCell>{item.account.middle_name}</TableBodyCell>
-						<TableBodyCell class="capitalize">{item.account.gender}</TableBodyCell>
-						<TableBodyCell>{item.account.contact_number}</TableBodyCell>
-						<TableBodyCell>{item.account.email}</TableBodyCell>
-						<TableBodyCell>{item.program.code}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.year}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.section}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.semester}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.school_year}</TableBodyCell>
-						<TableBodyCell>
-							{new Date(item.enrollee.created_at).toDateString()}
+							{new Date(item.courseClass.created_at).toDateString()}
 						</TableBodyCell>
 						<TableBodyCell>
 							<div class="flex gap-2">
+								<Button
+									class="w-[25px] h-[25px] flex-center"
+									href="{$page.url.pathname}/{item.courseClass.id}"
+								>
+									<i class="ti ti-eye text-sm" />
+								</Button>
 								<Button
 									class="w-[25px] h-[25px] flex-center"
 									color="green"
@@ -213,12 +213,11 @@
 									color="red"
 									on:click={() =>
 										createConfirmationModal({
-											message:
-												'Are you sure you want to archive this enrollee?',
-											handleProceed: () => handleArchive(item.enrollee.id),
+											message: 'Are you sure you want to delete this class?',
+											handleProceed: () => handleDelete(item.courseClass.id),
 										})}
 								>
-									<i class="ti ti-archive text-sm" />
+									<i class="ph-bold ph-trash text-sm" />
 								</Button>
 							</div>
 						</TableBodyCell>

@@ -31,7 +31,7 @@
 	export let data: any;
 
 	// STATES
-	let semester = '1',
+	let semester = '1st',
 		school_year = '2023-2024';
 	let enrollees: EnrolleeData[] = [];
 	let filteredItems: EnrolleeData[];
@@ -96,8 +96,8 @@
 			<Select
 				placeholder="Select Semester"
 				items={[
-					{ name: '1st', value: '1' },
-					{ name: '2nd', value: '2' },
+					{ name: '1st', value: '1st' },
+					{ name: '2nd', value: '2nd' },
 				]}
 				disabled={isLoading}
 				bind:value={semester}

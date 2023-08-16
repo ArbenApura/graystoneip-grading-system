@@ -4,7 +4,7 @@ import type { PageLoad } from './$types';
 import { selectEnrollees, selectPrograms } from '$utils/supabase';
 
 export const load = (async () => {
-	const enrollees = await selectEnrollees({ semester: '1', school_year: '2023-2024' });
+	const enrollees = await selectEnrollees({ semester: '1st', school_year: '2023-2024' });
 	const programs = await selectPrograms({});
 	return { enrollees, programs };
 }) satisfies PageLoad;

@@ -61,7 +61,7 @@
 		<div class="border-r hidden sm:block" />
 		<div class="w-full flex items-center gap-4">
 			<p class="flex-grow flex items-center">
-				{start + 1}-{items.length < end ? items.length : end} of {items.length}
+				{items.length ? start + 1 : 0}-{items.length < end ? items.length : end} of {items.length}
 				items
 			</p>
 			<ButtonGroup>

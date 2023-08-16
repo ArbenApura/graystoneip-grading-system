@@ -1,7 +1,6 @@
 <script lang="ts">
 	// IMPORTED TYPES
-	import type { Account, Enrollee } from '$types/master-list';
-	import type { Course, Program } from '$types/curriculum';
+	import type { Course, CourseClass } from '$types/curriculum';
 	// IMPORTED LIB-UTILS
 	import { page } from '$app/stores';
 	// IMPORTED UTILS
@@ -12,66 +11,44 @@
 	} from '$stores/modalStates';
 	// IMPORTED LIB-COMPONENTS
 	import { Button, Modal, Input, Badge, Select, Label, Spinner } from 'flowbite-svelte';
-	import { updateEnrollee } from '$utils/supabase';
+	import { updateCourseClass } from '$utils/supabase';
 
 	// PROPS
-	export let enrollee: Enrollee,
-		account: Account,
-		handleClose: () => void,
-		handleSearch: () => Promise<void>;
+	export let courseClass: CourseClass, handleClose: () => void, handleSearch: () => Promise<void>;
 
 	// STATES
-	let student_number = enrollee.student_number,
-		program_id = enrollee.program_id,
-		year = enrollee.year,
-		section = enrollee.section,
-		semester = enrollee.semester,
-		school_year = enrollee.school_year;
+	let name = courseClass.name,
+		semester = courseClass.semester,
+		school_year = courseClass.school_year,
+		course_id = courseClass.course_id;
 	let isLoading = false;
-	let programItems = ($page.data.programs || []).map((program: Program) => ({
-		name: program.code + ' - ' + program.description,
-		value: program.id,
-	}));
 	let courseItems = ($page.data.courses || []).map((course: Course) => ({
 		name: course.code + ' - ' + course.description,
 		value: course.id,
 	}));
 
-	// REACTIVE STATES
-	$: program = $page.data.programs
-		? (($page.data.programs || []).filter(
-				(program: Program) => program.id === program_id,
-		  )[0] as Program)
-		: null;
-
 	// UTILS
 	const handleReset = () => {
-		student_number = enrollee.student_number;
-		program_id = enrollee.program_id;
-		year = enrollee.year;
-		section = enrollee.section;
-		semester = enrollee.semester;
-		school_year = enrollee.school_year;
+		name = courseClass.name;
+		semester = courseClass.semester;
+		school_year = courseClass.school_year;
+		course_id = courseClass.course_id;
 	};
 	const handleSave = async () => {
 		isLoading = true;
 		try {
-			const search_key = `${account.full_name} ${student_number} ${program?.code} ${school_year}`;
-			await updateEnrollee({
-				id: enrollee.id,
-				account_id: account.id,
-				program_id,
-				student_number,
-				year,
-				section,
+			await updateCourseClass({
+				id: courseClass.id,
+				professor_id: courseClass.professor_id,
+				course_id,
+				name,
 				semester,
 				school_year,
-				search_key,
-				created_at: enrollee.created_at,
+				created_at: courseClass.created_at,
 			});
 			await handleSearch();
 			handleClose();
-			createSuccessModal({ message: 'Student was enrolled successfully!' });
+			createSuccessModal({ message: 'Class was edited successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -79,11 +56,7 @@
 	};
 	const handleProceed = async () => {
 		try {
-			if (
-				[student_number, program_id, year, section, semester, school_year, program].some(
-					(v) => !v,
-				)
-			)
+			if ([name, course_id, semester, school_year].some((v) => !v))
 				throw new Error('The form is incomplete!');
 			createConfirmationModal({
 				message: 'Are you sure you want to proceed?',
@@ -100,7 +73,7 @@
 	<svelte:fragment slot="header">
 		<div class="w-full flex items-center gap-4">
 			<Badge class="aspect-plus p-2"><i class="ph-bold ph-student text-[18px]" /></Badge>
-			<p class="text-xl text-black flex-grow">Update Enrollee</p>
+			<p class="text-xl text-black flex-grow">Edit Class</p>
 			<button class="w-[34px] flex-center" on:click={handleClose}>
 				<i class="ti ti-x text-xl cursor-pointer hover:text-black" />
 			</button>
@@ -108,42 +81,17 @@
 	</svelte:fragment>
 	<form class="flex flex-col gap-4" on:submit|preventDefault={handleProceed}>
 		<div>
-			<Label class="mb-2">Student No.</Label>
-			<Input
-				type="text"
-				placeholder="Input Student No."
-				required
-				bind:value={student_number}
-			/>
+			<Label class="mb-2">Name</Label>
+			<Input type="text" placeholder="Input Name" required bind:value={name} />
 		</div>
 		<div>
-			<Label class="mb-2">Program</Label>
+			<Label class="mb-2">Course</Label>
 			<Select
-				placeholder="Select Program"
-				items={programItems}
+				placeholder="Select Course"
+				items={courseItems}
 				required
-				bind:value={program_id}
+				bind:value={course_id}
 			/>
-		</div>
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-			<div>
-				<Label class="mb-2">Year</Label>
-				<Select
-					placeholder="Select Year"
-					required
-					items={[
-						{ name: '1st', value: '1st' },
-						{ name: '2nd', value: '2nd' },
-						{ name: '3rd', value: '3rd' },
-						{ name: '4th', value: '4th' },
-					]}
-					bind:value={year}
-				/>
-			</div>
-			<div>
-				<Label class="mb-2">Section</Label>
-				<Input type="text" placeholder="Input Section" required bind:value={section} />
-			</div>
 		</div>
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 			<div>
@@ -152,8 +100,8 @@
 					placeholder="Select Semester"
 					required
 					items={[
-						{ name: '1st', value: 1 },
-						{ name: '2nd', value: 2 },
+						{ name: '1st', value: '1st' },
+						{ name: '2nd', value: '2nd' },
 					]}
 					bind:value={semester}
 				/>
