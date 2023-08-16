@@ -1,5 +1,5 @@
 // IMPORTED TYPES
-import type { Account } from '$types/credentials';
+import type { Account } from '$types/master-list';
 // IMPORTED LIB-UTILS
 import { get } from 'svelte/store';
 import { goto } from '$app/navigation';

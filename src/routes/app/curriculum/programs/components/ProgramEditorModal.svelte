@@ -2,7 +2,11 @@
 	// IMPORTED TYPES
 	import type { Program } from '$types/curriculum';
 	// IMPORTED UTILS
-	import { createErrorModal, createSuccessModal } from '$stores/modalStates';
+	import {
+		createConfirmationModal,
+		createErrorModal,
+		createSuccessModal,
+	} from '$stores/modalStates';
 	import { updateProgram } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import { Button, Modal, FloatingLabelInput, Badge, Spinner } from 'flowbite-svelte';
@@ -20,10 +24,9 @@
 		code = program.code;
 		description = program.description;
 	};
-	const handleProceed = async () => {
+	const handleSave = async () => {
 		isLoading = true;
 		try {
-			if ([code, description].some((v) => !v)) throw new Error('The form is incomplete!');
 			await updateProgram({
 				id: program.id,
 				code,
@@ -32,11 +35,23 @@
 			});
 			await handleSearch();
 			handleClose();
-			createSuccessModal({ message: 'Program was created successfully!' });
+			createSuccessModal({ message: 'Program was edited successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
 		isLoading = false;
+	};
+	const handleProceed = async () => {
+		try {
+			if ([code, description].some((v) => !v)) throw new Error('The form is incomplete!');
+			createConfirmationModal({
+				message: 'Are you sure you want to save the changes?',
+				handleProceed: handleSave,
+			});
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+			isLoading = false;
+		}
 	};
 </script>
 

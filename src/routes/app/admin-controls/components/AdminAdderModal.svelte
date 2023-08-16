@@ -3,6 +3,7 @@
 	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED UTILS
 	import {
+		createConfirmationModal,
 		createErrorModal,
 		createSuccessModal,
 		createVerificationModal,
@@ -116,7 +117,10 @@
 				throw new Error('The form is incomplete!');
 			if (password !== repassword) throw new Error('The provided password does not match!');
 			if (!validateEmail(email)) throw new Error('The provided email is invalid!');
-			createVerificationModal({ handleProceed: handleSave });
+			createConfirmationModal({
+				message: 'Are you sure you want to proceed?',
+				handleProceed: () => createVerificationModal({ handleProceed: handleSave }),
+			});
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 			isLoading = false;

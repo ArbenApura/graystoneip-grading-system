@@ -1,5 +1,5 @@
 // IMPORTED TYPES
-import type { Account } from '$types/credentials';
+import type { Account } from '$types/master-list';
 // IMPORTED LIB-TYPES
 import type { PageLoad } from './$types';
 // IMPORTED UTILS

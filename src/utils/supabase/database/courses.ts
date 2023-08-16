@@ -10,6 +10,12 @@ export const insertCourse = async (course: Course) => {
 	const { error } = await supabase.from('courses').insert(course);
 	if (error) throw new Error(error.message);
 };
+export const selectCourse = async (id: string) => {
+	const { data, error } = await supabase.from('courses').select().match({ id });
+	if (error) throw new Error(error.message);
+	if (!data || !data.length) throw new Error('Course not found!');
+	return data[0] as Course;
+};
 export const selectCourses = async ({
 	search,
 	is_archived,
@@ -20,6 +26,7 @@ export const selectCourses = async ({
 	let query = supabase
 		.from('courses')
 		.select()
+		.order('code')
 		.eq('is_archived', typeof is_archived === 'undefined' ? false : is_archived);
 	if (search) query.ilike('code', `%${search}%`);
 	const { data, error } = await query;

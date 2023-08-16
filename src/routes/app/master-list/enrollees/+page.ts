@@ -1,11 +1,11 @@
 // IMPORTED LIB-TYPES
 import type { PageLoad } from './$types';
 // IMPORTED UTILS
-import { selectAccounts, selectCourses, selectPrograms } from '$utils/supabase';
+import { selectEnrollees, selectCourses, selectPrograms } from '$utils/supabase';
 
 export const load = (async () => {
-	const students = await selectAccounts({ type: 'student' });
+	const enrollees = await selectEnrollees({});
 	const programs = await selectPrograms({});
 	const courses = await selectCourses({});
-	return { students, programs, courses };
+	return { enrollees, programs, courses };
 }) satisfies PageLoad;

@@ -10,6 +10,12 @@ export const insertProgram = async (program: Program) => {
 	const { error } = await supabase.from('programs').insert(program);
 	if (error) throw new Error(error.message);
 };
+export const selectProgram = async (id: string) => {
+	const { data, error } = await supabase.from('programs').select().match({ id });
+	if (error) throw new Error(error.message);
+	if (!data || !data.length) throw new Error('Program not found!');
+	return data[0] as Program;
+};
 export const selectPrograms = async ({
 	search,
 	is_archived,
@@ -20,6 +26,7 @@ export const selectPrograms = async ({
 	let query = supabase
 		.from('programs')
 		.select()
+		.order('code')
 		.eq('is_archived', typeof is_archived === 'undefined' ? false : is_archived);
 	if (search) query.ilike('code', `%${search}%`);
 	const { data, error } = await query;

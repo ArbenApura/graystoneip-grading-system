@@ -3,6 +3,8 @@
 	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED TYPES
 	import type { Account } from '$types/index';
+	// IMPORTED STATES
+	import { isSMDown } from '$stores/mediaStates';
 	// IMPORTED LIB-UTILS
 	import { onMount } from 'svelte';
 	// IMPORTED UTILS
@@ -30,9 +32,8 @@
 	import Header from '$components/layouts/Header';
 	import StudentAdderModal from './components/StudentAdderModal.svelte';
 	import StudentEditorModal from './components/StudentEditorModal.svelte';
+	import EnrolleeAdderModal from './components/EnrolleeAdderModal.svelte';
 	import Table from '$components/modules/Table.svelte';
-	// IMPORTED STATES
-	import { isSMDown } from '$stores/mediaStates';
 
 	// PROPS
 	export let data: any;
@@ -46,7 +47,7 @@
 
 	// MODAL STATES
 	let modalId = generateId();
-	let modals = { adder: false, editor: false };
+	let modals = { adder: false, editor: false, enroller: false };
 	let target: Account | null = null;
 
 	// MODAL UTILS
@@ -67,6 +68,15 @@
 		modals.editor = false;
 		removeCustomModal(modalId);
 	};
+	const openEnrollerModal = (account: Account) => {
+		createCustomModal(modalId);
+		modals.enroller = true;
+		target = account;
+	};
+	const closeEnrollerModal = () => {
+		modals.enroller = false;
+		removeCustomModal(modalId);
+	};
 
 	// UTILS
 	const handleSearch = async () => {
@@ -80,7 +90,7 @@
 	};
 	const handleArchive = async (id: string) => {
 		isLoading = true;
-		const modalId = createLoadingModal({ message: 'Deleting student account...' });
+		const modalId = createLoadingModal({ message: 'Archiving student account...' });
 		try {
 			await archiveAccount(id);
 			await handleSearch();
@@ -111,6 +121,11 @@
 {#if target}
 	{#if modals.editor}
 		<StudentEditorModal account={target} handleClose={closeEditorModal} {handleSearch} />
+	{/if}
+{/if}
+{#if target}
+	{#if modals.enroller}
+		<EnrolleeAdderModal account={target} handleClose={closeEnrollerModal} {handleSearch} />
 	{/if}
 {/if}
 
@@ -173,6 +188,12 @@
 						<TableBodyCell>{item.email}</TableBodyCell>
 						<TableBodyCell>
 							<div class="flex gap-2">
+								<Button
+									class="w-[25px] h-[25px] flex-center"
+									on:click={() => openEnrollerModal(item)}
+								>
+									<i class="ph-bold ph-student text-sm" />
+								</Button>
 								<Button
 									class="w-[25px] h-[25px] flex-center"
 									color="green"

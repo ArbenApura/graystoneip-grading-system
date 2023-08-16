@@ -12,10 +12,8 @@
 		<div
 			class="w-full text-center text-xs text-gray-500 grid grid-rows-2 grid-cols-2 sm:flex sm:gap-4 sm:w-fit"
 		>
-			<a href="/app/resources/about">About</a>
 			<a href="/app/resources/privacy-policy">Privacy Policy</a>
 			<a href="/app/resources/terms-and-conditions">Terms & Conditions</a>
-			<a href="/app/resources/contact">Contact</a>
 		</div>
 	</div>
 	<hr />

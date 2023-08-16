@@ -1,5 +1,5 @@
 // IMPORTED TYPES
-import type { Account, AccountType } from '$types/credentials';
+import type { Account, AccountType } from '$types/master-list';
 // IMPORTED UTILS
 import { MONTH, WEEK, YEAR } from '$utils/constants';
 import { supabase } from '..';
@@ -9,6 +9,12 @@ export const insertAccount = async (account: Account) => {
 	if (await isEmailTaken(account.email)) throw new Error('Email is already taken!');
 	const { error } = await supabase.from('accounts').insert(account);
 	if (error) throw new Error(error.message);
+};
+export const selectAccount = async (id: string) => {
+	const { data, error } = await supabase.from('accounts').select().match({ id });
+	if (error) throw new Error(error.message);
+	if (!data || !data.length) throw new Error('Account not found!');
+	return data[0] as Account;
 };
 export const selectAccounts = async ({
 	type,
@@ -22,6 +28,7 @@ export const selectAccounts = async ({
 	let query = supabase
 		.from('accounts')
 		.select()
+		.order('last_name')
 		.eq('account_type', type)
 		.eq('is_archived', typeof is_archived === 'undefined' ? false : is_archived);
 	if (search) query.ilike('full_name', `%${search}%`);

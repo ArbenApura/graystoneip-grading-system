@@ -1,6 +1,10 @@
 <script lang="ts">
 	// IMPORTED UTILS
-	import { createErrorModal, createSuccessModal } from '$stores/modalStates';
+	import {
+		createConfirmationModal,
+		createErrorModal,
+		createSuccessModal,
+	} from '$stores/modalStates';
 	import { generateId } from '$utils/helpers';
 	import { insertCourse } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
@@ -20,10 +24,9 @@
 		units = 0;
 		hours = 0;
 	};
-	const handleProceed = async () => {
+	const handleSave = async () => {
 		isLoading = true;
 		try {
-			if ([code, description].some((v) => !v)) throw new Error('The form is incomplete!');
 			const id = generateId();
 			const created_at = Date.now();
 			await insertCourse({
@@ -41,6 +44,18 @@
 			createErrorModal({ message: error.message });
 		}
 		isLoading = false;
+	};
+	const handleProceed = async () => {
+		try {
+			if ([code, description].some((v) => !v)) throw new Error('The form is incomplete!');
+			createConfirmationModal({
+				message: 'Are you sure you want to proceed?',
+				handleProceed: handleSave,
+			});
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+			isLoading = false;
+		}
 	};
 </script>
 

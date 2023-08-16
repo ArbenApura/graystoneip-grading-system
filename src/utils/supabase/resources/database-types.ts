@@ -93,6 +93,51 @@ export interface Database {
         }
         Relationships: []
       }
+      enrollees: {
+        Row: {
+          account_id: string | null
+          course_id: string | null
+          created_at: number
+          id: string
+          is_archived: boolean | null
+          program_id: string | null
+          school_year: string | null
+          search_key: string | null
+          section: string | null
+          semester: number | null
+          student_number: string | null
+          year: number | null
+        }
+        Insert: {
+          account_id?: string | null
+          course_id?: string | null
+          created_at: number
+          id: string
+          is_archived?: boolean | null
+          program_id?: string | null
+          school_year?: string | null
+          search_key?: string | null
+          section?: string | null
+          semester?: number | null
+          student_number?: string | null
+          year?: number | null
+        }
+        Update: {
+          account_id?: string | null
+          course_id?: string | null
+          created_at?: number
+          id?: string
+          is_archived?: boolean | null
+          program_id?: string | null
+          school_year?: string | null
+          search_key?: string | null
+          section?: string | null
+          semester?: number | null
+          student_number?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       programs: {
         Row: {
           code: string | null

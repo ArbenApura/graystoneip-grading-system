@@ -120,12 +120,10 @@
 				throw new Error('The form is incomplete!');
 			if (password !== repassword) throw new Error('The provided password does not match!');
 			if (!validateEmail(email)) throw new Error('The provided email is invalid!');
-			if (email === account.email && password === account.password)
-				createConfirmationModal({
-					message: 'Are you sure you want to save the changes?',
-					handleProceed: handleSave,
-				});
-			else createVerificationModal({ handleProceed: handleSave });
+			createConfirmationModal({
+				message: 'Are you sure you want to save the changes?',
+				handleProceed: () => createVerificationModal({ handleProceed: handleSave }),
+			});
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 			isLoading = false;

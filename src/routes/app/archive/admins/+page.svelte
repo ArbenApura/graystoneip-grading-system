@@ -122,21 +122,23 @@
 						<TableBodyCell class="capitalize">{item.gender}</TableBodyCell>
 						<TableBodyCell>{item.contact_number}</TableBodyCell>
 						<TableBodyCell>{item.email}</TableBodyCell>
-						<TableBodyCell class="flex gap-2">
-							<Button
-								class="w-[25px] h-[25px] flex-center"
-								on:click={() =>
-									createConfirmationModal({
-										message:
-											'Are you sure you want to unarchive this admin account?',
-										handleProceed: () =>
-											createVerificationModal({
-												handleProceed: () => handleRecover(item.id),
-											}),
-									})}
-							>
-								<i class="ti ti-archive-off text-sm" />
-							</Button>
+						<TableBodyCell>
+							<div class="flex gap-2">
+								<Button
+									class="w-[25px] h-[25px] flex-center"
+									on:click={() =>
+										createConfirmationModal({
+											message:
+												'Are you sure you want to unarchive this admin account?',
+											handleProceed: () =>
+												createVerificationModal({
+													handleProceed: () => handleRecover(item.id),
+												}),
+										})}
+								>
+									<i class="ti ti-archive-off text-sm" />
+								</Button>
+							</div>
 						</TableBodyCell>
 					</TableBodyRow>
 				{/each}

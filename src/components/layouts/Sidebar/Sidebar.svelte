@@ -59,6 +59,14 @@
 					isVisible: true,
 					contents: [],
 				},
+				{
+					label: 'Enrollees',
+					icon: 'ph-bold ph-user-list',
+					location: '/app/master-list/enrollees',
+					isOpen: false,
+					isVisible: true,
+					contents: [],
+				},
 			],
 		},
 		{
@@ -110,6 +118,14 @@
 					contents: [],
 				},
 				{
+					label: 'Enrollees',
+					icon: 'ph-bold ph-user-list',
+					location: '/app/archive/enrollees',
+					isOpen: false,
+					isVisible: true,
+					contents: [],
+				},
+				{
 					label: 'Courses',
 					icon: 'ti ti-books',
 					location: '/app/archive/courses',
@@ -143,14 +159,6 @@
 			isVisible: true,
 			contents: [
 				{
-					label: 'About',
-					icon: 'ph-bold ph-info',
-					location: '/app/resources/about',
-					isOpen: false,
-					isVisible: true,
-					contents: [],
-				},
-				{
 					label: 'Privacy Policy',
 					icon: 'ph-bold ph-lock-laminated',
 					location: '/app/resources/privacy-policy',
@@ -162,14 +170,6 @@
 					label: 'Terms and Conditions',
 					icon: 'ph-bold ph-handshake',
 					location: '/app/resources/terms-and-conditions',
-					isOpen: false,
-					isVisible: true,
-					contents: [],
-				},
-				{
-					label: 'Contact',
-					icon: 'ph-bold ph-phone',
-					location: '/app/resources/contact',
 					isOpen: false,
 					isVisible: true,
 					contents: [],

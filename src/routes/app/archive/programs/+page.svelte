@@ -9,7 +9,6 @@
 		createErrorModal,
 		createLoadingModal,
 		createSuccessModal,
-		createVerificationModal,
 		removeModal,
 	} from '$stores/modalStates';
 	import { unarchiveProgram, selectPrograms } from '$utils/supabase';
@@ -111,10 +110,7 @@
 								on:click={() =>
 									createConfirmationModal({
 										message: 'Are you sure you want to unarchive this program?',
-										handleProceed: () =>
-											createVerificationModal({
-												handleProceed: () => handleArchive(item.id),
-											}),
+										handleProceed: () => handleArchive(item.id),
 									})}
 							>
 								<i class="ti ti-archive text-sm" />

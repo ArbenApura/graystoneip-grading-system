@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { account } from '$stores/authStates';
-
 	// IMPORTED TYPES
 	import type { ModalItem } from '$stores/modalStates';
+	// IMPORTED STATES
+	import { account } from '$stores/authStates';
 	// IMPORTED UTILS
 	import { createErrorModal, removeModal } from '$stores/modalStates';
 	// IMPORTED LIB-COMPONENTS

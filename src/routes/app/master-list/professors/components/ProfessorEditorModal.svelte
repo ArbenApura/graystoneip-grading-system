@@ -72,30 +72,6 @@
 	const handleSave = async () => {
 		isLoading = true;
 		try {
-			let avatar = account.avatar;
-			if (files && files.length) {
-				await deleteAvatar(avatar);
-				avatar = await uploadAvatar(files[0]);
-			}
-			await updateAccount({
-				id: account.id,
-				last_name,
-				first_name,
-				middle_name,
-				full_name,
-				gender,
-				birth_date: new Date(birth_date).getTime(),
-				contact_number,
-				address,
-				account_type: account.account_type,
-				avatar,
-				email,
-				password,
-				created_at: account.created_at,
-			});
-			await handleSearch();
-			handleClose();
-			createSuccessModal({ message: 'Professor account was edited successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -120,12 +96,10 @@
 				throw new Error('The form is incomplete!');
 			if (password !== repassword) throw new Error('The provided password does not match!');
 			if (!validateEmail(email)) throw new Error('The provided email is invalid!');
-			if (email === account.email && password === account.password)
-				createConfirmationModal({
-					message: 'Are you sure you want to save the changes?',
-					handleProceed: handleSave,
-				});
-			else createVerificationModal({ handleProceed: handleSave });
+			createConfirmationModal({
+				message: 'Are you sure you want to save the changes?',
+				handleProceed: handleSave,
+			});
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 			isLoading = false;
