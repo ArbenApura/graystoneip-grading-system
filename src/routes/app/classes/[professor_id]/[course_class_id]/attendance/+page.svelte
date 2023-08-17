@@ -21,7 +21,7 @@
 			href: '/app/classes/' + $page.params.professor_id + '/' + $page.params.course_class_id,
 		},
 		{
-			label: 'Students',
+			label: 'Attendance',
 			href: $page.url.pathname,
 		},
 	]}

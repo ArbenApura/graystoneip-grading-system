@@ -49,7 +49,7 @@
 
 <style lang="scss">
 	.item {
-		@apply bg-white hover:bg-gray-200 rounded-md shadow-md text-right flex justify-between items-center;
+		@apply bg-white hover:bg-gray-200 rounded-md shadow-md text-right flex justify-between items-center p-2;
 		img {
 			@apply w-[50%] min-w-[50%] aspect-square;
 		}
