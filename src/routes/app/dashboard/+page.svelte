@@ -5,7 +5,8 @@
 	import { account } from '$stores/authStates';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
-	import AdminDashboard from './components/AdminDashboard.svelte';
+	import AdminDashboard from './components/AdminDashboard';
+	import ProfessorDashboard from './components/ProfessorDashboard.svelte';
 
 	// STATES
 	const breadcrumbItems: BreadcrumbItem[] = [
@@ -17,4 +18,6 @@
 
 {#if $account.account_type === 'admin'}
 	<AdminDashboard />
+{:else if $account.account_type === 'professor'}
+	<ProfessorDashboard />
 {/if}

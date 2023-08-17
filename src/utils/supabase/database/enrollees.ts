@@ -51,7 +51,6 @@ export const unarchiveEnrollee = async (id: string) => {
 	if (error) throw new Error(error.message);
 };
 export const updateEnrollee = async (enrollee: Enrollee) => {
-	if (await isAlreadyEnrolled(enrollee)) throw new Error('Enrollee is already enrolled!');
 	const { error } = await supabase.from('enrollees').update(enrollee).eq('id', enrollee.id);
 	if (error) throw new Error(error.message);
 };

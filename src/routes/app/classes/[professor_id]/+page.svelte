@@ -74,7 +74,12 @@
 	const handleSearch = async () => {
 		isLoading = true;
 		try {
-			courseClasses = await selectCourseClasses({ search, semester, school_year });
+			courseClasses = await selectCourseClasses({
+				search,
+				semester,
+				school_year,
+				professor_id: $page.data.professor.id,
+			});
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}

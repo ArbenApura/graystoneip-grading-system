@@ -4,4 +4,4 @@ import '$styles/index.scss';
 import '$styles/libs/nprogress.scss';
 
 export const ssr = false,
-	prerender = 'auto';
+	prerender = true;

@@ -152,8 +152,8 @@
 					placeholder="Select Semester"
 					required
 					items={[
-						{ name: '1st', value: 1 },
-						{ name: '2nd', value: 2 },
+						{ name: '1st', value: '1st' },
+						{ name: '2nd', value: '2nd' },
 					]}
 					bind:value={semester}
 				/>

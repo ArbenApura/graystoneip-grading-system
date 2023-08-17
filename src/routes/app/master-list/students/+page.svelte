@@ -208,10 +208,7 @@
 										createConfirmationModal({
 											message:
 												'Are you sure you want to archive this student account?',
-											handleProceed: () =>
-												createVerificationModal({
-													handleProceed: () => handleArchive(item.id),
-												}),
+											handleProceed: () => handleArchive(item.id),
 										})}
 								>
 									<i class="ti ti-archive text-sm" />

@@ -2,7 +2,7 @@
 	// IMPORTED ASSETS
 	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED TYPES
-	import type { Account } from '$types/credentials';
+	import type { Account } from '$types/master-list';
 	// IMPORTED STATES
 	import { isMD, isLG, isXL } from '$stores/mediaStates';
 	import { isOpen } from '$stores/sidebarStates';
