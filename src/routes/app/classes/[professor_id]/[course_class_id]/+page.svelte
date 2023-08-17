@@ -12,6 +12,13 @@
 			label: 'Classes',
 			href: '/app/classes/' + $page.params.professor_id,
 		},
-		{ label: $page.data.courseClass.name, href: '' },
+		{
+			label: $page.data.professor.full_name,
+			href: '/app/classes/' + $page.params.professor_id,
+		},
+		{
+			label: $page.data.courseClass.name,
+			href: $page.url.pathname,
+		},
 	]}
 />

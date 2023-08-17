@@ -23,7 +23,7 @@ export const selectCourseClasses = async ({
 	semester?: string;
 	school_year?: string;
 }) => {
-	let query = supabase.from('classes').select();
+	let query = supabase.from('classes').select().order('name');
 	if (semester) query.match({ semester });
 	if (school_year) query.match({ school_year });
 	if (search) query.ilike('name', `%${search}%`);

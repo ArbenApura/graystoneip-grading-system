@@ -100,7 +100,12 @@
 	});
 </script>
 
-<Header breadcrumbItems={[{ icon: 'ph-bold ph-chalkboard', label: 'Classes', href: '' }]} />
+<Header
+	breadcrumbItems={[
+		{ icon: 'ph-bold ph-chalkboard', label: 'Classes', href: '' },
+		{ label: $page.data.professor.full_name, href: $page.url.pathname },
+	]}
+/>
 
 {#if modals.adder}
 	<CourseClassAdderModal handleClose={closeAdderModal} {handleSearch} />

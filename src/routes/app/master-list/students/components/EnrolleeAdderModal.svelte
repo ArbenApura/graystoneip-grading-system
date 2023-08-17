@@ -29,7 +29,7 @@
 	let programItems = ($page.data.programs || []).map((program: Program) => ({
 		name: program.code + ' - ' + program.description,
 		value: program.id,
-	}));
+	}));	
 
 	// REACTIVE STATES
 	$: program = $page.data.programs
@@ -148,8 +148,8 @@
 					placeholder="Select Semester"
 					required
 					items={[
-						{ name: '1st', value: 1 },
-						{ name: '2nd', value: 2 },
+					{ name: '1st', value: '1st' },
+						{ name: '2nd', value: '2nd' },
 					]}
 					bind:value={semester}
 				/>

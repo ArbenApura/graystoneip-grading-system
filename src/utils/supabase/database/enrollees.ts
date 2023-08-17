@@ -23,6 +23,7 @@ export const selectEnrollees = async ({
 	let query = supabase
 		.from('enrollees')
 		.select()
+		.order('student_number')
 		.eq('is_archived', typeof is_archived === 'undefined' ? false : is_archived);
 	if (semester) query.match({ semester });
 	if (school_year) query.match({ school_year });

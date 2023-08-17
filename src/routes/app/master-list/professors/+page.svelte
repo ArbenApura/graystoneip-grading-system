@@ -175,6 +175,12 @@
 							<div class="flex gap-2">
 								<Button
 									class="w-[25px] h-[25px] flex-center"
+									href="/app/classes/{item.id}"
+								>
+									<i class="ti ti-eye text-sm" />
+								</Button>
+								<Button
+									class="w-[25px] h-[25px] flex-center"
 									color="green"
 									on:click={() => openEditorModal(item)}
 								>
