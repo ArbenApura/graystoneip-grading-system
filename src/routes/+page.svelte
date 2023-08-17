@@ -4,7 +4,7 @@
 	// IMPORTED LIB-UTILS
 	import { goto } from '$app/navigation';
 	// IMPORTED UTILS
-	import { createErrorModal, createSuccessModal } from '$stores/modalStates';
+	import { createErrorModal, createRecoveryModal, createSuccessModal } from '$stores/modalStates';
 	import { validateEmail } from '$utils/helpers';
 	// IMPORTED LIB-COMPONENTS
 	import { FloatingLabelInput, Button, Badge, Spinner } from 'flowbite-svelte';
@@ -63,7 +63,9 @@
 					/>
 				</div>
 				<span class="mt-2 mb-4 text-right">
-					<a class="text-xs text-link" href="/">Forgot password?</a>
+					<button class="text-xs text-link" type="button" on:click={createRecoveryModal}>
+						Forgot password?
+					</button>
 				</span>
 				<Button class="w-full" type="submit" disabled={isLoading}>
 					{#if isLoading}

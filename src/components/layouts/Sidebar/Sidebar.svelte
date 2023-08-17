@@ -103,6 +103,22 @@
 			],
 		},
 		{
+			label: 'Recovery Requests',
+			icon: 'ph-bold ph-arrow-counter-clockwise',
+			location: '/app/recovery-requests',
+			isOpen: false,
+			isVisible: $account.account_type === 'admin',
+			contents: [],
+		},
+		{
+			label: 'Admin Controls',
+			icon: 'ti ti-shield-lock',
+			location: '/app/admin-controls',
+			isOpen: false,
+			isVisible: $account.account_type === 'admin',
+			contents: [],
+		},
+		{
 			label: 'Archive',
 			icon: 'ti ti-archive',
 			location: '',
@@ -183,14 +199,6 @@
 					contents: [],
 				},
 			],
-		},
-		{
-			label: 'Admin Controls',
-			icon: 'ti ti-shield-lock',
-			location: '/app/admin-controls',
-			isOpen: false,
-			isVisible: $account.account_type === 'admin',
-			contents: [],
 		},
 	];
 	let isAccountMenuOpen = false;

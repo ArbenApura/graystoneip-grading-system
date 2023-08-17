@@ -189,6 +189,24 @@ export interface Database {
         }
         Relationships: []
       }
+      recovery_requests: {
+        Row: {
+          created_at: number
+          email: string | null
+          id: string
+        }
+        Insert: {
+          created_at: number
+          email?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: number
+          email?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,5 +1,5 @@
 // IMPORTED TYPES
-import type { Course, Program } from './curriculum';
+import type { Program } from './curriculum';
 
 // TYPES
 export type AccountType = 'admin' | 'professor' | 'student';

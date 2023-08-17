@@ -34,6 +34,9 @@ export const createConfirmationModal = ({
 		{ id: generateId(), type: 'confirmation', title, message, handleProceed },
 	]);
 };
+export const createRecoveryModal = () => {
+	modals.update((modals) => [...modals, { id: generateId(), type: 'recovery' }]);
+};
 export const createVerificationModal = ({
 	title,
 	message,

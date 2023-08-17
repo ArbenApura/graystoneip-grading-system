@@ -7,6 +7,7 @@
 	import SuccessModal from '$components/modules/SuccessModal.svelte';
 	import ConfirmationModal from '$components/modules/ConfirmationModal.svelte';
 	import VerificationModal from '$components/modules/VerificationModal.svelte';
+	import AccountRecoveryModal from '$components/modules/AccountRecoveryModal.svelte';
 	import LoadingModal from '$components/modules/LoadingModal.svelte';
 </script>
 
@@ -21,6 +22,8 @@
 		<ConfirmationModal {modal} />
 	{:else if modal.type === 'verification'}
 		<VerificationModal {modal} />
+	{:else if modal.type === 'recovery'}
+		<AccountRecoveryModal {modal} />
 	{:else if modal.type === 'loading'}
 		<LoadingModal {modal} />
 	{/if}
