@@ -175,7 +175,7 @@
 							<div class="flex gap-2">
 								<Button
 									class="w-[25px] h-[25px] flex-center"
-									href="/app/classes/{item.id}"
+									href="/app/classes?professor_id={item.id}"
 								>
 									<i class="ti ti-eye text-sm" />
 								</Button>

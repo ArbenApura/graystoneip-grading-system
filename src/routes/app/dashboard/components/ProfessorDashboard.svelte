@@ -16,7 +16,7 @@
         {$isOpen && $isXL ? 'xl:grid-cols-2' : 'xl:grid-cols-4'}
         gap-4"
 	>
-		<a class="item" href="/app/classes/{$account.id}">
+		<a class="item" href="/app/classes?professor_id={$account.id}">
 			<img src={ClassesPNG} alt="" />
 			<div class="details">
 				<p>

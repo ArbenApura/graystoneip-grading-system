@@ -4,11 +4,16 @@
 	import StudentsPNG from '$assets/storysets/Learning-cuate.png';
 	import CoursesPNG from '$assets/storysets/Learning-rafiki.png';
 	import ProgramsPNG from '$assets/storysets/Learning-bro.png';
-	// IMPORTED LIB-UTILS
-	import { page } from '$app/stores';
 	// IMPORTED STATES
 	import { isMD, isXL } from '$stores/mediaStates';
 	import { isOpen } from '$stores/sidebarStates';
+	// IMPORTED UTILS
+	import {
+		getCoursesCount,
+		getProfessorsCount,
+		getProgramsCount,
+		getStudentsCount,
+	} from '$utils/supabase';
 </script>
 
 <div
@@ -20,28 +25,60 @@
 	<a class="item" href="/app/master-list/professors">
 		<img src={ProgessorsPNG} alt="" />
 		<div class="details">
-			<p>{$page.data.professorsCount || 0}</p>
+			<p>
+				{#await getProfessorsCount()}
+					...
+				{:then count}
+					{count}
+				{:catch}
+					?
+				{/await}
+			</p>
 			<p>Professors</p>
 		</div>
 	</a>
 	<a class="item" href="/app/master-list/students">
 		<img src={StudentsPNG} alt="" />
 		<div class="details">
-			<p>{$page.data.studentsCount || 0}</p>
+			<p>
+				{#await getStudentsCount()}
+					...
+				{:then count}
+					{count}
+				{:catch}
+					?
+				{/await}
+			</p>
 			<p>Students</p>
 		</div>
 	</a>
 	<a class="item" href="/app/curriculum/courses">
 		<img src={CoursesPNG} alt="" />
 		<div class="details">
-			<p>{$page.data.coursesCount || 0}</p>
+			<p>
+				{#await getCoursesCount()}
+					...
+				{:then count}
+					{count}
+				{:catch}
+					?
+				{/await}
+			</p>
 			<p>Courses</p>
 		</div>
 	</a>
 	<a class="item" href="/app/curriculum/programs">
 		<img src={ProgramsPNG} alt="" />
 		<div class="details">
-			<p>{$page.data.programsCount || 0}</p>
+			<p>
+				{#await getProgramsCount()}
+					...
+				{:then count}
+					{count}
+				{:catch}
+					?
+				{/await}
+			</p>
 			<p>Programs</p>
 		</div>
 	</a>

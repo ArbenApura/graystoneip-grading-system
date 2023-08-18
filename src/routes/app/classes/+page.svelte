@@ -108,7 +108,7 @@
 <Header
 	breadcrumbItems={[
 		{ icon: 'ph-bold ph-chalkboard', label: 'Classes', href: '' },
-		{ label: $page.data.professor.full_name, href: $page.url.pathname },
+		{ label: $page.data.professor.full_name, href: $page.url.pathname + $page.url.search },
 	]}
 />
 
@@ -207,7 +207,8 @@
 							<div class="flex gap-2">
 								<Button
 									class="w-[25px] h-[25px] flex-center"
-									href="{$page.url.pathname}/{item.courseClass.id}"
+									href="/app/classes/class?professor_id={item.professor
+										.id}&course_class_id={item.courseClass.id}"
 								>
 									<i class="ti ti-eye text-sm" />
 								</Button>

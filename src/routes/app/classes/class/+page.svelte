@@ -17,15 +17,15 @@
 		{
 			icon: 'ph-bold ph-chalkboard',
 			label: 'Classes',
-			href: '/app/classes/' + $page.params.professor_id,
+			href: '/app/classes?professor_id=' + $page.data.professor.id,
 		},
 		{
 			label: $page.data.professor.full_name,
-			href: '/app/classes/' + $page.params.professor_id,
+			href: '/app/classes?professor_id=' + $page.data.professor.id,
 		},
 		{
 			label: $page.data.courseClass.name,
-			href: $page.url.pathname,
+			href: $page.url.pathname + $page.url.search,
 		},
 	]}
 />
@@ -37,20 +37,20 @@
         {$isOpen && $isXL ? 'xl:grid-cols-2' : 'xl:grid-cols-4'}
         gap-4"
 	>
-		<a class="item" href="{$page.url.pathname}/students">
+		<a class="item" href="{$page.url.pathname}/students{$page.url.search}">
 			<img src={StudentsPNG} alt="" />
 			<div class="p-8">
 				<p class="text-3xl">0</p>
 				<p>Students</p>
 			</div>
 		</a>
-		<a class="item" href="{$page.url.pathname}/grades">
+		<a class="item" href="{$page.url.pathname}/grades{$page.url.search}">
 			<img src={GradesPNG} alt="" />
 			<div class="p-8">
 				<p>Grades</p>
 			</div>
 		</a>
-		<a class="item" href="{$page.url.pathname}/attendance">
+		<a class="item" href="{$page.url.pathname}/attendance{$page.url.search}">
 			<img src={AttendancePNG} alt="" />
 			<div class="p-8">
 				<p>Attendance</p>

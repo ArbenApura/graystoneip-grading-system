@@ -50,7 +50,8 @@
 						<a
 							class="flex items-center gap-2 {i === 0
 								? 'text-lg'
-								: 'text-xs'} {item.href === $page.url.pathname && 'text-blue-600'}"
+								: 'text-xs'} {item.href === $page.url.pathname + $page.url.search &&
+								'text-blue-600'}"
 							href={item.href}
 						>
 							{#if i === 0}

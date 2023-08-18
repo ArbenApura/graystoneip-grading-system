@@ -2,7 +2,7 @@
 	// IMPORTED LIB-COMPONENTS
 	import { Badge, Select } from 'flowbite-svelte';
 	// IMPORTED LIB-UTILS
-	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
 	// IMPORTED UTILS
 	import { createErrorModal } from '$stores/modalStates';
 	import {
@@ -14,10 +14,10 @@
 
 	// STATES
 	let span = 'week';
-	let professors = $page.data.professorsCountWeek;
-	let students = $page.data.studentsCountWeek;
-	let courses = $page.data.coursesCountWeek;
-	let programs = $page.data.programsCountWeek;
+	let professors: any = '...';
+	let students: any = '...';
+	let courses: any = '...';
+	let programs: any = '...';
 	let isLoading = false;
 
 	// UTILS
@@ -35,6 +35,9 @@
 		}
 		isLoading = false;
 	};
+
+	// LIFECYCLES
+	onMount(handleChange);
 </script>
 
 <div class="bg-white rounded-md shadow-md w-full p-4 flex flex-col gap-4">

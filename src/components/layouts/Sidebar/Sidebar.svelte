@@ -18,6 +18,7 @@
 		label: string;
 		icon: string;
 		location: string;
+		params: string;
 		contents: Item[];
 		isOpen: boolean;
 		isVisible: boolean;
@@ -32,6 +33,7 @@
 			label: 'Dashboard',
 			icon: 'ti ti-layout-dashboard',
 			location: '/app/dashboard',
+			params: '',
 			isOpen: false,
 			isVisible: true,
 			contents: [],
@@ -39,7 +41,8 @@
 		{
 			label: 'Classes',
 			icon: 'ph-bold ph-chalkboard',
-			location: `/app/classes/${$account.id}`,
+			location: '/app/classes',
+			params: `?professor_id=${$account.id}`,
 			isOpen: false,
 			isVisible: $account.account_type === 'professor',
 			contents: [],
@@ -48,6 +51,7 @@
 			label: 'Master List',
 			icon: 'ph-bold ph-user-list',
 			location: '',
+			params: '',
 			isOpen: false,
 			isVisible: $account.account_type === 'admin',
 			contents: [
@@ -55,6 +59,7 @@
 					label: 'Professors',
 					icon: 'ph-bold ph-chalkboard-teacher',
 					location: '/app/master-list/professors',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -63,6 +68,7 @@
 					label: 'Students',
 					icon: 'ph-bold ph-student',
 					location: '/app/master-list/students',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -71,6 +77,7 @@
 					label: 'Enrollees',
 					icon: 'ph-bold ph-user-list',
 					location: '/app/master-list/enrollees',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -81,6 +88,7 @@
 			label: 'Curriculum',
 			icon: 'ti ti-list-details',
 			location: '',
+			params: '',
 			isOpen: false,
 			isVisible: $account.account_type === 'admin',
 			contents: [
@@ -88,6 +96,7 @@
 					label: 'Courses',
 					icon: 'ti ti-books',
 					location: '/app/curriculum/courses',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -96,6 +105,7 @@
 					label: 'Programs',
 					icon: 'ti ti-school',
 					location: '/app/curriculum/programs',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -106,6 +116,7 @@
 			label: 'Recovery Requests',
 			icon: 'ph-bold ph-arrow-counter-clockwise',
 			location: '/app/recovery-requests',
+			params: '',
 			isOpen: false,
 			isVisible: $account.account_type === 'admin',
 			contents: [],
@@ -114,6 +125,7 @@
 			label: 'Admin Controls',
 			icon: 'ti ti-shield-lock',
 			location: '/app/admin-controls',
+			params: '',
 			isOpen: false,
 			isVisible: $account.account_type === 'admin',
 			contents: [],
@@ -122,6 +134,7 @@
 			label: 'Archive',
 			icon: 'ti ti-archive',
 			location: '',
+			params: '',
 			isOpen: false,
 			isVisible: $account.account_type === 'admin',
 			contents: [
@@ -129,6 +142,7 @@
 					label: 'Professors',
 					icon: 'ph-bold ph-chalkboard-teacher',
 					location: '/app/archive/professors',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -137,6 +151,7 @@
 					label: 'Students',
 					icon: 'ph-bold ph-student',
 					location: '/app/archive/students',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -145,6 +160,7 @@
 					label: 'Enrollees',
 					icon: 'ph-bold ph-user-list',
 					location: '/app/archive/enrollees',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -153,6 +169,7 @@
 					label: 'Courses',
 					icon: 'ti ti-books',
 					location: '/app/archive/courses',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -161,6 +178,7 @@
 					label: 'Programs',
 					icon: 'ti ti-school',
 					location: '/app/archive/programs',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -169,6 +187,7 @@
 					label: 'Admins',
 					icon: 'ti ti-shield-lock',
 					location: '/app/archive/admins',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -179,6 +198,7 @@
 			label: 'Resources',
 			icon: 'ph-bold ph-folders',
 			location: '',
+			params: '',
 			isOpen: false,
 			isVisible: true,
 			contents: [
@@ -186,6 +206,7 @@
 					label: 'Privacy Policy',
 					icon: 'ph-bold ph-lock-laminated',
 					location: '/app/resources/privacy-policy',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -194,6 +215,7 @@
 					label: 'Terms and Conditions',
 					icon: 'ph-bold ph-handshake',
 					location: '/app/resources/terms-and-conditions',
+					params: '',
 					isOpen: false,
 					isVisible: true,
 					contents: [],
@@ -287,7 +309,7 @@
 											)
 												? 'bg-blue-600 text-white'
 												: 'bg-gray-200 hover:bg-gray-300'}"
-											href={content.location}
+											href={content.location + content.params}
 											on:click={handleClick}
 										>
 											<div class="w-[60px] h-[60px] flex-center">
@@ -315,7 +337,7 @@
 									)
 										? 'bg-blue-600 text-white'
 										: 'hover:bg-gray-100'}"
-									href={item.location}
+									href={item.location + item.params}
 									on:click={handleClick}
 								>
 									<div class="w-[60px] h-[60px] flex-center">

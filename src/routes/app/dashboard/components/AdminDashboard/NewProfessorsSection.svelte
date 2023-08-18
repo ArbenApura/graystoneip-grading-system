@@ -7,16 +7,16 @@
 	import { isMD, isLG, isXL } from '$stores/mediaStates';
 	import { isOpen } from '$stores/sidebarStates';
 	// IMPORTED LIB-UTILS
-	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
 	// IMPORTED UTILS
 	import { createErrorModal } from '$stores/modalStates';
 	import { selectNewProfessors } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
-	import { Badge, Select, Avatar } from 'flowbite-svelte';
+	import { Badge, Select } from 'flowbite-svelte';
 
 	// STATES
 	let span = 'week';
-	let professors: Account[] = $page.data.newProfessorsWeek || [];
+	let professors: Account[] = [];
 	let isLoading = false;
 
 	// UTILS
@@ -29,6 +29,9 @@
 		}
 		isLoading = false;
 	};
+
+	// LIFECYCLES
+	onMount(handleChange);
 </script>
 
 <div class="bg-white rounded-md shadow-md p-4 flex flex-col gap-4 h-full">
