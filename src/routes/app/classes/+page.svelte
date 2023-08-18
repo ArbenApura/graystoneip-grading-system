@@ -17,7 +17,11 @@
 		removeCustomModal,
 		removeModal,
 	} from '$stores/modalStates';
-	import { deleteCourseClass, selectCourseClasses } from '$utils/supabase';
+	import {
+		deleteCourseClass,
+		getCourseClassStudentsCount,
+		selectCourseClasses,
+	} from '$utils/supabase';
 	import { generateId } from '$utils/helpers';
 	// IMPORTED LIB-COMPONENTS
 	import {
@@ -197,7 +201,15 @@
 						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
 						<TableBodyCell>{item.courseClass.name}</TableBodyCell>
 						<TableBodyCell>{item.professor.full_name}</TableBodyCell>
-						<TableBodyCell>{0}</TableBodyCell>
+						<TableBodyCell>
+							{#await getCourseClassStudentsCount(item.courseClass.id)}
+								...
+							{:then count}
+								{count}
+							{:catch}
+								?
+							{/await}
+						</TableBodyCell>
 						<TableBodyCell>{item.courseClass.semester}</TableBodyCell>
 						<TableBodyCell>{item.courseClass.school_year}</TableBodyCell>
 						<TableBodyCell>

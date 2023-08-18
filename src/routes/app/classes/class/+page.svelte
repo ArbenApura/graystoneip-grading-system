@@ -6,8 +6,10 @@
 	// IMPORTED STATES
 	import { isMD, isXL } from '$stores/mediaStates';
 	import { isOpen } from '$stores/sidebarStates';
-	// IMPORTED UTILS
+	// IMPORTED LIB-UTILS
 	import { page } from '$app/stores';
+	// IMPORTED UTILS
+	import { getCourseClassStudentsCount } from '$utils/supabase';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
 </script>
@@ -40,7 +42,15 @@
 		<a class="item" href="{$page.url.pathname}/students{$page.url.search}">
 			<img src={StudentsPNG} alt="" />
 			<div class="p-8">
-				<p class="text-3xl">0</p>
+				<p class="text-3xl">
+					{#await getCourseClassStudentsCount($page.data.courseClass.id)}
+						...
+					{:then count}
+						{count}
+					{:catch}
+						?
+					{/await}
+				</p>
 				<p>Students</p>
 			</div>
 		</a>

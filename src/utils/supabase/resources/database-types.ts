@@ -63,7 +63,7 @@ export interface Database {
         }
         Relationships: []
       }
-      classes: {
+      course_classes: {
         Row: {
           course_id: string | null
           created_at: number
@@ -90,6 +90,42 @@ export interface Database {
           professor_id?: string | null
           school_year?: string | null
           semester?: string | null
+        }
+        Relationships: []
+      }
+      course_students: {
+        Row: {
+          course_class_id: string | null
+          created_at: number
+          grade: string | null
+          id: string
+          is_grade_released: boolean | null
+          school_year: string | null
+          search_key: string | null
+          semester: string | null
+          student_id: string | null
+        }
+        Insert: {
+          course_class_id?: string | null
+          created_at: number
+          grade?: string | null
+          id: string
+          is_grade_released?: boolean | null
+          school_year?: string | null
+          search_key?: string | null
+          semester?: string | null
+          student_id?: string | null
+        }
+        Update: {
+          course_class_id?: string | null
+          created_at?: number
+          grade?: string | null
+          id?: string
+          is_grade_released?: boolean | null
+          school_year?: string | null
+          search_key?: string | null
+          semester?: string | null
+          student_id?: string | null
         }
         Relationships: []
       }

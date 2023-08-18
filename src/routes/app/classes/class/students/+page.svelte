@@ -3,6 +3,8 @@
 	import { page } from '$app/stores';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
+
+	$: console.log($page.data);
 </script>
 
 <Header
