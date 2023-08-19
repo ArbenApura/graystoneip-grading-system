@@ -8,7 +8,11 @@
 	import { onMount } from 'svelte';
 	// IMPORTED UTILS
 	import { insertCourseStudent, selectEnrollees } from '$utils/supabase';
-	import { createErrorModal, createSuccessModal } from '$stores/modalStates';
+	import {
+		createConfirmationModal,
+		createErrorModal,
+		createSuccessModal,
+	} from '$stores/modalStates';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		Button,
@@ -64,9 +68,9 @@
 				is_grade_released: false,
 				created_at,
 			});
-			createSuccessModal({ message: 'Course student was added successfully!' });
 			await handleSearch();
 			await handleRefresh();
+			createSuccessModal({ message: 'Course student was added successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -134,7 +138,12 @@
 										class="w-[25px] h-[25px] flex-center"
 										color="blue"
 										disabled={isLoading}
-										on:click={() => handleAdd(item)}
+										on:click={() =>
+											createConfirmationModal({
+												message:
+													'Are you sure you want to add this course student?',
+												handleProceed: () => handleAdd(item),
+											})}
 									>
 										<i class="ph-bold ph-plus text-sm" />
 									</Button>

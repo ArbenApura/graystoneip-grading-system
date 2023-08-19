@@ -1,14 +1,7 @@
 // IMPORTED TYPES
 import type { CourseStudent, CourseStudentData } from '$types/curriculum';
 // IMPORTED UTILS
-import {
-	selectEnrollee,
-	selectCourse,
-	selectCourseClass,
-	supabase,
-	selectAccount,
-	selectProgram,
-} from '..';
+import { supabase } from '..';
 
 // UTILS
 export const insertCourseStudent = async (courseStudent: CourseStudent) => {
@@ -24,7 +17,10 @@ export const selectCourseStudent = async (id: string) => {
 		.match({ id });
 	if (error) throw new Error(error.message);
 	if (!data || !data.length) throw new Error('Class not found!');
-	return data[0] as unknown as CourseStudentData;
+	let courseStudent = data[0] as unknown as CourseStudentData;
+	if (!courseStudent.enrollee.is_archived || !courseStudent.enrollee.account.is_archived)
+		throw new Error('Course student unavailable!');
+	return courseStudent;
 };
 export const selectCourseStudents = async ({
 	search,
@@ -45,8 +41,13 @@ export const selectCourseStudents = async ({
 	if (search) query.ilike('search_key', `%${search}%`);
 	if (not_in_course_class_id) query.neq('course_class_id', not_in_course_class_id);
 	const { data, error } = await query;
+	let courseStudents = (data as unknown as CourseStudentData[]) || [];
+	courseStudents = courseStudents.filter(
+		(courseStudent) =>
+			!courseStudent.enrollee.is_archived && !courseStudent.enrollee.account.is_archived,
+	);
 	if (error) throw new Error(error.message);
-	return (data as unknown as CourseStudentData[]) || [];
+	return courseStudents;
 };
 export const deleteCourseStudent = async (id: string) => {
 	const { error } = await supabase.from('course_students').delete().match({ id });

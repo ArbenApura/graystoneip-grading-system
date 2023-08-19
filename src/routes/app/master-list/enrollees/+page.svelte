@@ -149,6 +149,7 @@
 	<Table items={enrollees} bind:filteredItems bind:startingItem>
 		<svelte:fragment slot="table-head">
 			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
+			<TableHeadCell>Tools</TableHeadCell>
 			<TableHeadCell>Avatar</TableHeadCell>
 			<TableHeadCell>Student No.</TableHeadCell>
 			<TableHeadCell>Last Name</TableHeadCell>
@@ -162,14 +163,36 @@
 			<TableHeadCell>Section</TableHeadCell>
 			<TableHeadCell>Semester</TableHeadCell>
 			<TableHeadCell>School Year</TableHeadCell>
-			<TableHeadCell>Created At</TableHeadCell>
-			<TableHeadCell class="rounded-r-md">Tools</TableHeadCell>
+			<TableHeadCell class="rounded-r-md">Created At</TableHeadCell>
 		</svelte:fragment>
 		<svelte:fragment slot="table-body">
 			{#if filteredItems && filteredItems.length}
 				{#each filteredItems as item, i}
 					<TableBodyRow>
 						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
+						<TableBodyCell>
+							<div class="flex gap-2">
+								<Button
+									class="w-[25px] h-[25px] flex-center"
+									color="green"
+									on:click={() => openEditorModal(item)}
+								>
+									<i class="ti ti-pencil text-sm" />
+								</Button>
+								<Button
+									class="w-[25px] h-[25px] flex-center"
+									color="red"
+									on:click={() =>
+										createConfirmationModal({
+											message:
+												'Are you sure you want to archive this enrollee?',
+											handleProceed: () => handleArchive(item.id),
+										})}
+								>
+									<i class="ti ti-archive text-sm" />
+								</Button>
+							</div>
+						</TableBodyCell>
 						<TableBodyCell>
 							<div class="rounded-full border-[2px] p-[2px] w-fit border-blue-600">
 								<div
@@ -193,29 +216,6 @@
 						<TableBodyCell>{item.school_year}</TableBodyCell>
 						<TableBodyCell>
 							{new Date(item.created_at).toDateString()}
-						</TableBodyCell>
-						<TableBodyCell>
-							<div class="flex gap-2">
-								<Button
-									class="w-[25px] h-[25px] flex-center"
-									color="green"
-									on:click={() => openEditorModal(item)}
-								>
-									<i class="ti ti-pencil text-sm" />
-								</Button>
-								<Button
-									class="w-[25px] h-[25px] flex-center"
-									color="red"
-									on:click={() =>
-										createConfirmationModal({
-											message:
-												'Are you sure you want to archive this enrollee?',
-											handleProceed: () => handleArchive(item.id),
-										})}
-								>
-									<i class="ti ti-archive text-sm" />
-								</Button>
-							</div>
 						</TableBodyCell>
 					</TableBodyRow>
 				{/each}

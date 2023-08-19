@@ -123,6 +123,7 @@
 	<Table items={enrollees} bind:filteredItems bind:startingItem>
 		<svelte:fragment slot="table-head">
 			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
+			<TableHeadCell>Tools</TableHeadCell>
 			<TableHeadCell>Avatar</TableHeadCell>
 			<TableHeadCell>Student No.</TableHeadCell>
 			<TableHeadCell>Last Name</TableHeadCell>
@@ -136,14 +137,28 @@
 			<TableHeadCell>Section</TableHeadCell>
 			<TableHeadCell>Semester</TableHeadCell>
 			<TableHeadCell>School Year</TableHeadCell>
-			<TableHeadCell>Created At</TableHeadCell>
-			<TableHeadCell class="rounded-r-md">Tools</TableHeadCell>
+			<TableHeadCell class="rounded-r-md">Created At</TableHeadCell>
 		</svelte:fragment>
 		<svelte:fragment slot="table-body">
 			{#if filteredItems && filteredItems.length}
 				{#each filteredItems as item, i}
 					<TableBodyRow>
 						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
+						<TableBodyCell>
+							<div class="flex gap-2">
+								<Button
+									class="w-[25px] h-[25px] flex-center"
+									on:click={() =>
+										createConfirmationModal({
+											message:
+												'Are you sure you want to unarchive this enrollee?',
+											handleProceed: () => handleUnarchive(item.id),
+										})}
+								>
+									<i class="ti ti-archive-off text-sm" />
+								</Button>
+							</div>
+						</TableBodyCell>
 						<TableBodyCell>
 							<div class="rounded-full border-[2px] p-[2px] w-fit border-blue-600">
 								<div
@@ -153,7 +168,7 @@
 								/>
 							</div>
 						</TableBodyCell>
-						<TableBodyCell>{item.enrollee.student_number}</TableBodyCell>
+						<TableBodyCell>{item.student_number}</TableBodyCell>
 						<TableBodyCell>{item.account.last_name}</TableBodyCell>
 						<TableBodyCell>{item.account.first_name}</TableBodyCell>
 						<TableBodyCell>{item.account.middle_name}</TableBodyCell>
@@ -161,27 +176,12 @@
 						<TableBodyCell>{item.account.contact_number}</TableBodyCell>
 						<TableBodyCell>{item.account.email}</TableBodyCell>
 						<TableBodyCell>{item.program.code}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.year}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.section}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.semester}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.school_year}</TableBodyCell>
+						<TableBodyCell>{item.year}</TableBodyCell>
+						<TableBodyCell>{item.section}</TableBodyCell>
+						<TableBodyCell>{item.semester}</TableBodyCell>
+						<TableBodyCell>{item.school_year}</TableBodyCell>
 						<TableBodyCell>
-							{new Date(item.enrollee.created_at).toDateString()}
-						</TableBodyCell>
-						<TableBodyCell>
-							<div class="flex gap-2">
-								<Button
-									class="w-[25px] h-[25px] flex-center"
-									on:click={() =>
-										createConfirmationModal({
-											message:
-												'Are you sure you want to unarchive this enrollee?',
-											handleProceed: () => handleUnarchive(item.enrollee.id),
-										})}
-								>
-									<i class="ti ti-archive-off text-sm" />
-								</Button>
-							</div>
+							{new Date(item.created_at).toDateString()}
 						</TableBodyCell>
 					</TableBodyRow>
 				{/each}
