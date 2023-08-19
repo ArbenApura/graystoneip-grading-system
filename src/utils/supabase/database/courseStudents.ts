@@ -51,14 +51,16 @@ export const selectCourseStudents = async ({
 	const { data, error } = await query;
 	if (error) throw new Error(error.message);
 	let courseStudents = (data as unknown as CourseStudentData[]) || [];
-	if (student_id)
+	if (student_id) {
 		courseStudents = courseStudents.filter(
 			(courseStudent) =>
 				!courseStudent.enrollee.is_archived && !courseStudent.enrollee.account.is_archived,
 		);
-	courseStudents = courseStudents.filter(
-		(courseStudent) => courseStudent.enrollee.account.id !== student_id,
-	);
+		courseStudents = courseStudents.filter(
+			(courseStudent) => courseStudent.enrollee.account.id === student_id,
+		);
+	}
+
 	return courseStudents;
 };
 export const deleteCourseStudent = async (id: string) => {
