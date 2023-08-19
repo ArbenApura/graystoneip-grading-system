@@ -12,7 +12,7 @@ export const selectCourseStudent = async (id: string) => {
 	const { data, error } = await supabase
 		.from('course_students')
 		.select(
-			'*, course_class: course_classes(*, professor: accounts(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
+			'*, course_class: course_classes(*, professor: accounts(*), course: courses(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
 		)
 		.match({ id });
 	if (error) throw new Error(error.message);
@@ -24,29 +24,41 @@ export const selectCourseStudent = async (id: string) => {
 };
 export const selectCourseStudents = async ({
 	search,
+	semester,
+	school_year,
+	student_id,
 	course_class_id,
 	not_in_course_class_id,
 }: {
 	search?: string;
+	semester?: string;
+	school_year?: string;
+	student_id?: string;
 	course_class_id?: string;
 	not_in_course_class_id?: string;
 }) => {
 	let query = supabase
 		.from('course_students')
 		.select(
-			'*, course_class: course_classes(*, professor: accounts(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
+			'*, course_class: course_classes(*, professor: accounts(*), course: courses(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
 		)
 		.order('created_at', { ascending: false });
 	if (course_class_id) query.match({ course_class_id });
-	if (search) query.ilike('search_key', `%${search}%`);
 	if (not_in_course_class_id) query.neq('course_class_id', not_in_course_class_id);
+	if (search) query.ilike('search_key', `%${search}%`);
+	if (semester) query.match({ semester });
+	if (school_year) query.match({ school_year });
 	const { data, error } = await query;
-	let courseStudents = (data as unknown as CourseStudentData[]) || [];
-	courseStudents = courseStudents.filter(
-		(courseStudent) =>
-			!courseStudent.enrollee.is_archived && !courseStudent.enrollee.account.is_archived,
-	);
 	if (error) throw new Error(error.message);
+	let courseStudents = (data as unknown as CourseStudentData[]) || [];
+	if (student_id)
+		courseStudents = courseStudents.filter(
+			(courseStudent) =>
+				!courseStudent.enrollee.is_archived && !courseStudent.enrollee.account.is_archived,
+		);
+	courseStudents = courseStudents.filter(
+		(courseStudent) => courseStudent.enrollee.account.id !== student_id,
+	);
 	return courseStudents;
 };
 export const deleteCourseStudent = async (id: string) => {

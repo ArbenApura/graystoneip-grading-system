@@ -158,6 +158,7 @@
 	<Table items={students} bind:filteredItems bind:startingItem>
 		<svelte:fragment slot="table-head">
 			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
+			<TableHeadCell>Tools</TableHeadCell>
 			<TableHeadCell>Avatar</TableHeadCell>
 			<TableHeadCell>Last Name</TableHeadCell>
 			<TableHeadCell>First Name</TableHeadCell>
@@ -165,7 +166,7 @@
 			<TableHeadCell>Gender</TableHeadCell>
 			<TableHeadCell>Contact No.</TableHeadCell>
 			<TableHeadCell>Email</TableHeadCell>
-			<TableHeadCell class="rounded-r-md">Tools</TableHeadCell>
+			<TableHeadCell class="rounded-r-md">Created At</TableHeadCell>
 		</svelte:fragment>
 		<svelte:fragment slot="table-body">
 			{#if filteredItems && filteredItems.length}
@@ -173,23 +174,16 @@
 					<TableBodyRow>
 						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
 						<TableBodyCell>
-							<div class="rounded-full border-[2px] p-[2px] w-fit border-blue-600">
-								<div
-									class="bg-gray-100 w-[35px] h-[35px] rounded-full bg-cover bg-center"
-									style="background-image: url({item.avatar || NoImagePNG})"
-								/>
-							</div>
-						</TableBodyCell>
-						<TableBodyCell>{item.last_name}</TableBodyCell>
-						<TableBodyCell>{item.first_name}</TableBodyCell>
-						<TableBodyCell>{item.middle_name}</TableBodyCell>
-						<TableBodyCell class="capitalize">{item.gender}</TableBodyCell>
-						<TableBodyCell>{item.contact_number}</TableBodyCell>
-						<TableBodyCell>{item.email}</TableBodyCell>
-						<TableBodyCell>
 							<div class="flex gap-2">
 								<Button
 									class="w-[25px] h-[25px] flex-center"
+									href="/app/grades?student_id={item.id}"
+								>
+									<i class="ph-bold ph-eye text-sm" />
+								</Button>
+								<Button
+									class="w-[25px] h-[25px] flex-center"
+									color="yellow"
 									on:click={() => openEnrollerModal(item)}
 								>
 									<i class="ph-bold ph-student text-sm" />
@@ -215,6 +209,21 @@
 								</Button>
 							</div>
 						</TableBodyCell>
+						<TableBodyCell>
+							<div class="rounded-full border-[2px] p-[2px] w-fit border-blue-600">
+								<div
+									class="bg-gray-100 w-[35px] h-[35px] rounded-full bg-cover bg-center"
+									style="background-image: url({item.avatar || NoImagePNG})"
+								/>
+							</div>
+						</TableBodyCell>
+						<TableBodyCell>{item.last_name}</TableBodyCell>
+						<TableBodyCell>{item.first_name}</TableBodyCell>
+						<TableBodyCell>{item.middle_name}</TableBodyCell>
+						<TableBodyCell class="capitalize">{item.gender}</TableBodyCell>
+						<TableBodyCell>{item.contact_number}</TableBodyCell>
+						<TableBodyCell>{item.email}</TableBodyCell>
+						<TableBodyCell>{new Date(item.created_at).toDateString()}</TableBodyCell>
 					</TableBodyRow>
 				{/each}
 			{/if}

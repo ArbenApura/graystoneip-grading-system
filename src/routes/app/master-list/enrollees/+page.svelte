@@ -109,6 +109,7 @@
 			on:submit|preventDefault={handleSearch}
 		>
 			<FloatingLabelInput
+				class="w-full"
 				style="outlined"
 				type="text"
 				label="Search..."

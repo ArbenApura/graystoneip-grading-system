@@ -49,7 +49,7 @@
 	</div>
 	<svelte:fragment slot="footer">
 		<div class="w-full flex items-center justify-end gap-4">
-			<Button color="red" on:click={handleClose}>Cancel</Button>
+			<Button color="red" disabled={isLoading} on:click={handleClose}>Cancel</Button>
 			<Button
 				id="confirm-btn-{modal.id}"
 				color="green"

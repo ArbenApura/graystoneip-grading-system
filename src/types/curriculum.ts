@@ -29,6 +29,7 @@ export type CourseClass = {
 };
 export type CourseClassData = CourseClass & {
 	professor: Account;
+	course: Course;
 };
 export type CourseStudent = {
 	id: string;
@@ -43,5 +44,5 @@ export type CourseStudent = {
 };
 export type CourseStudentData = CourseStudent & {
 	enrollee: EnrolleeData;
-	courseClass: CourseClassData;
+	course_class: CourseClassData;
 };

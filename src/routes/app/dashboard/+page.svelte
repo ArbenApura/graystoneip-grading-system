@@ -7,6 +7,7 @@
 	import Header from '$components/layouts/Header';
 	import AdminDashboard from './components/AdminDashboard';
 	import ProfessorDashboard from './components/ProfessorDashboard.svelte';
+	import StudentDashboard from './components/StudentDashboard.svelte';
 
 	// STATES
 	const breadcrumbItems: BreadcrumbItem[] = [
@@ -20,4 +21,6 @@
 	<AdminDashboard />
 {:else if $account.account_type === 'professor'}
 	<ProfessorDashboard />
+{:else if $account.account_type === 'student'}
+	<StudentDashboard />
 {/if}

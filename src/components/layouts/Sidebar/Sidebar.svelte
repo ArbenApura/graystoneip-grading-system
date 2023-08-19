@@ -39,6 +39,15 @@
 			contents: [],
 		},
 		{
+			label: 'Grades',
+			icon: 'ph-bold ph-exam',
+			location: '/app/grades',
+			params: `?student_id=${$account.id}`,
+			isOpen: false,
+			isVisible: $account.account_type === 'student',
+			contents: [],
+		},
+		{
 			label: 'Classes',
 			icon: 'ph-bold ph-chalkboard',
 			location: '/app/classes',

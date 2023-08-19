@@ -11,7 +11,7 @@ export const insertCourseClass = async (courseClass: CourseClass) => {
 export const selectCourseClass = async (id: string) => {
 	const { data, error } = await supabase
 		.from('course_classes')
-		.select('*, professor: accounts(*)')
+		.select('*, professor: accounts(*), course: courses(*)')
 		.match({ id });
 	if (error) throw new Error(error.message);
 	if (!data || !data.length) throw new Error('Class not found!');
@@ -28,7 +28,10 @@ export const selectCourseClasses = async ({
 	school_year?: string;
 	professor_id?: string;
 }) => {
-	let query = supabase.from('course_classes').select('*, professor: accounts(*)').order('name');
+	let query = supabase
+		.from('course_classes')
+		.select('*, professor: accounts(*), course: courses(*)')
+		.order('name');
 	if (semester) query.match({ semester });
 	if (school_year) query.match({ school_year });
 	if (professor_id) query.match({ professor_id });

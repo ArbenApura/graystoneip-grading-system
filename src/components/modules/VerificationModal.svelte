@@ -56,7 +56,7 @@
 	</form>
 	<svelte:fragment slot="footer">
 		<div class="w-full flex items-center justify-end gap-4">
-			<Button color="red" on:click={handleClose}>Cancel</Button>
+			<Button color="red" disabled={isLoading} on:click={handleClose}>Cancel</Button>
 			<Button color="green" disabled={isLoading} on:click={handleVerification}>
 				{#if isLoading}
 					<Spinner class="mr-3" size="4" color="white" /> Loading
