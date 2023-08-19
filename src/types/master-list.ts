@@ -33,8 +33,7 @@ export type Enrollee = {
 	is_archived?: boolean;
 	created_at: number;
 };
-export type EnrolleeData = {
+export type EnrolleeData = Enrollee & {
 	account: Account;
 	program: Program;
-	enrollee: Enrollee;
 };

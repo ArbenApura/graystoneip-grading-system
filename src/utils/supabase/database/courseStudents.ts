@@ -1,7 +1,14 @@
 // IMPORTED TYPES
 import type { CourseStudent, CourseStudentData } from '$types/curriculum';
 // IMPORTED UTILS
-import { selectAccount, selectCourse, selectCourseClass, supabase } from '..';
+import {
+	selectEnrollee,
+	selectCourse,
+	selectCourseClass,
+	supabase,
+	selectAccount,
+	selectProgram,
+} from '..';
 
 // UTILS
 export const insertCourseStudent = async (courseStudent: CourseStudent) => {
@@ -9,40 +16,37 @@ export const insertCourseStudent = async (courseStudent: CourseStudent) => {
 	if (error) throw new Error(error.message);
 };
 export const selectCourseStudent = async (id: string) => {
-	const { data, error } = await supabase.from('course_students').select().match({ id });
+	const { data, error } = await supabase
+		.from('course_students')
+		.select(
+			'*, course_class: course_classes(*, professor: accounts(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
+		)
+		.match({ id });
 	if (error) throw new Error(error.message);
 	if (!data || !data.length) throw new Error('Class not found!');
-	return data[0] as CourseStudent;
+	return data[0] as unknown as CourseStudentData;
 };
 export const selectCourseStudents = async ({
 	search,
 	course_class_id,
+	not_in_course_class_id,
 }: {
 	search?: string;
 	course_class_id?: string;
+	not_in_course_class_id?: string;
 }) => {
-	let query = supabase.from('course_students').select().order('created_at', { ascending: false });
+	let query = supabase
+		.from('course_students')
+		.select(
+			'*, course_class: course_classes(*, professor: accounts(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
+		)
+		.order('created_at', { ascending: false });
 	if (course_class_id) query.match({ course_class_id });
 	if (search) query.ilike('search_key', `%${search}%`);
+	if (not_in_course_class_id) query.neq('course_class_id', not_in_course_class_id);
 	const { data, error } = await query;
 	if (error) throw new Error(error.message);
-	const courseStudentes: CourseStudentData[] = [];
-	await Promise.all(
-		(data as CourseStudent[]).map(async (courseStudent) => {
-			const courseClass = await selectCourseClass(courseStudent.course_class_id);
-			courseStudentes.push({
-				student: await selectAccount(courseStudent.student_id),
-				course: await selectCourse(courseClass.course_id),
-				courseClass,
-				courseStudent,
-			});
-		}),
-	);
-	return courseStudentes;
-};
-export const deleteCourseStudents = async (course_class_id: string) => {
-	const { error } = await supabase.from('course_students').delete().match({ course_class_id });
-	if (error) throw new Error(error.message);
+	return (data as unknown as CourseStudentData[]) || [];
 };
 export const deleteCourseStudent = async (id: string) => {
 	const { error } = await supabase.from('course_students').delete().match({ id });

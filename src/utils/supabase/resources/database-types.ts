@@ -97,35 +97,35 @@ export interface Database {
         Row: {
           course_class_id: string | null
           created_at: number
+          enrollee_id: string | null
           grade: string | null
           id: string
           is_grade_released: boolean | null
           school_year: string | null
           search_key: string | null
           semester: string | null
-          student_id: string | null
         }
         Insert: {
           course_class_id?: string | null
           created_at: number
+          enrollee_id?: string | null
           grade?: string | null
           id: string
           is_grade_released?: boolean | null
           school_year?: string | null
           search_key?: string | null
           semester?: string | null
-          student_id?: string | null
         }
         Update: {
           course_class_id?: string | null
           created_at?: number
+          enrollee_id?: string | null
           grade?: string | null
           id?: string
           is_grade_released?: boolean | null
           school_year?: string | null
           search_key?: string | null
           semester?: string | null
-          student_id?: string | null
         }
         Relationships: []
       }

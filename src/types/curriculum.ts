@@ -1,5 +1,5 @@
 // IMPORTED TYPES
-import type { Account } from './master-list';
+import type { Account, Enrollee, EnrolleeData } from './master-list';
 
 // TYPES
 export type Program = {
@@ -27,14 +27,13 @@ export type CourseClass = {
 	school_year: string;
 	created_at: number;
 };
-export type CourseClassData = {
+export type CourseClassData = CourseClass & {
 	professor: Account;
-	courseClass: CourseClass;
 };
 export type CourseStudent = {
 	id: string;
 	course_class_id: string;
-	student_id: string;
+	enrollee_id: string;
 	search_key: string;
 	semester: string;
 	school_year: string;
@@ -42,9 +41,7 @@ export type CourseStudent = {
 	is_grade_released: boolean;
 	created_at: number;
 };
-export type CourseStudentData = {
-	student: Account;
-	course: Course;
-	courseClass: CourseClass;
-	courseStudent: CourseStudent;
+export type CourseStudentData = CourseStudent & {
+	enrollee: EnrolleeData;
+	courseClass: CourseClassData;
 };

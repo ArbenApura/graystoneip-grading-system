@@ -98,12 +98,7 @@
 
 {#if target}
 	{#if modals.editor}
-		<EnrolleeEditorModal
-			enrollee={target.enrollee}
-			account={target.account}
-			handleClose={closeEditorModal}
-			{handleSearch}
-		/>
+		<EnrolleeEditorModal enrollee={target} handleClose={closeEditorModal} {handleSearch} />
 	{/if}
 {/if}
 
@@ -184,7 +179,7 @@
 								/>
 							</div>
 						</TableBodyCell>
-						<TableBodyCell>{item.enrollee.student_number}</TableBodyCell>
+						<TableBodyCell>{item.student_number}</TableBodyCell>
 						<TableBodyCell>{item.account.last_name}</TableBodyCell>
 						<TableBodyCell>{item.account.first_name}</TableBodyCell>
 						<TableBodyCell>{item.account.middle_name}</TableBodyCell>
@@ -192,12 +187,12 @@
 						<TableBodyCell>{item.account.contact_number}</TableBodyCell>
 						<TableBodyCell>{item.account.email}</TableBodyCell>
 						<TableBodyCell>{item.program.code}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.year}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.section}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.semester}</TableBodyCell>
-						<TableBodyCell>{item.enrollee.school_year}</TableBodyCell>
+						<TableBodyCell>{item.year}</TableBodyCell>
+						<TableBodyCell>{item.section}</TableBodyCell>
+						<TableBodyCell>{item.semester}</TableBodyCell>
+						<TableBodyCell>{item.school_year}</TableBodyCell>
 						<TableBodyCell>
-							{new Date(item.enrollee.created_at).toDateString()}
+							{new Date(item.created_at).toDateString()}
 						</TableBodyCell>
 						<TableBodyCell>
 							<div class="flex gap-2">
@@ -215,7 +210,7 @@
 										createConfirmationModal({
 											message:
 												'Are you sure you want to archive this enrollee?',
-											handleProceed: () => handleArchive(item.enrollee.id),
+											handleProceed: () => handleArchive(item.id),
 										})}
 								>
 									<i class="ti ti-archive text-sm" />

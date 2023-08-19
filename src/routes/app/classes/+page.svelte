@@ -122,7 +122,7 @@
 {#if target}
 	{#if modals.editor}
 		<CourseClassEditorModal
-			courseClass={target.courseClass}
+			courseClass={target}
 			handleClose={closeEditorModal}
 			{handleSearch}
 		/>
@@ -199,10 +199,10 @@
 				{#each filteredItems as item, i}
 					<TableBodyRow>
 						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
-						<TableBodyCell>{item.courseClass.name}</TableBodyCell>
+						<TableBodyCell>{item.name}</TableBodyCell>
 						<TableBodyCell>{item.professor.full_name}</TableBodyCell>
 						<TableBodyCell>
-							{#await getCourseClassStudentsCount(item.courseClass.id)}
+							{#await getCourseClassStudentsCount(item.id)}
 								...
 							{:then count}
 								{count}
@@ -210,17 +210,17 @@
 								?
 							{/await}
 						</TableBodyCell>
-						<TableBodyCell>{item.courseClass.semester}</TableBodyCell>
-						<TableBodyCell>{item.courseClass.school_year}</TableBodyCell>
+						<TableBodyCell>{item.semester}</TableBodyCell>
+						<TableBodyCell>{item.school_year}</TableBodyCell>
 						<TableBodyCell>
-							{new Date(item.courseClass.created_at).toDateString()}
+							{new Date(item.created_at).toDateString()}
 						</TableBodyCell>
 						<TableBodyCell>
 							<div class="flex gap-2">
 								<Button
 									class="w-[25px] h-[25px] flex-center"
 									href="/app/classes/class?professor_id={item.professor
-										.id}&course_class_id={item.courseClass.id}"
+										.id}&course_class_id={item.id}"
 								>
 									<i class="ti ti-eye text-sm" />
 								</Button>
@@ -237,7 +237,7 @@
 									on:click={() =>
 										createConfirmationModal({
 											message: 'Are you sure you want to delete this class?',
-											handleProceed: () => handleDelete(item.courseClass.id),
+											handleProceed: () => handleDelete(item.id),
 										})}
 								>
 									<i class="ph-bold ph-trash text-sm" />

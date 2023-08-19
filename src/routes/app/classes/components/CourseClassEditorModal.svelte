@@ -1,6 +1,6 @@
 <script lang="ts">
 	// IMPORTED TYPES
-	import type { Course, CourseClass } from '$types/curriculum';
+	import type { Course, CourseClassData } from '$types/curriculum';
 	// IMPORTED LIB-UTILS
 	import { page } from '$app/stores';
 	// IMPORTED UTILS
@@ -14,7 +14,9 @@
 	import { updateCourseClass } from '$utils/supabase';
 
 	// PROPS
-	export let courseClass: CourseClass, handleClose: () => void, handleSearch: () => Promise<void>;
+	export let courseClass: CourseClassData,
+		handleClose: () => void,
+		handleSearch: () => Promise<void>;
 
 	// STATES
 	let name = courseClass.name,

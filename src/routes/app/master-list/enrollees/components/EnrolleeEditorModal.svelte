@@ -1,6 +1,6 @@
 <script lang="ts">
 	// IMPORTED TYPES
-	import type { Account, Enrollee } from '$types/master-list';
+	import type { Account, EnrolleeData } from '$types/master-list';
 	import type { Course, Program } from '$types/curriculum';
 	// IMPORTED LIB-UTILS
 	import { page } from '$app/stores';
@@ -15,10 +15,7 @@
 	import { updateEnrollee } from '$utils/supabase';
 
 	// PROPS
-	export let enrollee: Enrollee,
-		account: Account,
-		handleClose: () => void,
-		handleSearch: () => Promise<void>;
+	export let enrollee: EnrolleeData, handleClose: () => void, handleSearch: () => Promise<void>;
 
 	// STATES
 	let student_number = enrollee.student_number,
@@ -56,10 +53,10 @@
 	const handleSave = async () => {
 		isLoading = true;
 		try {
-			const search_key = `${account.full_name} ${student_number} ${program?.code} ${school_year}`;
+			const search_key = `${enrollee.account.full_name} ${student_number} ${program?.code} ${school_year}`;
 			await updateEnrollee({
 				id: enrollee.id,
-				account_id: account.id,
+				account_id: enrollee.account.id,
 				program_id,
 				student_number,
 				year,
