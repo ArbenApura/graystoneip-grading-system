@@ -8,7 +8,7 @@
 		@apply w-1 h-1;
 	}
 	&::-webkit-scrollbar-track {
-		@apply bg-transparent;
+		@apply bg-blue-100;
 	}
 	&::-webkit-scrollbar-thumb {
 		@apply bg-blue-600 rounded-md;

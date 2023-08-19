@@ -48,7 +48,7 @@ export const loadData = async () => {
 export const observeRoute = async () => {
 	const isLogined = get(authStates.isLogined);
 	const account = get(authStates.account);
-	const { route, params } = get(page);
+	const { route } = get(page);
 	if (!route || !route.id) return;
 	else if (isLogined && route.id === '/') await goto('/app/dashboard');
 	else if (!isLogined && route.id.match('/app/')) await goto('/');
@@ -56,6 +56,10 @@ export const observeRoute = async () => {
 		account.account_type !== 'admin' &&
 		route.id.match(/\/app\/(curriculum|master-list|admin-controls)\//g)
 	)
+		await goto('/app/dashboard');
+	else if (account.account_type === 'professor' && route.id?.match(/\/app\/grades/g))
+		await goto('/app/dashboard');
+	else if (account.account_type === 'student' && route.id?.match(/\/app\/classes/g))
 		await goto('/app/dashboard');
 };
 export const initializeAuthStates = async () => {
