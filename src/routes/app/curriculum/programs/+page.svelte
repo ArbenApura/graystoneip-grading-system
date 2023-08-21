@@ -23,6 +23,7 @@
 		TableHeadCell,
 		TableBodyRow,
 		TableBodyCell,
+		Tooltip,
 	} from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
@@ -136,6 +137,9 @@
 		>
 			<i class="ti ti-plus text-xl" />
 		</Button>
+		<Tooltip class="text-xs whitespace-nowrap z-[100]" color="light" placement="left">
+			Add Program
+		</Tooltip>
 	</div>
 	<Table items={programs} bind:filteredItems bind:startingItem>
 		<svelte:fragment slot="table-head">

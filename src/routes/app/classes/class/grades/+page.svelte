@@ -128,7 +128,9 @@
 	>
 		<i class="ti ti-plus text-xl" />
 	</Button>
-	<Tooltip class="text-xs whitespace-nowrap" color="light" placement="left">Add Criteria</Tooltip>
+	<Tooltip class="text-xs whitespace-nowrap z-[100]" color="light" placement="left"
+		>Add Criteria</Tooltip
+	>
 {/if}
 
 <div class="p-4 pt-0 flex flex-col gap-4">

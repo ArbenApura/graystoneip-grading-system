@@ -149,7 +149,9 @@
 >
 	<i class="ph-bold ph-globe text-xl" />
 </Button>
-<Tooltip class="text-xs whitespace-nowrap" color="light" placement="left">Release Grades</Tooltip>
+<Tooltip class="text-xs whitespace-nowrap z-[100]" color="light" placement="left">
+	Release Grades
+</Tooltip>
 
 <div class="flex flex-col gap-2">
 	<div class="overflow-auto border-r">
