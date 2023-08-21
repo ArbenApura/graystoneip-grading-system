@@ -79,7 +79,7 @@
 	const getFinalGrade = (course_student_id: string) =>
 		(getMidTermGrade(course_student_id) + getFinalTermGrade(course_student_id)) / 2;
 	const getEquivalent = (course_student_id: string) => {
-		const finalGrade = getFinalGrade(course_student_id);
+		const finalGrade = Math.round(getFinalGrade(course_student_id));
 		if (finalGrade >= 98 && finalGrade <= 100) return 1.0;
 		if (finalGrade >= 96 && finalGrade <= 97) return 1.25;
 		if (finalGrade >= 93 && finalGrade <= 95) return 1.5;
@@ -89,8 +89,7 @@
 		if (finalGrade >= 81 && finalGrade <= 83) return 2.5;
 		if (finalGrade >= 77 && finalGrade <= 80) return 2.75;
 		if (finalGrade >= 75 && finalGrade <= 76) return 3.0;
-		if (finalGrade < 74) return 5.0;
-		return 0;
+		return 5.0;
 	};
 	const handleReleaseGrades = async () => {
 		isLoading = true;
