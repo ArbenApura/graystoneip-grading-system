@@ -91,7 +91,20 @@ export interface Database {
           school_year?: string | null
           semester?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "course_classes_course_id_fkey"
+            columns: ["course_id"]
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_classes_professor_id_fkey"
+            columns: ["professor_id"]
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       course_students: {
         Row: {
@@ -127,7 +140,20 @@ export interface Database {
           search_key?: string | null
           semester?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "course_students_course_class_id_fkey"
+            columns: ["course_class_id"]
+            referencedRelation: "course_classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_students_enrollee_id_fkey"
+            columns: ["enrollee_id"]
+            referencedRelation: "enrollees"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       courses: {
         Row: {
@@ -158,6 +184,117 @@ export interface Database {
           units?: number | null
         }
         Relationships: []
+      }
+      criteria_grades: {
+        Row: {
+          course_class_id: string | null
+          course_student_id: string | null
+          created_at: number
+          criteria_item_id: string | null
+          id: string
+          score: number | null
+        }
+        Insert: {
+          course_class_id?: string | null
+          course_student_id?: string | null
+          created_at: number
+          criteria_item_id?: string | null
+          id: string
+          score?: number | null
+        }
+        Update: {
+          course_class_id?: string | null
+          course_student_id?: string | null
+          created_at?: number
+          criteria_item_id?: string | null
+          id?: string
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criteria_grades_course_class_id_fkey"
+            columns: ["course_class_id"]
+            referencedRelation: "course_classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "criteria_grades_course_student_id_fkey"
+            columns: ["course_student_id"]
+            referencedRelation: "course_students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "criteria_grades_criteria_item_id_fkey"
+            columns: ["criteria_item_id"]
+            referencedRelation: "criteria_items"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      criteria_items: {
+        Row: {
+          created_at: number
+          criteria_id: string | null
+          id: string
+          name: string | null
+          total: number | null
+        }
+        Insert: {
+          created_at: number
+          criteria_id?: string | null
+          id: string
+          name?: string | null
+          total?: number | null
+        }
+        Update: {
+          created_at?: number
+          criteria_id?: string | null
+          id?: string
+          name?: string | null
+          total?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criteria_items_criteria_id_fkey"
+            columns: ["criteria_id"]
+            referencedRelation: "criterias"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      criterias: {
+        Row: {
+          course_class_id: string | null
+          created_at: number
+          id: string
+          name: string | null
+          percentage: number | null
+          term: string | null
+        }
+        Insert: {
+          course_class_id?: string | null
+          created_at: number
+          id: string
+          name?: string | null
+          percentage?: number | null
+          term?: string | null
+        }
+        Update: {
+          course_class_id?: string | null
+          created_at?: number
+          id?: string
+          name?: string | null
+          percentage?: number | null
+          term?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criterias_course_class_id_fkey"
+            columns: ["course_class_id"]
+            referencedRelation: "course_classes"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       enrollees: {
         Row: {
@@ -199,7 +336,20 @@ export interface Database {
           student_number?: string | null
           year?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "enrollees_account_id_fkey"
+            columns: ["account_id"]
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollees_program_id_fkey"
+            columns: ["program_id"]
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       programs: {
         Row: {

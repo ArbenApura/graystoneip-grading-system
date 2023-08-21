@@ -46,3 +46,44 @@ export type CourseStudentData = CourseStudent & {
 	enrollee: EnrolleeData;
 	course_class: CourseClassData;
 };
+export type Criteria = {
+	id: string;
+	course_class_id: string;
+	name: string;
+	percentage: number;
+	term: string;
+	created_at: number;
+};
+export type CriteriaData = Criteria & {
+	course_class: CourseClassData;
+};
+export type CriteriaItem = {
+	id: string;
+	criteria_id: string;
+	name: string;
+	total: number;
+	created_at: number;
+};
+export type CriteriaItemData = CriteriaItem & {
+	criteria: CriteriaData;
+};
+export type CriteriaGrade = {
+	id: string;
+	criteria_item_id: string;
+	course_class_id: string;
+	course_student_id: string;
+	score: number;
+	created_at: number;
+};
+export type CriteriaGradeData = CriteriaGrade & {
+	criteria_item: CriteriaItemData;
+	course_student: CourseStudentData;
+};
+export type AdvanceCriteriaItem = {
+	criteria_item: CriteriaItemData;
+	criteria_grades: CriteriaGradeData[];
+};
+export type AdvanceCriteria = {
+	criteria: CriteriaData;
+	advance_criteria_items: AdvanceCriteriaItem[];
+};

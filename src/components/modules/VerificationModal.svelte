@@ -40,7 +40,7 @@
 				<i class="ph-bold ph-shield-warning text-[18px]" />
 			</Badge>
 			<p class="text-lg text-black flex-grow">Verify your identity!</p>
-			<button class="w-[34px] flex-center" on:click={handleClose}>
+			<button class="w-[34px] flex-center" disabled={isLoading} on:click={handleClose}>
 				<i class="ti ti-x text-xl cursor-pointer hover:text-black" />
 			</button>
 		</div>

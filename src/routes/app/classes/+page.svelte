@@ -64,10 +64,10 @@
 		modals.adder = false;
 		removeCustomModal(modalId);
 	};
-	const openEditorModal = (enrollee: CourseClassData) => {
+	const openEditorModal = (courseClass: CourseClassData) => {
 		createCustomModal(modalId);
 		modals.editor = true;
-		target = enrollee;
+		target = courseClass;
 	};
 	const closeEditorModal = () => {
 		modals.editor = false;

@@ -2,7 +2,6 @@
 	// IMPORTED ASSETS
 	import StudentsPNG from '$assets/storysets/Students-rafiki.png';
 	import GradesPNG from '$assets/storysets/Grades-bro.png';
-	import AttendancePNG from '$assets/storysets/Date picker-pana.png';
 	// IMPORTED STATES
 	import { isMD, isXL } from '$stores/mediaStates';
 	import { isOpen } from '$stores/sidebarStates';
@@ -58,12 +57,6 @@
 			<img src={GradesPNG} alt="" />
 			<div class="p-8">
 				<p>Grades</p>
-			</div>
-		</a>
-		<a class="item" href="{$page.url.pathname}/attendance{$page.url.search}">
-			<img src={AttendancePNG} alt="" />
-			<div class="p-8">
-				<p>Attendance</p>
 			</div>
 		</a>
 	</div>

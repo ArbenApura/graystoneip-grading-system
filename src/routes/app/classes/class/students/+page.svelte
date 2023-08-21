@@ -1,21 +1,19 @@
 <script lang="ts">
 	// IMPORTED ASSETS
 	import NoImagePNG from '$assets/images/no-image.png';
-	// IMPORTED UTILS
-	import { page } from '$app/stores';
 	// IMPORTED TYPES
 	import type { CourseStudentData } from '$types/index';
 	// IMPORTED STATES
 	import { isSMDown } from '$stores/mediaStates';
+	// IMPORTED LIB-UTILS
+	import { page } from '$app/stores';
 	// IMPORTED UTILS
 	import {
 		createConfirmationModal,
 		createCustomModal,
 		createErrorModal,
-		createLoadingModal,
 		createSuccessModal,
 		removeCustomModal,
-		removeModal,
 	} from '$stores/modalStates';
 	import { deleteCourseStudent, selectCourseStudents } from '$utils/supabase';
 	import { generateId } from '$utils/helpers';

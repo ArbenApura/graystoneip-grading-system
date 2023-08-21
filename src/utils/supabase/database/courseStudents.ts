@@ -60,7 +60,6 @@ export const selectCourseStudents = async ({
 			(courseStudent) => courseStudent.enrollee.account.id === student_id,
 		);
 	}
-
 	return courseStudents;
 };
 export const deleteCourseStudent = async (id: string) => {
@@ -101,4 +100,22 @@ export const getCourseClassStudentsCount = async (course_class_id: string) => {
 		.select('*', { count: 'exact', head: true })
 		.match({ course_class_id });
 	return count || 0;
+};
+export const releaseGrade = async (
+	course_class_id: string,
+	course_student_id: string,
+	grade: string,
+) => {
+	const { error } = await supabase
+		.from('course_students')
+		.update({ is_grade_released: true, grade })
+		.match({ id: course_student_id, course_class_id });
+	if (error) throw new Error(error.message);
+};
+export const unreleaseGrades = async (course_class_id: string) => {
+	const { error } = await supabase
+		.from('course_students')
+		.update({ is_grade_released: false })
+		.match({ course_class_id });
+	if (error) throw new Error(error.message);
 };
