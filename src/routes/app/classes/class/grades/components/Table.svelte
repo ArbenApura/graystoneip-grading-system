@@ -1,4 +1,6 @@
 <script lang="ts">
+	// IMPORTED LIB-TYPES
+	import type { Row } from 'write-excel-file';
 	// IMPORTED TYPES
 	import type {
 		AdvanceCriteria,
@@ -8,11 +10,19 @@
 		CriteriaGradeData,
 		CriteriaItemData,
 	} from '$types/curriculum';
+	// IMPORTED LIB-UTILS
+	import { page } from '$app/stores';
+	import writeXlsxFile from 'write-excel-file';
 	// IMPORTED UTILS
-	import { createCustomModal, removeCustomModal } from '$stores/modalStates';
+	import {
+		createConfirmationModal,
+		createCustomModal,
+		createErrorModal,
+		removeCustomModal,
+	} from '$stores/modalStates';
 	import { generateId } from '$utils/helpers';
 	// IMPORTED LIB-COMPONENTS
-	import { Button } from 'flowbite-svelte';
+	import { Button, Tooltip } from 'flowbite-svelte';
 	import CriteriaItemEditorModal from './CriteriaItemEditorModal.svelte';
 	import CriteriaGradeAdderModal from './CriteriaGradeAdderModal.svelte';
 	import CriteriaGradeEditorModal from './CriteriaGradeEditorModal.svelte';
@@ -104,11 +114,59 @@
 		});
 		return grade;
 	};
+	const handleExport = async () => {
+		try {
+			const tableEl = document.getElementById('table') as HTMLTableElement;
+			if (!tableEl) throw new Error('Failed to get table data!');
+			const rows: Row[] = [];
+			for (let i = 0; i < tableEl.rows.length; i++) {
+				if (i === 0) continue;
+				const row = tableEl.rows[i];
+				const row_data: Row = [];
+				for (let j = 0; j < row.cells.length; j++) {
+					const cell = row.cells[j];
+					row_data.push({
+						value: cell.innerText,
+						type: String,
+						span: cell.colSpan,
+						align: i === 1 ? 'center' : 'left',
+						fontWeight: i === 1 || i === 2 ? 'bold' : undefined,
+						backgroundColor: i === 1 ? '#60a5fa' : i === 2 ? '#bfdbfe' : undefined,
+						borderColor: i === 1 || i === 2 ? '#3b82f6' : undefined,
+					});
+					if (cell.colSpan > 1)
+						Array(cell.colSpan - 1)
+							.fill(null)
+							.map(() => row_data.push(null));
+				}
+				rows.push(row_data);
+			}
+			await writeXlsxFile([...rows], {
+				fileName: `${$page.data.courseClass.name} - ${term}.xlsx`,
+			});
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+	};
 </script>
+
+<Button
+	class={`w-[48px] h-[48px] shadow-md fixed bottom-[16px] right-[82px] z-20}`}
+	pill={true}
+	disabled={isLoading}
+	on:click={() =>
+		createConfirmationModal({
+			message: 'Are you sure you want to export the grades?',
+			handleProceed: handleExport,
+		})}
+>
+	<i class="ph-bold ph-export text-xl" />
+</Button>
+<Tooltip class="text-xs whitespace-nowrap z-[100]" color="light" placement="top">Export</Tooltip>
 
 <div class="flex flex-col gap-2">
 	<div class="overflow-auto border-r">
-		<table class="text-center w-full">
+		<table id="table" class="text-center w-full">
 			<thead>
 				{#if advance_criterias.length}
 					<tr>
@@ -268,9 +326,7 @@
 								{#if isLoading}
 									...
 								{:else}
-									{getGrade(advance_criterias, course_student.id).toFixed(
-										2,
-									)}%
+									{getGrade(advance_criterias, course_student.id).toFixed(2)}%
 								{/if}
 							</p>
 						</td>

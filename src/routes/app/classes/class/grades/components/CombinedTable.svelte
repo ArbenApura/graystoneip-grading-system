@@ -1,4 +1,6 @@
 <script lang="ts">
+	// IMPORTED LIB-TYPES
+	import type { Row } from 'write-excel-file';
 	// IMPORTED TYPES
 	import type {
 		AdvanceCriteria,
@@ -8,6 +10,7 @@
 	} from '$types/curriculum';
 	// IMPORTED LIB-UTILS
 	import { page } from '$app/stores';
+	import writeXlsxFile from 'write-excel-file';
 	// IMPORTED UTILS
 	import {
 		createConfirmationModal,
@@ -120,6 +123,32 @@
 		}
 		isLoading = false;
 	};
+	const handleExport = async () => {
+		try {
+			const tableEl = document.getElementById('table') as HTMLTableElement;
+			if (!tableEl) throw new Error('Failed to get table data!');
+			const rows: Row[] = [];
+			for (let i = 0; i < tableEl.rows.length; i++) {
+				const row = tableEl.rows[i];
+				const row_data: Row = [];
+				for (let j = 0; j < row.cells.length; j++) {
+					const cell = row.cells[j];
+					row_data.push({
+						value: cell.innerText,
+						type: String,
+						fontWeight: i === 0 ? 'bold' : undefined,
+						backgroundColor: i === 0 ? '#60a5fa' : undefined,
+					});
+				}
+				rows.push(row_data);
+			}
+			await writeXlsxFile([...rows], {
+				fileName: `${$page.data.courseClass.name} - COMBINED TERM.xlsx`,
+			});
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+	};
 </script>
 
 <Button
@@ -134,7 +163,21 @@
 >
 	<i class="ph-bold ph-lock text-xl" />
 </Button>
-<Tooltip class="text-xs whitespace-nowrap" color="light" placement="left">Unrelease Grades</Tooltip>
+<Tooltip class="text-xs whitespace-nowrap" color="light" placement="top">Unrelease Grades</Tooltip>
+
+<Button
+	class={`w-[48px] h-[48px] shadow-md fixed bottom-[16px] right-[150px] z-20}`}
+	pill={true}
+	disabled={isLoading}
+	on:click={() =>
+		createConfirmationModal({
+			message: 'Are you sure you want to export the grades?',
+			handleProceed: handleExport,
+		})}
+>
+	<i class="ph-bold ph-export text-xl" />
+</Button>
+<Tooltip class="text-xs whitespace-nowrap z-[100]" color="light" placement="top">Export</Tooltip>
 
 <Button
 	class={`w-[48px] h-[48px] shadow-md fixed bottom-[16px] right-[16px] z-20}`}
@@ -148,13 +191,13 @@
 >
 	<i class="ph-bold ph-globe text-xl" />
 </Button>
-<Tooltip class="text-xs whitespace-nowrap z-[100]" color="light" placement="left">
+<Tooltip class="text-xs whitespace-nowrap z-[100]" color="light" placement="top">
 	Release Grades
 </Tooltip>
 
 <div class="flex flex-col gap-2">
 	<div class="overflow-auto border-r">
-		<table class="text-center w-full">
+		<table id="table" class="text-center w-full">
 			<thead>
 				<tr class="bg-slate-100">
 					<th><p>#</p></th>
@@ -229,9 +272,6 @@
 	th,
 	td {
 		@apply text-xs border min-w-[60px] whitespace-nowrap;
-		&[data-input] {
-			@apply cursor-pointer hover:outline outline-1 outline-blue-500;
-		}
 		& > p {
 			@apply p-2;
 		}
@@ -250,26 +290,6 @@
 	tbody {
 		td:last-child {
 			@apply border-r-0;
-		}
-		tr:last-child {
-			td[data-input] {
-				@apply hover:border-b-blue-500;
-			}
-		}
-	}
-	[data-input] {
-		@apply p-0;
-		input {
-			@apply w-full h-full text-xs bg-transparent border-none;
-			text-align: inherit;
-			&::-webkit-outer-spin-button,
-			&::-webkit-inner-spin-button {
-				-webkit-appearance: none;
-				margin: 0;
-			}
-			&[type='number'] {
-				-moz-appearance: textfield;
-			}
 		}
 	}
 </style>
