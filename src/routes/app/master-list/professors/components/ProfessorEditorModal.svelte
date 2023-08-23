@@ -94,6 +94,7 @@
 				created_at: account.created_at,
 			});
 			await handleSearch();
+			handleClose();
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
