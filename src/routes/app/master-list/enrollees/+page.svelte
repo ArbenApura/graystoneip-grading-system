@@ -1,10 +1,14 @@
 <script lang="ts">
 	// IMPORTED ASSETS
 	import NoImagePNG from '$assets/images/no-image.png';
+	// IMPORTED LIB-TYPES
+	import type { Row } from 'write-excel-file';
 	// IMPORTED TYPES
 	import type { EnrolleeData } from '$types/index';
 	// IMPORTED LIB-UTILS
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+	import writeXlsxFile from 'write-excel-file';
 	// IMPORTED UTILS
 	import {
 		createConfirmationModal,
@@ -25,6 +29,7 @@
 		TableBodyRow,
 		TableBodyCell,
 		Select,
+		Tooltip,
 	} from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
@@ -82,6 +87,33 @@
 		removeModal(modalId);
 		isLoading = false;
 	};
+	const handleExport = async () => {
+		try {
+			const tableEl = document.querySelector('table') as HTMLTableElement;
+			if (!tableEl) throw new Error('Failed to get table data!');
+			const rows: Row[] = [];
+			for (let i = 0; i < tableEl.rows.length; i++) {
+				const row = tableEl.rows[i];
+				const row_data: Row = [];
+				for (let j = 0; j < row.cells.length; j++) {
+					const cell = row.cells[j];
+					if (j === 1 || j === 2) continue;
+					row_data.push({
+						value: cell.innerText,
+						type: String,
+						fontWeight: i === 0 ? 'bold' : undefined,
+						backgroundColor: i === 0 ? '#60a5fa' : undefined,
+					});
+				}
+				rows.push(row_data);
+			}
+			await writeXlsxFile([...rows], {
+				fileName: `Enrollees - ${semester} - ${school_year}.xlsx`,
+			});
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+	};
 
 	// LIFECYCLES
 	onMount(() => {
@@ -101,6 +133,20 @@
 		<EnrolleeEditorModal enrollee={target} handleClose={closeEditorModal} {handleSearch} />
 	{/if}
 {/if}
+
+<Button
+	class={`w-[48px] h-[48px] shadow-md fixed bottom-[16px] right-[16px] z-20}`}
+	pill={true}
+	disabled={isLoading}
+	on:click={() =>
+		createConfirmationModal({
+			message: 'Are you sure you want to export the enrollees?',
+			handleProceed: handleExport,
+		})}
+>
+	<i class="ph-bold ph-export text-xl" />
+</Button>
+<Tooltip class="text-xs whitespace-nowrap z-[100]" color="light" placement="left">Export</Tooltip>
 
 <div class="p-4 pt-0 flex flex-col gap-4">
 	<div class="flex flex-col md:flex-row items-center justify-between gap-4">
