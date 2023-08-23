@@ -72,6 +72,28 @@
 	const handleSave = async () => {
 		isLoading = true;
 		try {
+			let avatar = account.avatar;
+			if (files && files.length) {
+				await deleteAvatar(avatar);
+				avatar = await uploadAvatar(files[0]);
+			}
+			await updateAccount({
+				id: account.id,
+				last_name,
+				first_name,
+				middle_name,
+				full_name,
+				gender,
+				birth_date: new Date(birth_date).getTime(),
+				contact_number,
+				address,
+				account_type: account.account_type,
+				avatar,
+				email,
+				password,
+				created_at: account.created_at,
+			});
+			await handleSearch();
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
