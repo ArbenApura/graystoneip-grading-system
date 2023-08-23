@@ -72,7 +72,7 @@
 				{#if isLoading}
 					<Spinner class="mr-3" size="4" color="white" /> Loading
 				{:else}
-					Verify
+					Submit
 				{/if}
 			</Button>
 		</div>

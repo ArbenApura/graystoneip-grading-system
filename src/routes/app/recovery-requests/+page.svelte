@@ -130,7 +130,7 @@
 								class="w-[25px] h-[25px] flex-center"
 								on:click={() =>
 									createInfoModal({
-										message: `Please send the account information to the corresponding email address of the recovery request. [Email: ${item.account.email}, Password: ${item.account.password}]`,
+										message: `Please send the account information to the corresponding email address or contact number of the recovery request. [Email: ${item.account.email}, Contact Number: ${item.account.contact_number}, Password: ${item.account.password}]`,
 									})}
 							>
 								<i class="ph-bold ph-paper-plane-right text-sm" />
