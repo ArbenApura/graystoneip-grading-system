@@ -24,12 +24,12 @@ export const selectRecoveryRequests = async ({ search }: { search?: string }) =>
 	if (error) throw new Error(error.message);
 	const recoveryRequests: RecoveryRequestData[] = [];
 	await Promise.all(
-		(data as RecoveryRequest[]).map(async (recoveryRequest) =>
-			recoveryRequests.push({
-				account: await selectAccountByEmail(recoveryRequest.email),
-				recoveryRequest: recoveryRequest,
-			}),
-		),
+		(data as RecoveryRequest[]).map(async (recoveryRequest) => {
+			try {
+				const account = await selectAccountByEmail(recoveryRequest.email);
+				recoveryRequests.push({ account, recoveryRequest });
+			} catch {}
+		}),
 	);
 	return recoveryRequests;
 };

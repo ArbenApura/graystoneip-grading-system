@@ -65,7 +65,7 @@ export const isEmailOverwrite = async (id: string, email: string) => {
 		.neq('id', id);
 	return !!count;
 };
-export const selectAccountByEmail = async (email: string) => {
+export const selectAccountByEmail = async (email: string, safe: boolean = false) => {
 	const { data, error } = await supabase.from('accounts').select().match({ email });
 	if (error) throw new Error(error.message);
 	if (!data.length) throw new Error('Account does not exist!');
