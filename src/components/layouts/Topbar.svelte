@@ -11,6 +11,14 @@
 	import { isSMUp } from '$stores/mediaStates';
 	import { isOpen } from '$stores/sidebarStates';
 
+	// REACTIVE STATES
+	$: href =
+		$account.account_type === 'student'
+			? '/app/grades?student_id=' + $account.id
+			: $account.account_type === 'professor'
+			? '/app/classes?professor_id=' + $account.id
+			: '/app/dashboard';
+
 	// UTILS
 	const handleLogout = () =>
 		createConfirmationModal({
@@ -25,7 +33,7 @@
 			<i class={`ti ti-${$isOpen ? 'x' : 'menu-2'}`} />
 		</Button>
 	</div>
-	<a class="h-[60px] flex items-center gap-2 flex-grow" href="/app/dashboard">
+	<a class="h-[60px] flex items-center gap-2 flex-grow" {href}>
 		<img class=" rounded-full shadow-md w-[36px] h-[36px]" src={LogoPNG} alt="" />
 		<p class="text-xs sm:text-sm">Graystone Institute of the Philippines</p>
 	</a>

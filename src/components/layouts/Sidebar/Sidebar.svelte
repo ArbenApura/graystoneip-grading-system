@@ -35,7 +35,7 @@
 			location: '/app/dashboard',
 			params: '',
 			isOpen: false,
-			isVisible: true,
+			isVisible: $account.account_type === 'admin',
 			contents: [],
 		},
 		{

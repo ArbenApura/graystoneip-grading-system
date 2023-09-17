@@ -1,8 +1,6 @@
 <script lang="ts">
 	// IMPORTED ASSETS
 	import LogoPNG from '$assets/images/logo.png';
-	// IMPORTED LIB-UTILS
-	import { goto } from '$app/navigation';
 	// IMPORTED UTILS
 	import { createErrorModal, createRecoveryModal, createSuccessModal } from '$stores/modalStates';
 	import { validateEmail } from '$utils/helpers';

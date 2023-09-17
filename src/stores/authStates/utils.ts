@@ -45,22 +45,32 @@ export const loadData = async () => {
 		await logout();
 	}
 };
+export const handleRedirect = async () => {
+	const account = get(authStates.account);
+	const location =
+		account.account_type === 'student'
+			? '/app/grades?student_id=' + account.id
+			: account.account_type === 'professor'
+			? '/app/classes?professor_id=' + account.id
+			: '/app/dashboard';
+	await goto(location);
+};
 export const observeRoute = async () => {
 	const isLogined = get(authStates.isLogined);
 	const account = get(authStates.account);
 	const { route } = get(page);
 	if (!route || !route.id) return;
-	else if (isLogined && route.id === '/') await goto('/app/dashboard');
-	else if (!isLogined && route.id.match('/app/')) await goto('/');
-	else if (
+	if (isLogined && route.id === '/') await handleRedirect();
+	if (!isLogined && route.id.match('/app/')) await goto('/');
+	if (
 		account.account_type !== 'admin' &&
 		route.id.match(/\/app\/(curriculum|master-list|admin-controls)\//g)
 	)
-		await goto('/app/dashboard');
-	else if (account.account_type === 'professor' && route.id?.match(/\/app\/grades/g))
-		await goto('/app/dashboard');
-	else if (account.account_type === 'student' && route.id?.match(/\/app\/classes/g))
-		await goto('/app/dashboard');
+		await handleRedirect();
+	if (account.account_type === 'professor' && route.id?.match(/\/app\/(dashboard|grades)/g))
+		await handleRedirect();
+	if (account.account_type === 'student' && route.id?.match(/\/app\/(dashboard|classes)/g))
+		await handleRedirect();
 };
 export const initializeAuthStates = async () => {
 	await loadData();
