@@ -41,6 +41,6 @@ export const load = (async ({ url }) => {
 		if (!professor) throw new Error();
 		return { courseClass, professor, course_students, advance_criterias, criteria_grades };
 	} catch {
-		throw redirect(300, '/app/dashboard');
+		throw redirect(300, '/app/classes?professor_id=' + url.searchParams.get('professor_id'));
 	}
 }) satisfies PageLoad;
