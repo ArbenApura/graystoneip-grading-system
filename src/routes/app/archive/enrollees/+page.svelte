@@ -1,8 +1,14 @@
 <script lang="ts">
-	// IMPORTED ASSETS
-	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED TYPES
 	import type { EnrolleeData } from '$types/index';
+	import type {
+		Column,
+		ColumnItem,
+		RowItem,
+		RowTool,
+		SortItem,
+		FilterGroup,
+	} from '$components/modules/InteractiveTable';
 	// IMPORTED LIB-UTILS
 	import { onMount } from 'svelte';
 	// IMPORTED UTILS
@@ -11,187 +17,185 @@
 		createErrorModal,
 		createLoadingModal,
 		createSuccessModal,
+		createVerificationModal,
 		removeModal,
 	} from '$stores/modalStates';
 	import { unarchiveEnrollee, selectEnrollees } from '$utils/supabase';
-	// IMPORTED LIB-COMPONENTS
-	import {
-		FloatingLabelInput,
-		Button,
-		TableHeadCell,
-		TableBodyRow,
-		TableBodyCell,
-		Select,
-	} from 'flowbite-svelte';
+	import { encrypt, decrypt } from '$utils';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
-	import Table from '$components/modules/Table.svelte';
+	import InteractiveTable from '$components/modules/InteractiveTable/InteractiveTable.svelte';
 
 	// PROPS
 	export let data: any;
 
 	// STATES
-	let semester = '1st',
-		school_year = '2023-2024';
-	let enrollees: EnrolleeData[] = [];
-	let filteredItems: EnrolleeData[];
-	let startingItem = 0;
+	let items: EnrolleeData[] = [];
 	let search = '';
-	let isLoading = false;
+	let loading = false;
+	let initialized = false;
+	let localStorageKey = 'config.archive.enrollees';
+
+	// TABLE STATES
+	let columns: Column[] = [
+		{ name: 'id', label: 'Student ID', visible: true },
+		{ name: 'last_name', label: 'Last Name', visible: true },
+		{ name: 'first_name', label: 'First Name', visible: true },
+		{ name: 'middle_name', label: 'Middle Name', visible: true },
+		{ name: 'gender', label: 'Gender', visible: true },
+		{ name: 'contact_number', label: 'Contact Number', visible: true },
+		{ name: 'email', label: 'Email', visible: true },
+		{ name: 'semester', label: 'Semester', visible: true },
+		{ name: 'school_year', label: 'School Year', visible: true },
+		{ name: 'program', label: 'Program', visible: true },
+		{ name: 'year', label: 'Year', visible: true },
+		{ name: 'section', label: 'Section', visible: true },
+		{ name: 'created_at', label: 'Enrolled At', visible: true },
+	];
+	let sortItems: SortItem[] = [
+		{ name: 'id', label: 'Student ID', type: 'none' },
+		{ name: 'last_name', label: 'Last Name', type: 'asc' },
+		{ name: 'first_name', label: 'First Name', type: 'none' },
+		{ name: 'middle_name', label: 'Middle Name', type: 'none' },
+		{ name: 'gender', label: 'Gender', type: 'none' },
+		{ name: 'contact_number', label: 'Contact Number', type: 'none' },
+		{ name: 'email', label: 'Email', type: 'none' },
+		{ name: 'semester', label: 'Semester', type: 'none' },
+		{ name: 'school_year', label: 'School Year', type: 'none' },
+		{ name: 'program', label: 'Program', type: 'none' },
+		{ name: 'year', label: 'Year', type: 'none' },
+		{ name: 'section', label: 'Section', type: 'none' },
+		{ name: 'created_at', label: 'Enrolled At', type: 'none' },
+	];
+	let filterGroups: FilterGroup[] = [
+		{
+			label: 'Semester',
+			name: 'semester',
+			items: [
+				{ label: '1st', match: '1st', active: true },
+				{ label: '2nd', match: '2nd', active: false },
+			],
+		},
+		{
+			label: 'School Year',
+			name: 'school_year',
+			items: [
+				{ label: '2023-2024', match: '2023-2024', active: true },
+				{ label: '2024-2025', match: '2024-2025', active: false },
+				{ label: '2025-2026', match: '2025-2026', active: false },
+				{ label: '2026-2027', match: '2026-2027', active: false },
+				{ label: '2027-2028', match: '2027-2028', active: false },
+			],
+		},
+	];
+	$: rowItems = items.map((item) => {
+		const columnItems: ColumnItem[] = [
+			{ name: 'id', label: 'Student ID', value: item.id },
+			{ name: 'last_name', label: 'Last Name', value: item.account.last_name },
+			{ name: 'first_name', label: 'First Name', value: item.account.first_name },
+			{ name: 'middle_name', label: 'Middle Name', value: item.account.middle_name },
+			{ name: 'gender', label: 'Gender', value: item.account.gender },
+			{ name: 'contact_number', label: 'Contact Number', value: item.account.contact_number },
+			{ name: 'email', label: 'Email', value: item.account.email },
+			{ name: 'semester', label: 'Semester', value: item.semester },
+			{ name: 'school_year', label: 'School Year', value: item.school_year },
+			{ name: 'program', label: 'Program', value: item.program.code },
+			{ name: 'year', label: 'Year', value: item.year },
+			{ name: 'section', label: 'Section', value: item.section },
+			{
+				name: 'created_at',
+				label: 'Enrolled At',
+				value: new Date(item.created_at).toDateString(),
+			},
+		];
+		const tools: RowTool[] = [
+			{
+				label: 'Unarchive Enrollee',
+				icon: 'ph-bold ph-arrow-counter-clockwise',
+				handleClick: () =>
+					createConfirmationModal({
+						message: 'Are you sure you want to unarchive this enrollee account?',
+						handleProceed: () =>
+							createVerificationModal({
+								handleProceed: () => handleUnarchive(item.id),
+							}),
+					}),
+			},
+		];
+		return { columnItems, tools } as RowItem;
+	});
+
+	// REACTIVE STATES
+	$: {
+		// SAVE CHANGES TO LOCAL STORAGES
+		columns;
+		sortItems;
+		filterGroups;
+		saveData();
+	}
 
 	// UTILS
-	const handleSearch = async () => {
-		isLoading = true;
+	const saveData = () => {
+		if (typeof localStorage === 'undefined' || !initialized) return;
+		const data = JSON.stringify({ columns, sortItems, filterGroups });
+		const encrypted = encrypt(data);
+		localStorage.setItem(localStorageKey, encrypted);
+	};
+	const loadData = () => {
 		try {
-			enrollees = await selectEnrollees({ search, semester, school_year, is_archived: true });
+			if (typeof localStorage === 'undefined') throw new Error();
+			const encrypted = localStorage.getItem(localStorageKey);
+			if (!encrypted) throw new Error();
+			const decrypted = decrypt(encrypted);
+			if (!decrypted) throw new Error();
+			const data = JSON.parse(decrypted);
+			if (data.columns) columns = data.columns;
+			if (data.sortItems) sortItems = data.sortItems;
+			if (data.filterGroups) filterGroups = data.filterGroups;
+		} catch {}
+		initialized = true;
+	};
+	const handleRefresh = async () => {
+		loading = true;
+		try {
+			items = await selectEnrollees({ search, is_archived: true });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
-		isLoading = false;
+		loading = false;
 	};
 	const handleUnarchive = async (id: string) => {
-		isLoading = true;
+		loading = true;
 		const modalId = createLoadingModal({ message: 'Unarchiving enrollee...' });
 		try {
 			await unarchiveEnrollee(id);
-			await handleSearch();
-			createSuccessModal({ message: 'Enrollee was unarchived successfully!' });
+			await handleRefresh();
+			createSuccessModal({ message: 'Enrollee account was unarchived successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
 		removeModal(modalId);
-		isLoading = false;
+		loading = false;
 	};
 
 	// LIFECYCLES
 	onMount(() => {
-		if (data.enrollees) enrollees = data.enrollees;
+		if (data.enrollees) items = data.enrollees;
+		loadData();
 	});
 </script>
 
 <Header
 	breadcrumbItems={[
-		{ icon: 'ph-bold ph-user-list', label: 'Archive', href: '' },
+		{ icon: 'ti ti-archive', label: 'Archive', href: '' },
 		{ label: 'Enrollees', href: '/app/archive/enrollees' },
 	]}
 />
 
-<div class="p-4 pt-0 flex flex-col gap-4">
-	<div class="flex flex-col md:flex-row items-center justify-between gap-4">
-		<form
-			class="search w-full md:w-[50%] bg-white rounded-md shadow-md p-2 flex gap-2"
-			on:submit|preventDefault={handleSearch}
-		>
-			<FloatingLabelInput
-				style="outlined"
-				type="text"
-				label="Search..."
-				bind:value={search}
-			/>
-			<Button class="w-[48px] h-[48px]" type="submit" disabled={isLoading}>
-				<i class="ti ti-search text-xl" />
-			</Button>
-		</form>
-		<div class="w-full md:w-fit bg-white rounded-md shadow-md p-2 flex gap-2">
-			<Select
-				placeholder="Select Semester"
-				items={[
-					{ name: '1st', value: '1st' },
-					{ name: '2nd', value: '2nd' },
-				]}
-				disabled={isLoading}
-				bind:value={semester}
-				on:change={handleSearch}
-			/>
-			<Select
-				placeholder="Select School Year"
-				items={[
-					{ name: '2023-2024', value: '2023-2024' },
-					{ name: '2024-2025', value: '2024-2025' },
-					{ name: '2025-2026', value: '2025-2026' },
-					{ name: '2026-2027', value: '2026-2027' },
-					{ name: '2027-2028', value: '2027-2028' },
-					{ name: '2028-2029', value: '2028-2029' },
-					{ name: '2029-2030', value: '2029-2030' },
-				]}
-				disabled={isLoading}
-				bind:value={school_year}
-				on:change={handleSearch}
-			/>
-		</div>
-	</div>
-	<Table items={enrollees} bind:filteredItems bind:startingItem>
-		<svelte:fragment slot="table-head">
-			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
-			<TableHeadCell>Tools</TableHeadCell>
-			<TableHeadCell>Avatar</TableHeadCell>
-			<TableHeadCell>Student No.</TableHeadCell>
-			<TableHeadCell>Last Name</TableHeadCell>
-			<TableHeadCell>First Name</TableHeadCell>
-			<TableHeadCell>Middle Name</TableHeadCell>
-			<TableHeadCell>Gender</TableHeadCell>
-			<TableHeadCell>Contact No.</TableHeadCell>
-			<TableHeadCell>Email</TableHeadCell>
-			<TableHeadCell>Program</TableHeadCell>
-			<TableHeadCell>Year</TableHeadCell>
-			<TableHeadCell>Section</TableHeadCell>
-			<TableHeadCell>Semester</TableHeadCell>
-			<TableHeadCell>School Year</TableHeadCell>
-			<TableHeadCell class="rounded-r-md">Created At</TableHeadCell>
-		</svelte:fragment>
-		<svelte:fragment slot="table-body">
-			{#if filteredItems && filteredItems.length}
-				{#each filteredItems as item, i}
-					<TableBodyRow>
-						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
-						<TableBodyCell>
-							<div class="flex gap-2">
-								<Button
-									class="w-[25px] h-[25px] flex-center"
-									on:click={() =>
-										createConfirmationModal({
-											message:
-												'Are you sure you want to unarchive this enrollee?',
-											handleProceed: () => handleUnarchive(item.id),
-										})}
-								>
-									<i class="ti ti-archive-off text-sm" />
-								</Button>
-							</div>
-						</TableBodyCell>
-						<TableBodyCell>
-							<div class="rounded-full border-[2px] p-[2px] w-fit border-blue-600">
-								<div
-									class="bg-gray-100 w-[35px] h-[35px] rounded-full bg-cover bg-center"
-									style="background-image: url({item.account.avatar ||
-										NoImagePNG})"
-								/>
-							</div>
-						</TableBodyCell>
-						<TableBodyCell>{item.student_number}</TableBodyCell>
-						<TableBodyCell>{item.account.last_name}</TableBodyCell>
-						<TableBodyCell>{item.account.first_name}</TableBodyCell>
-						<TableBodyCell>{item.account.middle_name}</TableBodyCell>
-						<TableBodyCell class="capitalize">{item.account.gender}</TableBodyCell>
-						<TableBodyCell>{item.account.contact_number}</TableBodyCell>
-						<TableBodyCell>{item.account.email}</TableBodyCell>
-						<TableBodyCell>{item.program.code}</TableBodyCell>
-						<TableBodyCell>{item.year}</TableBodyCell>
-						<TableBodyCell>{item.section}</TableBodyCell>
-						<TableBodyCell>{item.semester}</TableBodyCell>
-						<TableBodyCell>{item.school_year}</TableBodyCell>
-						<TableBodyCell>
-							{new Date(item.created_at).toDateString()}
-						</TableBodyCell>
-					</TableBodyRow>
-				{/each}
-			{/if}
-		</svelte:fragment>
-	</Table>
-</div>
-
-<style lang="scss">
-	:global(.search > div) {
-		flex-grow: 1;
-	}
-</style>
+<InteractiveTable
+	bind:columns
+	bind:sortItems
+	bind:filterGroups
+	bind:loading
+	{...{ rowItems, handleRefresh }}
+/>

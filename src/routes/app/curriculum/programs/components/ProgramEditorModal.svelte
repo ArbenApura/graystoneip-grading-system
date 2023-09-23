@@ -12,7 +12,7 @@
 	import { Button, Modal, FloatingLabelInput, Badge, Spinner } from 'flowbite-svelte';
 
 	// PROPS
-	export let program: Program, handleClose: () => void, handleSearch: () => Promise<void>;
+	export let program: Program, handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
 	let code = program.code,
@@ -33,7 +33,7 @@
 				description,
 				created_at: program.created_at,
 			});
-			await handleSearch();
+			await handleRefresh();
 			handleClose();
 			createSuccessModal({ message: 'Program was edited successfully!' });
 		} catch (error: any) {

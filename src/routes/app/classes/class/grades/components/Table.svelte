@@ -219,7 +219,7 @@
 				{/if}
 				<tr class="bg-slate-100">
 					<th><p>#</p></th>
-					<th class="text-left"><p>Student No.</p></th>
+					<th class="text-left"><p>Student ID</p></th>
 					<th class="text-left"><p>Last Name</p></th>
 					<th class="text-left"><p>First Name</p></th>
 					<th class="text-left"><p>Middle Name</p></th>
@@ -263,7 +263,7 @@
 				{#each course_students as course_student, i}
 					<tr>
 						<td class="text-center"><p>{i + 1}</p></td>
-						<td class="text-left"><p>{course_student.enrollee.student_number}</p></td>
+						<td class="text-left"><p>{course_student.enrollee.account.id}</p></td>
 						<td class="text-left"><p>{course_student.enrollee.account.last_name}</p></td
 						>
 						<td class="text-left">
@@ -392,6 +392,9 @@
 			td[data-input] {
 				@apply hover:border-b-blue-500;
 			}
+		}
+		tr:nth-child(even) {
+			@apply bg-gray-50;
 		}
 	}
 	[data-input] {

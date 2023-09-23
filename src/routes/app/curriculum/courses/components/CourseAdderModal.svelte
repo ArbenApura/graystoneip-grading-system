@@ -11,7 +11,7 @@
 	import { Button, Modal, FloatingLabelInput, Badge, Spinner } from 'flowbite-svelte';
 
 	// PROPS
-	export let handleClose: () => void, handleSearch: () => Promise<void>;
+	export let handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
 	let code: string, description: string, units: number, hours: number;
@@ -37,7 +37,7 @@
 				hours: hours || 0,
 				created_at,
 			});
-			await handleSearch();
+			await handleRefresh();
 			handleClose();
 			createSuccessModal({ message: 'Course was created successfully!' });
 		} catch (error: any) {

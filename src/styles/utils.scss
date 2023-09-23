@@ -4,6 +4,9 @@
 .flex-start-center {
 	@apply flex justify-start items-center;
 }
+.flex-end-center {
+	@apply flex justify-end items-center;
+}
 .text-link {
 	@apply text-blue-600;
 	&:hover {

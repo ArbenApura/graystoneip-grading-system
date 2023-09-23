@@ -51,9 +51,9 @@
 			label: 'Classes',
 			icon: 'ph-bold ph-chalkboard',
 			location: '/app/classes',
-			params: `?professor_id=${$account.id}`,
+			params: `?instructor_id=${$account.id}`,
 			isOpen: false,
-			isVisible: $account.account_type === 'professor',
+			isVisible: $account.account_type === 'instructor',
 			contents: [],
 		},
 		{
@@ -65,9 +65,9 @@
 			isVisible: $account.account_type === 'admin',
 			contents: [
 				{
-					label: 'Professors',
+					label: 'Instructors',
 					icon: 'ph-bold ph-chalkboard-teacher',
-					location: '/app/master-list/professors',
+					location: '/app/master-list/instructors',
 					params: '',
 					isOpen: false,
 					isVisible: true,
@@ -148,9 +148,9 @@
 			isVisible: $account.account_type === 'admin',
 			contents: [
 				{
-					label: 'Professors',
+					label: 'Instructors',
 					icon: 'ph-bold ph-chalkboard-teacher',
-					location: '/app/archive/professors',
+					location: '/app/archive/instructors',
 					params: '',
 					isOpen: false,
 					isVisible: true,

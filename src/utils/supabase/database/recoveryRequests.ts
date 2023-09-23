@@ -1,7 +1,7 @@
 // IMPORTED TYPES
 import type { RecoveryRequest, RecoveryRequestData } from '$types/others';
 // IMPORTED UTILS
-import { selectAccountByEmail, supabase } from '..';
+import { selectAccountByEmailOrId, supabase } from '..';
 
 // UTILS
 export const insertRecoveryRequest = async (recoveryRequest: RecoveryRequest) => {
@@ -19,14 +19,14 @@ export const selectRecoveryRequests = async ({ search }: { search?: string }) =>
 		.from('recovery_requests')
 		.select()
 		.order('created_at', { ascending: false });
-	if (search) query.ilike('email', `%${search}%`);
+	if (search) query.ilike('source', `%${search}%`);
 	const { data, error } = await query;
 	if (error) throw new Error(error.message);
 	const recoveryRequests: RecoveryRequestData[] = [];
 	await Promise.all(
 		(data as RecoveryRequest[]).map(async (recoveryRequest) => {
 			try {
-				const account = await selectAccountByEmail(recoveryRequest.email);
+				const account = await selectAccountByEmailOrId(recoveryRequest.source);
 				recoveryRequests.push({ account, recoveryRequest });
 			} catch {}
 		}),

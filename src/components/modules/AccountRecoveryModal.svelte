@@ -3,8 +3,8 @@
 	import type { ModalItem } from '$stores/modalStates';
 	// IMPORTED UTILS
 	import { createErrorModal, createInfoModal, removeModal } from '$stores/modalStates';
-	import { generateId, validateEmail } from '$utils/helpers';
-	import { insertRecoveryRequest, isEmailTaken } from '$utils/supabase';
+	import { generateId } from '$utils/helpers';
+	import { insertRecoveryRequest, selectAccountByEmailOrId } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import { Button, Modal, Badge, FloatingLabelInput, Spinner } from 'flowbite-svelte';
 
@@ -12,7 +12,7 @@
 	export let modal: ModalItem;
 
 	// STATES
-	let email = '';
+	let source = '';
 	let isLoading = false;
 
 	// UTILS
@@ -20,15 +20,15 @@
 	const handleSubmit = async () => {
 		isLoading = true;
 		try {
-			if (!email) throw new Error('The form is incomplete!');
-			if (!validateEmail(email)) throw new Error('The provided email is invalid!');
-			if (!(await isEmailTaken(email))) throw new Error('Account does not exist!');
+			if (!source) throw new Error('The form is incomplete!');
+			if (!(await selectAccountByEmailOrId(source)))
+				throw new Error('Account does not exist!');
 			const id = generateId();
 			const created_at = Date.now();
-			await insertRecoveryRequest({ id, email, created_at });
+			await insertRecoveryRequest({ id, source, created_at });
 			createInfoModal({
 				message:
-					'Thank you for submitting your account recovery request. Kindly await our email response for further instructions. We appreciate your patience.',
+					'Thank you for submitting your account recovery request. Kindly await our source response for further instructions. We appreciate your patience.',
 			});
 			handleClose();
 		} catch (error: any) {
@@ -58,10 +58,10 @@
 	</svelte:fragment>
 	<form on:submit|preventDefault={handleSubmit}>
 		<FloatingLabelInput
-			bind:value={email}
+			bind:value={source}
 			style="outlined"
 			type="text"
-			label="Email"
+			label="Email / Student ID"
 			required
 		/>
 	</form>

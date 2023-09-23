@@ -16,15 +16,10 @@
 	import { insertEnrollee } from '$utils/supabase';
 
 	// PROPS
-	export let account: Account, handleClose: () => void, handleSearch: () => Promise<void>;
+	export let account: Account, handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
-	let student_number: string,
-		program_id: string,
-		year: string,
-		section: string,
-		semester: string,
-		school_year: string;
+	let program_id: string, year: string, section: string, semester: string, school_year: string;
 	let isLoading = false;
 	let programItems = ($page.data.programs || []).map((program: Program) => ({
 		name: program.code + ' - ' + program.description,
@@ -40,7 +35,6 @@
 
 	// UTILS
 	const handleReset = () => {
-		student_number = '';
 		program_id = '';
 		year = '';
 		section = '';
@@ -50,14 +44,13 @@
 	const handleSave = async () => {
 		isLoading = true;
 		try {
-			const search_key = `${account.full_name} ${student_number} ${program?.code} ${school_year}`;
+			const search_key = `${account.full_name} ${program?.code} ${school_year}`;
 			const id = generateId();
 			const created_at = Date.now();
 			await insertEnrollee({
 				id,
 				account_id: account.id,
 				program_id,
-				student_number,
 				year,
 				section,
 				semester,
@@ -65,7 +58,7 @@
 				search_key,
 				created_at,
 			});
-			await handleSearch();
+			await handleRefresh();
 			handleClose();
 			createSuccessModal({ message: 'Student was enrolled successfully!' });
 		} catch (error: any) {
@@ -75,11 +68,7 @@
 	};
 	const handleProceed = async () => {
 		try {
-			if (
-				[student_number, program_id, year, section, semester, school_year, program].some(
-					(v) => !v,
-				)
-			)
+			if ([program_id, year, section, semester, school_year, program].some((v) => !v))
 				throw new Error('The form is incomplete!');
 			createConfirmationModal({
 				message: 'Are you sure you want to proceed?',
@@ -104,13 +93,8 @@
 	</svelte:fragment>
 	<form class="flex flex-col gap-4" on:submit|preventDefault={handleProceed}>
 		<div>
-			<Label class="mb-2">Student No.</Label>
-			<Input
-				type="text"
-				placeholder="Input Student No."
-				required
-				bind:value={student_number}
-			/>
+			<Label class="mb-2">Student ID</Label>
+			<Input type="text" value={account.id} required disabled />
 		</div>
 		<div>
 			<Label class="mb-2">Program</Label>

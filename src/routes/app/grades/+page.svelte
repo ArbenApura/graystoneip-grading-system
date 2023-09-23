@@ -1,47 +1,148 @@
 <script lang="ts">
 	// IMPORTED TYPES
 	import type { CourseStudentData } from '$types/index';
-	// IMPORTED UTILS
+	import type {
+		Column,
+		ColumnItem,
+		RowItem,
+		SortItem,
+		FilterGroup,
+	} from '$components/modules/InteractiveTable';
+	// IMPORTED LIB-STORES
 	import { page } from '$app/stores';
-	import { selectCourseStudents } from '$utils/supabase';
-	import { createErrorModal } from '$stores/modalStates';
-	// IMPORTED LIB-COMPONENTS
+	// IMPORTED LIB-UTILS
+	import { onMount } from 'svelte';
+	// IMPORTED UTILS
 	import {
-		FloatingLabelInput,
-		Button,
-		TableHeadCell,
-		TableBodyRow,
-		TableBodyCell,
-		Select,
-	} from 'flowbite-svelte';
+		createErrorModal,
+		createLoadingModal,
+		createSuccessModal,
+		removeModal,
+	} from '$stores/modalStates';
+	import { unarchiveEnrollee, selectCourseStudents } from '$utils/supabase';
+	import { encrypt, decrypt } from '$utils';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
-	import Table from '$components/modules/Table.svelte';
+	import InteractiveTable from '$components/modules/InteractiveTable/InteractiveTable.svelte';
+
+	// PROPS
+	export let data: any;
 
 	// STATES
-	let semester = $page.url.searchParams.get('semester') || '1st',
-		school_year = $page.url.searchParams.get('school_year') || '2023-2024';
-	let courseStudents: CourseStudentData[] = $page.data.courseStudents || [];
-	let filteredItems: CourseStudentData[];
-	let startingItem = 0;
+	let items: CourseStudentData[] = [];
 	let search = '';
-	let isLoading = false;
+	let loading = false;
+	let initialized = false;
+	let localStorageKey = 'config.grades';
+
+	// TABLE STATES
+	let columns: Column[] = [
+		{ name: 'name', label: 'Name', visible: true },
+		{ name: 'professor', label: 'Professor', visible: true },
+		{ name: 'course_code', label: 'Course Code', visible: true },
+		{ name: 'course_description', label: 'Course Description', visible: true },
+		{ name: 'grade', label: 'Grade', visible: true },
+		{ name: 'semester', label: 'Semester', visible: true },
+		{ name: 'school_year', label: 'School Year', visible: true },
+	];
+	let sortItems: SortItem[] = [
+		{ name: 'name', label: 'Name', type: 'asc' },
+		{ name: 'professor', label: 'Professor', type: 'none' },
+		{ name: 'course_code', label: 'Course Code', type: 'none' },
+		{ name: 'grade', label: 'Grade', type: 'none' },
+		{ name: 'semester', label: 'Semester', type: 'none' },
+		{ name: 'school_year', label: 'School Year', type: 'none' },
+	];
+	let filterGroups: FilterGroup[] = [
+		{
+			label: 'Semester',
+			name: 'semester',
+			items: [
+				{ label: '1st', match: '1st', active: true },
+				{ label: '2nd', match: '2nd', active: false },
+			],
+		},
+		{
+			label: 'School Year',
+			name: 'school_year',
+			items: [
+				{ label: '2023-2024', match: '2023-2024', active: true },
+				{ label: '2024-2025', match: '2024-2025', active: false },
+				{ label: '2025-2026', match: '2025-2026', active: false },
+				{ label: '2026-2027', match: '2026-2027', active: false },
+				{ label: '2027-2028', match: '2027-2028', active: false },
+			],
+		},
+	];
+	$: rowItems = items.map((item) => {
+		const columnItems: ColumnItem[] = [
+			{ name: 'name', label: 'Name', value: item.course_class.name },
+			{ name: 'professor', label: 'Professor', value: item.course_class.professor.full_name },
+			{ name: 'course_code', label: 'Course Code', value: item.course_class.course.code },
+			{
+				name: 'course_description',
+				label: 'Course Description',
+				value: item.course_class.course.description,
+			},
+			{
+				name: 'grade',
+				label: 'Grade',
+				value: item.is_grade_released ? item.grade : 'Not Yet Released',
+			},
+			{ name: 'semester', label: 'Semester', value: item.semester },
+			{ name: 'school_year', label: 'School Year', value: item.school_year },
+		];
+		return { columnItems, tools: [] } as RowItem;
+	});
+
+	// REACTIVE STATES
+	$: {
+		// SAVE CHANGES TO LOCAL STORAGES
+		columns;
+		sortItems;
+		filterGroups;
+		saveData();
+	}
 
 	// UTILS
-	const handleSearch = async () => {
-		isLoading = true;
+	const saveData = () => {
+		if (typeof localStorage === 'undefined' || !initialized) return;
+		const data = JSON.stringify({ columns, sortItems, filterGroups });
+		const encrypted = encrypt(data);
+		localStorage.setItem(localStorageKey, encrypted);
+	};
+	const loadData = () => {
 		try {
-			courseStudents = await selectCourseStudents({
+			if (typeof localStorage === 'undefined') throw new Error();
+			const encrypted = localStorage.getItem(localStorageKey);
+			if (!encrypted) throw new Error();
+			const decrypted = decrypt(encrypted);
+			if (!decrypted) throw new Error();
+			const data = JSON.parse(decrypted);
+			if (data.columns) columns = data.columns;
+			if (data.sortItems) sortItems = data.sortItems;
+			if (data.filterGroups) filterGroups = data.filterGroups;
+		} catch {}
+		initialized = true;
+	};
+	const handleRefresh = async () => {
+		loading = true;
+		try {
+			items = await selectCourseStudents({
 				search,
-				semester,
-				school_year,
 				student_id: $page.data.student.id,
 			});
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
-		isLoading = false;
+		loading = false;
 	};
+
+	// LIFECYCLES
+	onMount(() => {
+		if (data.courseStudents) items = data.courseStudents;
+		loadData();
+	});
 </script>
 
 <Header
@@ -49,91 +150,19 @@
 		{
 			icon: 'ph-bold ph-exam',
 			label: 'Grades',
+			href: '',
+		},
+		{
+			label: $page.data.student.full_name,
 			href: '/app/grades?student_id=' + $page.data.student.id,
 		},
 	]}
 />
 
-<div class="p-4 pt-0 flex flex-col gap-4">
-	<div class="flex flex-col md:flex-row items-center justify-between gap-4">
-		<form
-			class="search w-full md:w-[50%] bg-white rounded-md shadow-md p-2 flex gap-2"
-			on:submit|preventDefault={handleSearch}
-		>
-			<FloatingLabelInput
-				style="outlined"
-				type="text"
-				label="Search..."
-				bind:value={search}
-			/>
-			<Button class="w-[48px] h-[48px]" type="submit" disabled={isLoading}>
-				<i class="ti ti-search text-xl" />
-			</Button>
-		</form>
-		<div class="w-full md:w-fit bg-white rounded-md shadow-md p-2 flex gap-2">
-			<Select
-				placeholder="Select Semester"
-				items={[
-					{ name: '1st', value: '1st' },
-					{ name: '2nd', value: '2nd' },
-				]}
-				disabled={isLoading}
-				bind:value={semester}
-				on:change={handleSearch}
-			/>
-			<Select
-				placeholder="Select School Year"
-				items={[
-					{ name: '2023-2024', value: '2023-2024' },
-					{ name: '2024-2025', value: '2024-2025' },
-					{ name: '2025-2026', value: '2025-2026' },
-					{ name: '2026-2027', value: '2026-2027' },
-					{ name: '2027-2028', value: '2027-2028' },
-					{ name: '2028-2029', value: '2028-2029' },
-					{ name: '2029-2030', value: '2029-2030' },
-				]}
-				disabled={isLoading}
-				bind:value={school_year}
-				on:change={handleSearch}
-			/>
-		</div>
-	</div>
-	<Table items={courseStudents} bind:filteredItems bind:startingItem>
-		<svelte:fragment slot="table-head">
-			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
-			<TableHeadCell>Name</TableHeadCell>
-			<TableHeadCell>Professor</TableHeadCell>
-			<TableHeadCell>Course Code</TableHeadCell>
-			<TableHeadCell>Course Description</TableHeadCell>
-			<TableHeadCell>Grade</TableHeadCell>
-			<TableHeadCell>Semester</TableHeadCell>
-			<TableHeadCell class="rounded-r-md">School Year</TableHeadCell>
-		</svelte:fragment>
-		<svelte:fragment slot="table-body">
-			{#if filteredItems && filteredItems.length}
-				{#each filteredItems as item, i}
-					<TableBodyRow>
-						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
-						<TableBodyCell>{item.course_class.name}</TableBodyCell>
-						<TableBodyCell>{item.course_class.professor.full_name}</TableBodyCell>
-						<TableBodyCell>{item.course_class.course.code}</TableBodyCell>
-						<TableBodyCell>{item.course_class.course.description}</TableBodyCell>
-						<TableBodyCell
-							>{item.is_grade_released
-								? item.grade
-								: 'Not Yet Released'}</TableBodyCell
-						>
-						<TableBodyCell>{item.semester}</TableBodyCell>
-						<TableBodyCell>{item.school_year}</TableBodyCell>
-					</TableBodyRow>
-				{/each}
-			{/if}
-		</svelte:fragment>
-	</Table>
-</div>
-
-<style lang="scss">
-	:global(.search > div) {
-		flex-grow: 1;
-	}
-</style>
+<InteractiveTable
+	bind:columns
+	bind:sortItems
+	bind:filterGroups
+	bind:loading
+	{...{ rowItems, handleRefresh }}
+/>

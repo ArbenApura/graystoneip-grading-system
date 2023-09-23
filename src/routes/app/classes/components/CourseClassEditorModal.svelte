@@ -16,7 +16,7 @@
 	// PROPS
 	export let courseClass: CourseClassData,
 		handleClose: () => void,
-		handleSearch: () => Promise<void>;
+		handleRefresh: () => Promise<void>;
 
 	// STATES
 	let name = courseClass.name,
@@ -41,14 +41,14 @@
 		try {
 			await updateCourseClass({
 				id: courseClass.id,
-				professor_id: courseClass.professor_id,
+				instructor_id: courseClass.instructor_id,
 				course_id,
 				name,
 				semester,
 				school_year,
 				created_at: courseClass.created_at,
 			});
-			await handleSearch();
+			await handleRefresh();
 			handleClose();
 			createSuccessModal({ message: 'Class was edited successfully!' });
 		} catch (error: any) {

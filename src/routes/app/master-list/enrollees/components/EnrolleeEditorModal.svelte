@@ -13,13 +13,13 @@
 	// IMPORTED LIB-COMPONENTS
 	import { Button, Modal, Input, Badge, Select, Label, Spinner } from 'flowbite-svelte';
 	import { updateEnrollee } from '$utils/supabase';
+	import { account } from '$stores/authStates';
 
 	// PROPS
-	export let enrollee: EnrolleeData, handleClose: () => void, handleSearch: () => Promise<void>;
+	export let enrollee: EnrolleeData, handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
-	let student_number = enrollee.student_number,
-		program_id = enrollee.program_id,
+	let program_id = enrollee.program_id,
 		year = enrollee.year,
 		section = enrollee.section,
 		semester = enrollee.semester,
@@ -43,7 +43,6 @@
 
 	// UTILS
 	const handleReset = () => {
-		student_number = enrollee.student_number;
 		program_id = enrollee.program_id;
 		year = enrollee.year;
 		section = enrollee.section;
@@ -53,12 +52,11 @@
 	const handleSave = async () => {
 		isLoading = true;
 		try {
-			const search_key = `${enrollee.account.full_name} ${student_number} ${program?.code} ${school_year}`;
+			const search_key = `${enrollee.account.full_name} ${program?.code} ${school_year}`;
 			await updateEnrollee({
 				id: enrollee.id,
 				account_id: enrollee.account.id,
 				program_id,
-				student_number,
 				year,
 				section,
 				semester,
@@ -66,7 +64,7 @@
 				search_key,
 				created_at: enrollee.created_at,
 			});
-			await handleSearch();
+			await handleRefresh();
 			handleClose();
 			createSuccessModal({ message: 'Student was enrolled successfully!' });
 		} catch (error: any) {
@@ -76,11 +74,7 @@
 	};
 	const handleProceed = async () => {
 		try {
-			if (
-				[student_number, program_id, year, section, semester, school_year, program].some(
-					(v) => !v,
-				)
-			)
+			if ([program_id, year, section, semester, school_year, program].some((v) => !v))
 				throw new Error('The form is incomplete!');
 			createConfirmationModal({
 				message: 'Are you sure you want to proceed?',
@@ -109,8 +103,9 @@
 			<Input
 				type="text"
 				placeholder="Input Student No."
+				value={enrollee.account.id}
 				required
-				bind:value={student_number}
+				disabled
 			/>
 		</div>
 		<div>

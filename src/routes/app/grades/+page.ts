@@ -7,17 +7,11 @@ import { selectAccount, selectCourseStudents } from '$utils/supabase';
 
 export const load = (async ({ url }) => {
 	const student_id = url.searchParams.get('student_id');
-	const semester = url.searchParams.get('semester') || '1st';
-	const school_year = url.searchParams.get('school_year') || '2023-2024';
 	if (!student_id) throw new Error();
 	let courseStudents: CourseStudentData[] = [];
 	let student: Account;
 	await Promise.all([
-		(courseStudents = await selectCourseStudents({
-			student_id,
-			semester,
-			school_year,
-		})),
+		(courseStudents = await selectCourseStudents({ student_id })),
 		(student = await selectAccount(student_id)),
 	]);
 	if (!student) throw new Error();

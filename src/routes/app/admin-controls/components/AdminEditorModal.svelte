@@ -25,7 +25,7 @@
 	} from 'flowbite-svelte';
 
 	// PROPS
-	export let account: Account, handleClose: () => void, handleSearch: () => Promise<void>;
+	export let account: Account, handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
 	let files: FileList,
@@ -93,7 +93,7 @@
 				password,
 				created_at: account.created_at,
 			});
-			await handleSearch();
+			await handleRefresh();
 			handleClose();
 			createSuccessModal({ message: 'Admin account was edited successfully!' });
 		} catch (error: any) {

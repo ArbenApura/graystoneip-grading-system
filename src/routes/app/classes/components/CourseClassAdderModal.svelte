@@ -15,7 +15,7 @@
 	import { insertCourseClass } from '$utils/supabase';
 
 	// PROPS
-	export let handleClose: () => void, handleSearch: () => Promise<void>;
+	export let handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
 	let name: string, semester: string, school_year: string, course_id: string;
@@ -38,14 +38,14 @@
 			const created_at = Date.now();
 			await insertCourseClass({
 				id,
-				professor_id: $page.data.professor.id,
+				instructor_id: $page.data.instructor.id,
 				course_id,
 				name,
 				semester,
 				school_year,
 				created_at,
 			});
-			await handleSearch();
+			await handleRefresh();
 			handleClose();
 			createSuccessModal({ message: 'Class was added successfully!' });
 		} catch (error: any) {

@@ -11,7 +11,7 @@
 	import { Button, Modal, FloatingLabelInput, Badge, Spinner } from 'flowbite-svelte';
 
 	// PROPS
-	export let handleClose: () => void, handleSearch: () => Promise<void>;
+	export let handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
 	let code: string, description: string;
@@ -33,7 +33,7 @@
 				description,
 				created_at,
 			});
-			await handleSearch();
+			await handleRefresh();
 			handleClose();
 			createSuccessModal({ message: 'Program was created successfully!' });
 		} catch (error: any) {

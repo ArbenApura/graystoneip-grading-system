@@ -7,14 +7,14 @@
 	import { createErrorModal } from '$stores/modalStates';
 	import {
 		getCoursesCount,
-		getProfessorsCount,
+		getInstructorsCount,
 		getProgramsCount,
 		getStudentsCount,
 	} from '$utils/supabase';
 
 	// STATES
 	let span = 'week';
-	let professors: any = '...';
+	let instructors: any = '...';
 	let students: any = '...';
 	let courses: any = '...';
 	let programs: any = '...';
@@ -25,7 +25,7 @@
 		isLoading = true;
 		try {
 			await Promise.all([
-				(professors = await getProfessorsCount(span)),
+				(instructors = await getInstructorsCount(span)),
 				(students = await getStudentsCount(span)),
 				(courses = await getCoursesCount(span)),
 				(programs = await getProgramsCount(span)),
@@ -63,13 +63,13 @@
 	</div>
 	<hr />
 	<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4">
-		<a class="item bg-blue-500 hover:bg-blue-600" href="/app/master-list/professors">
+		<a class="item bg-blue-500 hover:bg-blue-600" href="/app/master-list/instructors">
 			<Badge class="aspect-square p-2">
 				<i class="ph-bold ph-chalkboard-teacher text-[18px]" />
 			</Badge>
 			<div class="details">
-				<p>New Professors</p>
-				<p>+ {professors}</p>
+				<p>New Instructors</p>
+				<p>+ {instructors}</p>
 			</div>
 		</a>
 		<a class="item bg-red-500 hover:bg-red-600" href="/app/master-list/students">

@@ -1,12 +1,17 @@
 <script lang="ts">
-	// IMPORTED ASSETS
-	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED TYPES
 	import type { Account } from '$types/index';
+	import type {
+		Column,
+		ColumnItem,
+		RowItem,
+		RowTool,
+		SortItem,
+		TableTool,
+	} from '$components/modules/InteractiveTable';
 	// IMPORTED LIB-UTILS
 	import { onMount } from 'svelte';
 	// IMPORTED UTILS
-	import { generateId } from '$utils/helpers';
 	import {
 		createConfirmationModal,
 		createCustomModal,
@@ -17,33 +22,16 @@
 		removeCustomModal,
 		removeModal,
 	} from '$stores/modalStates';
-	import { archiveAccount, selectAccounts } from '$utils/supabase';
-	// IMPORTED LIB-COMPONENTS
-	import {
-		FloatingLabelInput,
-		Button,
-		TableHeadCell,
-		TableBodyRow,
-		TableBodyCell,
-		Tooltip,
-	} from 'flowbite-svelte';
+	import { selectAccounts, archiveAccount } from '$utils/supabase';
+	import { generateId, encrypt, decrypt } from '$utils';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
+	import InteractiveTable from '$components/modules/InteractiveTable/InteractiveTable.svelte';
 	import AdminAdderModal from './components/AdminAdderModal.svelte';
 	import AdminEditorModal from './components/AdminEditorModal.svelte';
-	import Table from '$components/modules/Table.svelte';
-	// IMPORTED STATES
-	import { isSMDown } from '$stores/mediaStates';
 
 	// PROPS
 	export let data: any;
-
-	// STATES
-	let admins: Account[] = [];
-	let filteredItems: Account[];
-	let startingItem = 0;
-	let search = '';
-	let isLoading = false;
 
 	// MODAL STATES
 	let modalId = generateId();
@@ -69,33 +57,120 @@
 		removeCustomModal(modalId);
 	};
 
+	// STATES
+	let items: Account[] = [];
+	let search = '';
+	let loading = false;
+	let initialized = false;
+	let localStorageKey = 'config.admin-controls';
+
+	// TABLE STATES
+	let columns: Column[] = [
+		{ name: 'last_name', label: 'Last Name', visible: true },
+		{ name: 'first_name', label: 'First Name', visible: true },
+		{ name: 'middle_name', label: 'Middle Name', visible: true },
+		{ name: 'gender', label: 'Gender', visible: true },
+		{ name: 'contact_number', label: 'Contact Nmber', visible: true },
+		{ name: 'email', label: 'Email', visible: true },
+		{ name: 'created_at', label: 'Created At', visible: true },
+	];
+	let sortItems: SortItem[] = [
+		{ name: 'last_name', label: 'Last Name', type: 'asc' },
+		{ name: 'email', label: 'Email', type: 'none' },
+		{ name: 'created_at', label: 'Created At', type: 'none' },
+	];
+	$: rowItems = items.map((item) => {
+		const columnItems: ColumnItem[] = [
+			{ name: 'last_name', label: 'Last Name', value: item.last_name },
+			{ name: 'first_name', label: 'First Name', value: item.first_name },
+			{ name: 'middle_name', label: 'Middle Name', value: item.middle_name },
+			{ name: 'gender', label: 'Gender', value: item.gender },
+			{ name: 'contact_number', label: 'Contact Nmber', value: item.contact_number },
+			{ name: 'email', label: 'Email', value: item.email },
+			{
+				name: 'created_at',
+				label: 'Created At',
+				value: new Date(item.created_at).toDateString(),
+			},
+		];
+		const tools: RowTool[] = [
+			{
+				label: 'Edit Admin',
+				icon: 'ph-bold ph-pen',
+				handleClick: () => openEditorModal(item),
+			},
+			{
+				label: 'Archive Admin',
+				icon: 'ph-bold ph-archive',
+				handleClick: () =>
+					createConfirmationModal({
+						message: 'Are you sure you want to archive this admin account?',
+						handleProceed: () =>
+							createVerificationModal({
+								handleProceed: () => handleArchive(item.id),
+							}),
+					}),
+			},
+		];
+		return { columnItems, tools } as RowItem;
+	});
+	let tableTools: TableTool[] = [{ icon: 'ph-bold ph-plus', handleClick: openAdderModal }];
+
+	// REACTIVE STATES
+	$: {
+		// SAVE CHANGES TO LOCAL STORAGES
+		columns;
+		sortItems;
+		saveData();
+	}
+
 	// UTILS
-	const handleSearch = async () => {
-		isLoading = true;
+	const saveData = () => {
+		if (typeof localStorage === 'undefined' || !initialized) return;
+		const data = JSON.stringify({ columns, sortItems });
+		const encrypted = encrypt(data);
+		localStorage.setItem(localStorageKey, encrypted);
+	};
+	const loadData = () => {
 		try {
-			admins = await selectAccounts({ type: 'admin', search });
+			if (typeof localStorage === 'undefined') throw new Error();
+			const encrypted = localStorage.getItem(localStorageKey);
+			if (!encrypted) throw new Error();
+			const decrypted = decrypt(encrypted);
+			if (!decrypted) throw new Error();
+			const data = JSON.parse(decrypted);
+			if (data.columns) columns = data.columns;
+			if (data.sortItems) sortItems = data.sortItems;
+		} catch {}
+		initialized = true;
+	};
+	const handleRefresh = async () => {
+		loading = true;
+		try {
+			items = await selectAccounts({ type: 'admin', search });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
-		isLoading = false;
+		loading = false;
 	};
 	const handleArchive = async (id: string) => {
-		isLoading = true;
-		const modalId = createLoadingModal({ message: 'Deleting admin account...' });
+		loading = true;
+		const modalId = createLoadingModal({ message: 'Archiving admin account...' });
 		try {
 			await archiveAccount(id);
-			await handleSearch();
+			await handleRefresh();
 			createSuccessModal({ message: 'Admin account was archived successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
 		removeModal(modalId);
-		isLoading = false;
+		loading = false;
 	};
 
 	// LIFECYCLES
 	onMount(() => {
-		if (data.admins) admins = data.admins;
+		if (data.admins) items = data.admins;
+		loadData();
 	});
 </script>
 
@@ -110,109 +185,17 @@
 />
 
 {#if modals.adder}
-	<AdminAdderModal handleClose={closeAdderModal} {handleSearch} />
+	<AdminAdderModal handleClose={closeAdderModal} {handleRefresh} />
 {/if}
 {#if target}
 	{#if modals.editor}
-		<AdminEditorModal account={target} handleClose={closeEditorModal} {handleSearch} />
+		<AdminEditorModal account={target} handleClose={closeEditorModal} {handleRefresh} />
 	{/if}
 {/if}
 
-<div class="p-4 pt-0 flex flex-col gap-4">
-	<div class="flex items-center justify-between">
-		<form
-			class="search w-full md:w-[50%] bg-white rounded-md shadow-md p-2 flex gap-2"
-			on:submit|preventDefault={handleSearch}
-		>
-			<FloatingLabelInput
-				style="outlined"
-				type="text"
-				label="Search Names..."
-				bind:value={search}
-			/>
-			<Button class="w-[48px] h-[48px]" type="submit" disabled={isLoading}>
-				<i class="ti ti-search text-xl" />
-			</Button>
-		</form>
-		<Button
-			class={`w-[48px] h-[48px] shadow-md ${
-				$isSMDown && 'fixed bottom-[16px] right-[16px] z-20'
-			}`}
-			pill={true}
-			on:click={openAdderModal}
-		>
-			<i class="ti ti-plus text-xl" />
-		</Button>
-		<Tooltip class="text-xs whitespace-nowrap z-[100]" color="light" placement="left">
-			Add Admin
-		</Tooltip>
-	</div>
-	<Table items={admins} bind:filteredItems bind:startingItem>
-		<svelte:fragment slot="table-head">
-			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
-			<TableHeadCell>Avatar</TableHeadCell>
-			<TableHeadCell>Last Name</TableHeadCell>
-			<TableHeadCell>First Name</TableHeadCell>
-			<TableHeadCell>Middle Name</TableHeadCell>
-			<TableHeadCell>Gender</TableHeadCell>
-			<TableHeadCell>Contact No.</TableHeadCell>
-			<TableHeadCell>Email</TableHeadCell>
-			<TableHeadCell class="rounded-r-md">Tools</TableHeadCell>
-		</svelte:fragment>
-		<svelte:fragment slot="table-body">
-			{#if filteredItems && filteredItems.length}
-				{#each filteredItems as item, i}
-					<TableBodyRow>
-						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
-						<TableBodyCell>
-							<div class="rounded-full border-[2px] p-[2px] w-fit border-blue-600">
-								<div
-									class="bg-gray-100 w-[35px] h-[35px] rounded-full bg-cover bg-center"
-									style="background-image: url({item.avatar || NoImagePNG})"
-								/>
-							</div>
-						</TableBodyCell>
-						<TableBodyCell>{item.last_name}</TableBodyCell>
-						<TableBodyCell>{item.first_name}</TableBodyCell>
-						<TableBodyCell>{item.middle_name}</TableBodyCell>
-						<TableBodyCell class="capitalize">{item.gender}</TableBodyCell>
-						<TableBodyCell>{item.contact_number}</TableBodyCell>
-						<TableBodyCell>{item.email}</TableBodyCell>
-						<TableBodyCell>
-							<div class="flex gap-2">
-								<Button
-									class="w-[25px] h-[25px] flex-center"
-									color="green"
-									on:click={() => openEditorModal(item)}
-								>
-									<i class="ti ti-pencil text-sm" />
-								</Button>
-								<Button
-									class="w-[25px] h-[25px] flex-center"
-									color="red"
-									on:click={() =>
-										createConfirmationModal({
-											message:
-												'Are you sure you want to archive this admin account?',
-											handleProceed: () =>
-												createVerificationModal({
-													handleProceed: () => handleArchive(item.id),
-												}),
-										})}
-								>
-									<i class="ti ti-archive text-sm" />
-								</Button>
-							</div>
-						</TableBodyCell>
-					</TableBodyRow>
-				{/each}
-			{/if}
-		</svelte:fragment>
-	</Table>
-</div>
-
-<style lang="scss">
-	:global(.search > div) {
-		flex-grow: 1;
-	}
-</style>
+<InteractiveTable
+	bind:columns
+	bind:sortItems
+	bind:loading
+	{...{ rowItems, tableTools, handleRefresh }}
+/>

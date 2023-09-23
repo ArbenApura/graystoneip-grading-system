@@ -10,7 +10,7 @@
 	// IMPORTED UTILS
 	import {
 		getCoursesCount,
-		getProfessorsCount,
+		getInstructorsCount,
 		getProgramsCount,
 		getStudentsCount,
 	} from '$utils/supabase';
@@ -22,11 +22,11 @@
         {$isOpen && $isXL ? 'xl:grid-cols-2' : 'xl:grid-cols-4'}
         gap-4"
 >
-	<a class="item" href="/app/master-list/professors">
+	<a class="item" href="/app/master-list/instructors">
 		<img src={ProgessorsPNG} alt="" />
 		<div class="details">
 			<p>
-				{#await getProfessorsCount()}
+				{#await getInstructorsCount()}
 					...
 				{:then count}
 					{count}
@@ -34,7 +34,7 @@
 					?
 				{/await}
 			</p>
-			<p>Professors</p>
+			<p>Instructors</p>
 		</div>
 	</a>
 	<a class="item" href="/app/master-list/students">

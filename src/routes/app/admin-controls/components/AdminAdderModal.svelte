@@ -23,7 +23,7 @@
 	} from 'flowbite-svelte';
 
 	// PROPS
-	export let handleClose: () => void, handleSearch: () => Promise<void>;
+	export let handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
 	let files: FileList,
@@ -90,7 +90,7 @@
 				password,
 				created_at,
 			});
-			await handleSearch();
+			await handleRefresh();
 			handleClose();
 			createSuccessModal({ message: 'Admin account was created successfully!' });
 		} catch (error: any) {

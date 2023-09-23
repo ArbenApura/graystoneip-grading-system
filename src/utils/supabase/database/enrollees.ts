@@ -1,7 +1,7 @@
 // IMPORTED TYPES
 import type { Enrollee, EnrolleeData } from '$types/master-list';
 // IMPORTED UTILS
-import { selectCourseStudent, selectCourseStudents, supabase } from '..';
+import { selectCourseStudents, supabase } from '..';
 
 // UTILS
 export const insertEnrollee = async (enrollee: Enrollee) => {
@@ -34,7 +34,6 @@ export const selectEnrollees = async ({
 	let query = supabase
 		.from('enrollees')
 		.select('*, account: accounts(*), program: programs(*)')
-		.order('student_number')
 		.eq('is_archived', typeof is_archived === 'undefined' ? false : is_archived);
 	if (semester) query.match({ semester });
 	if (school_year) query.match({ school_year });
@@ -65,15 +64,10 @@ export const updateEnrollee = async (enrollee: Enrollee) => {
 	const { error } = await supabase.from('enrollees').update(enrollee).match({ id: enrollee.id });
 	if (error) throw new Error(error.message);
 };
-export const isAlreadyEnrolled = async ({
-	account_id,
-	semester,
-	school_year,
-	program_id,
-}: Enrollee) => {
+export const isAlreadyEnrolled = async ({ account_id, semester, school_year }: Enrollee) => {
 	const { count } = await supabase
 		.from('enrollees')
 		.select('*', { count: 'exact', head: true })
-		.match({ account_id, semester, school_year, program_id });
+		.match({ account_id, semester, school_year });
 	return !!count;
 };

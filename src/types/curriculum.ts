@@ -20,7 +20,7 @@ export type Course = {
 };
 export type CourseClass = {
 	id: string;
-	professor_id: string;
+	instructor_id: string;
 	course_id: string;
 	name: string;
 	semester: string;
@@ -28,7 +28,7 @@ export type CourseClass = {
 	created_at: number;
 };
 export type CourseClassData = CourseClass & {
-	professor: Account;
+	instructor: Account;
 	course: Course;
 };
 export type CourseStudent = {

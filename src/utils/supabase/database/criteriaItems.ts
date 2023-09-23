@@ -17,7 +17,7 @@ export const selectCriteriaItem = async (id: string) => {
 				*, 
 				course_class: course_classes(
 					*, 
-					professor: accounts(*), 
+					instructor: accounts(*), 
 					course: courses(*)
 				)
 			)`,
@@ -36,7 +36,7 @@ export const selectCriteriaItems = async ({ criteria_id }: { criteria_id?: strin
 				*, 
 				course_class: course_classes(
 					*, 
-					professor: accounts(*), 
+					instructor: accounts(*), 
 					course: courses(*)
 				)
 			)`,

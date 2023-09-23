@@ -6,7 +6,7 @@
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
 	import AdminDashboard from './components/AdminDashboard';
-	import ProfessorDashboard from './components/ProfessorDashboard.svelte';
+	import InstructorDashboard from './components/InstructorDashboard.svelte';
 	import StudentDashboard from './components/StudentDashboard.svelte';
 
 	// STATES
@@ -19,8 +19,8 @@
 
 {#if $account.account_type === 'admin'}
 	<AdminDashboard />
-{:else if $account.account_type === 'professor'}
-	<ProfessorDashboard />
+{:else if $account.account_type === 'instructor'}
+	<InstructorDashboard />
 {:else if $account.account_type === 'student'}
 	<StudentDashboard />
 {/if}

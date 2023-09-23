@@ -44,11 +44,16 @@ export const unarchiveAccount = async (id: string) => {
 	const { error } = await supabase.from('accounts').update({ is_archived: false }).eq('id', id);
 	if (error) throw new Error(error.message);
 };
-export const updateAccount = async (account: Account) => {
-	if (await isEmailOverwrite(account.id, account.email))
-		throw new Error('Email is already taken!');
-	const { error } = await supabase.from('accounts').update(account).eq('id', account.id);
-	if (error) throw new Error(error.message);
+export const updateAccount = async (id: string, account: Account) => {
+	try {
+		if (await isEmailOverwrite(id, account.email)) throw new Error('Email is already taken!');
+		const { error } = await supabase.from('accounts').update(account).eq('id', id);
+		if (error) throw new Error(error.message);
+	} catch (error: any) {
+		if (error?.message === 'duplicate key value violates unique constraint "accounts_pkey"')
+			throw new Error('Id is already taken!');
+		else throw error;
+	}
 };
 export const isEmailTaken = async (email: string) => {
 	const { count } = await supabase
@@ -65,8 +70,19 @@ export const isEmailOverwrite = async (id: string, email: string) => {
 		.neq('id', id);
 	return !!count;
 };
-export const selectAccountByEmail = async (email: string, safe: boolean = false) => {
+export const selectAccountByEmail = async (email: string) => {
 	const { data, error } = await supabase.from('accounts').select().match({ email });
+	if (error) throw new Error(error.message);
+	if (!data.length) throw new Error('Account does not exist!');
+	const account = data[0] as Account;
+	if (account.is_archived) throw new Error('Account unavaible!');
+	return account;
+};
+export const selectAccountByEmailOrId = async (source: string) => {
+	const { data, error } = await supabase
+		.from('accounts')
+		.select()
+		.or(`email.eq.${source}, id.eq.${source}`);
 	if (error) throw new Error(error.message);
 	if (!data.length) throw new Error('Account does not exist!');
 	const account = data[0] as Account;
@@ -81,11 +97,11 @@ export const selectAccountByEmailAndPassword = async (email: string, password: s
 	if (account.is_archived) throw new Error('Account unavaible!');
 	return account;
 };
-export const getProfessorsCount = async (span: string = 'all') => {
+export const getInstructorsCount = async (span: string = 'all') => {
 	const query = supabase
 		.from('accounts')
 		.select('*', { count: 'exact', head: true })
-		.eq('account_type', 'professor')
+		.eq('account_type', 'instructor')
 		.eq('is_archived', false);
 	if (span === 'week') query.gt('created_at', Date.now() - WEEK);
 	else if (span === 'month') query.gt('created_at', Date.now() - MONTH);
@@ -105,11 +121,11 @@ export const getStudentsCount = async (span: string = 'all') => {
 	const { count } = await query;
 	return count || 0;
 };
-export const selectNewProfessors = async (span: string = 'all') => {
+export const selectNewInstructors = async (span: string = 'all') => {
 	const query = supabase
 		.from('accounts')
 		.select()
-		.eq('account_type', 'professor')
+		.eq('account_type', 'instructor')
 		.eq('is_archived', false);
 	if (span === 'week') query.gt('created_at', Date.now() - WEEK);
 	else if (span === 'month') query.gt('created_at', Date.now() - MONTH);

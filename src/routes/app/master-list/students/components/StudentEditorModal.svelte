@@ -25,17 +25,16 @@
 	} from 'flowbite-svelte';
 
 	// PROPS
-	export let account: Account, handleClose: () => void, handleSearch: () => Promise<void>;
+	export let account: Account, handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
 	let files: FileList,
+		id = account.id,
 		first_name = account.first_name,
 		last_name = account.last_name,
 		middle_name = account.middle_name,
 		gender = account.gender,
-		birth_date = formatDate(new Date(account.birth_date)),
 		contact_number = account.contact_number,
-		address = account.address,
 		email = account.email,
 		password = account.password,
 		repassword = account.password;
@@ -62,9 +61,7 @@
 		last_name = account.last_name;
 		middle_name = account.middle_name;
 		gender = account.gender;
-		birth_date = formatDate(new Date(account.birth_date));
 		contact_number = account.contact_number;
-		address = account.address;
 		email = account.email;
 		password = account.password;
 		repassword = account.password;
@@ -77,23 +74,21 @@
 				await deleteAvatar(avatar);
 				avatar = await uploadAvatar(files[0]);
 			}
-			await updateAccount({
-				id: account.id,
+			await updateAccount(account.id, {
+				id,
 				last_name,
 				first_name,
 				middle_name,
 				full_name,
 				gender,
-				birth_date: new Date(birth_date).getTime(),
 				contact_number,
-				address,
 				account_type: account.account_type,
 				avatar,
 				email,
 				password,
 				created_at: account.created_at,
 			});
-			await handleSearch();
+			await handleRefresh();
 			handleClose();
 			createSuccessModal({ message: 'Student account was edited successfully!' });
 		} catch (error: any) {
@@ -109,9 +104,7 @@
 					first_name,
 					middle_name,
 					gender,
-					birth_date,
 					contact_number,
-					address,
 					email,
 					password,
 					repassword,
@@ -192,40 +185,31 @@
 					]}
 				/>
 				<FloatingLabelInput
-					bind:value={birth_date}
-					style="outlined"
-					type="date"
-					label="Birth Date"
-					required
-				/>
-			</div>
-
-			<Label>Contact Info</Label>
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-				<FloatingLabelInput
 					bind:value={contact_number}
 					style="outlined"
 					type="text"
 					label="Contact No."
 					required
 				/>
-				<FloatingLabelInput
-					bind:value={address}
-					style="outlined"
-					type="text"
-					label="Address"
-					required
-				/>
 			</div>
 
 			<Label>Access Info</Label>
-			<FloatingLabelInput
-				bind:value={email}
-				style="outlined"
-				type="email"
-				label="Email"
-				required
-			/>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<FloatingLabelInput
+					bind:value={id}
+					style="outlined"
+					type="text"
+					label="Student ID"
+					required
+				/>
+				<FloatingLabelInput
+					bind:value={email}
+					style="outlined"
+					type="email"
+					label="Email"
+					required
+				/>
+			</div>
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 				<FloatingLabelInput
 					bind:value={password}

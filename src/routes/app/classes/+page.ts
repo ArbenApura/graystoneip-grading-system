@@ -6,20 +6,20 @@ import type { CourseClassData, Course, Account } from '$types/index';
 import { selectAccount, selectCourseClasses, selectCourses } from '$utils/supabase';
 
 export const load = (async ({ url }) => {
-	const professor_id = url.searchParams.get('professor_id');
-	if (!professor_id) throw new Error();
+	const instructor_id = url.searchParams.get('instructor_id');
+	if (!instructor_id) throw new Error();
 	let courseClasses: CourseClassData[] = [];
 	let courses: Course[] = [];
-	let professor: Account;
+	let instructor: Account;
 	await Promise.all([
 		(courseClasses = await selectCourseClasses({
 			semester: '1st',
 			school_year: '2023-2024',
-			professor_id: professor_id,
+			instructor_id: instructor_id,
 		})),
 		(courses = await selectCourses({})),
-		(professor = await selectAccount(professor_id)),
+		(instructor = await selectAccount(instructor_id)),
 	]);
-	if (!professor) throw new Error();
-	return { courseClasses, courses, professor };
+	if (!instructor) throw new Error();
+	return { courseClasses, courses, instructor };
 }) satisfies PageLoad;

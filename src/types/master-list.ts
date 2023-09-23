@@ -2,7 +2,7 @@
 import type { Program } from './curriculum';
 
 // TYPES
-export type AccountType = 'admin' | 'professor' | 'student';
+export type AccountType = 'admin' | 'instructor' | 'student';
 export type Account = {
 	id: string;
 	last_name: string;
@@ -10,8 +10,6 @@ export type Account = {
 	middle_name: string;
 	full_name: string;
 	gender: string;
-	birth_date: number;
-	address: string;
 	contact_number: string;
 	account_type: AccountType;
 	avatar: string;
@@ -24,7 +22,6 @@ export type Enrollee = {
 	id: string;
 	account_id: string;
 	program_id: string;
-	student_number: string;
 	year: string;
 	section: string;
 	semester: string;

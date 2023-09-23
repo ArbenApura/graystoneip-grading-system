@@ -18,11 +18,11 @@
 		{
 			icon: 'ph-bold ph-chalkboard',
 			label: 'Classes',
-			href: '/app/classes?professor_id=' + $page.data.professor.id,
+			href: '/app/classes?instructor_id=' + $page.data.instructor.id,
 		},
 		{
-			label: $page.data.professor.full_name,
-			href: '/app/classes?professor_id=' + $page.data.professor.id,
+			label: $page.data.instructor.full_name,
+			href: '/app/classes?instructor_id=' + $page.data.instructor.id,
 		},
 		{
 			label: $page.data.courseClass.name,

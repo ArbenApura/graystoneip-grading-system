@@ -1,6 +1,13 @@
 <script lang="ts">
 	// IMPORTED TYPES
 	import type { Program } from '$types/index';
+	import type {
+		Column,
+		ColumnItem,
+		RowItem,
+		RowTool,
+		SortItem,
+	} from '$components/modules/InteractiveTable';
 	// IMPORTED LIB-UTILS
 	import { onMount } from 'svelte';
 	// IMPORTED UTILS
@@ -12,55 +19,111 @@
 		removeModal,
 	} from '$stores/modalStates';
 	import { unarchiveProgram, selectPrograms } from '$utils/supabase';
-	// IMPORTED LIB-COMPONENTS
-	import {
-		FloatingLabelInput,
-		Button,
-		TableHeadCell,
-		TableBodyRow,
-		TableBodyCell,
-	} from 'flowbite-svelte';
+	import { encrypt, decrypt } from '$utils';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
-	import Table from '$components/modules/Table.svelte';
+	import InteractiveTable from '$components/modules/InteractiveTable/InteractiveTable.svelte';
 
 	// PROPS
 	export let data: any;
 
 	// STATES
-	let programs: Program[] = [];
-	let filteredItems: Program[];
-	let startingItem = 0;
+	let items: Program[] = [];
 	let search = '';
-	let isLoading = false;
+	let loading = false;
+	let initialized = false;
+	let localStorageKey = 'config.archive.programs';
+
+	// TABLE STATES
+	let columns: Column[] = [
+		{ name: 'code', label: 'Code', visible: true },
+		{ name: 'description', label: 'Description', visible: true },
+		{ name: 'created_at', label: 'Created At', visible: true },
+	];
+	let sortItems: SortItem[] = [
+		{ name: 'code', label: 'Code', type: 'asc' },
+		{ name: 'description', label: 'Description', type: 'none' },
+		{ name: 'created_at', label: 'Created At', type: 'none' },
+	];
+	$: rowItems = items.map((item) => {
+		const columnItems: ColumnItem[] = [
+			{ name: 'code', label: 'Code', value: item.code },
+			{ name: 'description', label: 'Description', value: item.description },
+			{
+				name: 'created_at',
+				label: 'Created At',
+				value: new Date(item.created_at).toDateString(),
+			},
+		];
+		const tools: RowTool[] = [
+			{
+				label: 'Unarchive Program',
+				icon: 'ph-bold ph-arrow-counter-clockwise',
+				handleClick: () =>
+					createConfirmationModal({
+						message: 'Are you sure you want to unarchive this program?',
+						handleProceed: () => handleUnarchive(item.id),
+					}),
+			},
+		];
+		return { columnItems, tools } as RowItem;
+	});
+
+	// REACTIVE STATES
+	$: {
+		// SAVE CHANGES TO LOCAL STORAGES
+		columns;
+		sortItems;
+		saveData();
+	}
 
 	// UTILS
-	const handleSearch = async () => {
-		isLoading = true;
+	const saveData = () => {
+		if (typeof localStorage === 'undefined' || !initialized) return;
+		const data = JSON.stringify({ columns, sortItems });
+		const encrypted = encrypt(data);
+		localStorage.setItem(localStorageKey, encrypted);
+	};
+	const loadData = () => {
 		try {
-			programs = await selectPrograms({ search, is_archived: true });
+			if (typeof localStorage === 'undefined') throw new Error();
+			const encrypted = localStorage.getItem(localStorageKey);
+			if (!encrypted) throw new Error();
+			const decrypted = decrypt(encrypted);
+			if (!decrypted) throw new Error();
+			const data = JSON.parse(decrypted);
+			if (data.columns) columns = data.columns;
+			if (data.sortItems) sortItems = data.sortItems;
+		} catch {}
+		initialized = true;
+	};
+	const handleRefresh = async () => {
+		loading = true;
+		try {
+			items = await selectPrograms({ search, is_archived: true });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
-		isLoading = false;
+		loading = false;
 	};
-	const handleArchive = async (id: string) => {
-		isLoading = true;
+	const handleUnarchive = async (id: string) => {
+		loading = true;
 		const modalId = createLoadingModal({ message: 'Unarchiving program...' });
 		try {
 			await unarchiveProgram(id);
-			await handleSearch();
+			await handleRefresh();
 			createSuccessModal({ message: 'Program was unarchived successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
 		removeModal(modalId);
-		isLoading = false;
+		loading = false;
 	};
 
 	// LIFECYCLES
 	onMount(() => {
-		if (data.programs) programs = data.programs;
+		if (data.programs) items = data.programs;
+		loadData();
 	});
 </script>
 
@@ -71,60 +134,4 @@
 	]}
 />
 
-<div class="p-4 pt-0 flex flex-col gap-4">
-	<div class="flex items-center justify-between">
-		<form
-			class="search w-full md:w-[50%] bg-white rounded-md shadow-md p-2 flex gap-2"
-			on:submit|preventDefault={handleSearch}
-		>
-			<FloatingLabelInput
-				style="outlined"
-				type="text"
-				label="Search Codes..."
-				bind:value={search}
-			/>
-			<Button class="w-[48px] h-[48px]" type="submit" disabled={isLoading}>
-				<i class="ti ti-search text-xl" />
-			</Button>
-		</form>
-	</div>
-	<Table items={programs} bind:filteredItems bind:startingItem>
-		<svelte:fragment slot="table-head">
-			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
-			<TableHeadCell>Code</TableHeadCell>
-			<TableHeadCell>Description</TableHeadCell>
-			<TableHeadCell>Created At</TableHeadCell>
-			<TableHeadCell class="rounded-r-md">Tools</TableHeadCell>
-		</svelte:fragment>
-		<svelte:fragment slot="table-body">
-			{#if filteredItems && filteredItems.length}
-				{#each filteredItems as item, i}
-					<TableBodyRow>
-						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
-						<TableBodyCell>{item.code}</TableBodyCell>
-						<TableBodyCell>{item.description}</TableBodyCell>
-						<TableBodyCell>{new Date(item.created_at).toDateString()}</TableBodyCell>
-						<TableBodyCell class="flex gap-2">
-							<Button
-								class="w-[25px] h-[25px] flex-center"
-								on:click={() =>
-									createConfirmationModal({
-										message: 'Are you sure you want to unarchive this program?',
-										handleProceed: () => handleArchive(item.id),
-									})}
-							>
-								<i class="ti ti-archive text-sm" />
-							</Button>
-						</TableBodyCell>
-					</TableBodyRow>
-				{/each}
-			{/if}
-		</svelte:fragment>
-	</Table>
-</div>
-
-<style lang="scss">
-	:global(.search > div) {
-		flex-grow: 1;
-	}
-</style>
+<InteractiveTable bind:columns bind:sortItems bind:loading {...{ rowItems, handleRefresh }} />

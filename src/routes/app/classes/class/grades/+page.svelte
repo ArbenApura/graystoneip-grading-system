@@ -98,17 +98,17 @@
 		{
 			icon: 'ph-bold ph-chalkboard',
 			label: 'Classes',
-			href: '/app/classes?professor_id=' + $page.data.professor.id,
+			href: '/app/classes?instructor_id=' + $page.data.instructor.id,
 		},
 		{
-			label: $page.data.professor.full_name,
-			href: '/app/classes?professor_id=' + $page.data.professor.id,
+			label: $page.data.instructor.full_name,
+			href: '/app/classes?instructor_id=' + $page.data.instructor.id,
 		},
 		{
 			label: $page.data.courseClass.name,
 			href:
-				'/app/classes/class?professor_id=' +
-				$page.data.professor.id +
+				'/app/classes/class?instructor_id=' +
+				$page.data.instructor.id +
 				'&course_class_id=' +
 				$page.data.courseClass.id,
 		},

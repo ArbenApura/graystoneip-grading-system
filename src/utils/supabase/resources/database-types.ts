@@ -12,9 +12,7 @@ export interface Database {
       accounts: {
         Row: {
           account_type: string | null
-          address: string | null
           avatar: string | null
-          birth_date: number | null
           contact_number: string | null
           created_at: number
           email: string | null
@@ -29,9 +27,7 @@ export interface Database {
         }
         Insert: {
           account_type?: string | null
-          address?: string | null
           avatar?: string | null
-          birth_date?: number | null
           contact_number?: string | null
           created_at: number
           email?: string | null
@@ -46,9 +42,7 @@ export interface Database {
         }
         Update: {
           account_type?: string | null
-          address?: string | null
           avatar?: string | null
-          birth_date?: number | null
           contact_number?: string | null
           created_at?: number
           email?: string | null
@@ -68,8 +62,8 @@ export interface Database {
           course_id: string | null
           created_at: number
           id: string
+          instructor_id: string | null
           name: string | null
-          professor_id: string | null
           school_year: string | null
           semester: string | null
         }
@@ -77,8 +71,8 @@ export interface Database {
           course_id?: string | null
           created_at: number
           id: string
+          instructor_id?: string | null
           name?: string | null
-          professor_id?: string | null
           school_year?: string | null
           semester?: string | null
         }
@@ -86,8 +80,8 @@ export interface Database {
           course_id?: string | null
           created_at?: number
           id?: string
+          instructor_id?: string | null
           name?: string | null
-          professor_id?: string | null
           school_year?: string | null
           semester?: string | null
         }
@@ -99,8 +93,8 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "course_classes_professor_id_fkey"
-            columns: ["professor_id"]
+            foreignKeyName: "course_classes_instructor_id_fkey"
+            columns: ["instructor_id"]
             referencedRelation: "accounts"
             referencedColumns: ["id"]
           }
@@ -307,7 +301,6 @@ export interface Database {
           search_key: string | null
           section: string | null
           semester: string | null
-          student_number: string | null
           year: string | null
         }
         Insert: {
@@ -320,7 +313,6 @@ export interface Database {
           search_key?: string | null
           section?: string | null
           semester?: string | null
-          student_number?: string | null
           year?: string | null
         }
         Update: {
@@ -333,7 +325,6 @@ export interface Database {
           search_key?: string | null
           section?: string | null
           semester?: string | null
-          student_number?: string | null
           year?: string | null
         }
         Relationships: [
@@ -378,18 +369,18 @@ export interface Database {
       recovery_requests: {
         Row: {
           created_at: number
-          email: string | null
           id: string
+          source: string | null
         }
         Insert: {
           created_at: number
-          email?: string | null
           id: string
+          source?: string | null
         }
         Update: {
           created_at?: number
-          email?: string | null
           id?: string
+          source?: string | null
         }
         Relationships: []
       }

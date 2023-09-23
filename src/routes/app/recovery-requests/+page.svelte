@@ -1,88 +1,138 @@
 <script lang="ts">
 	// IMPORTED TYPES
 	import type { RecoveryRequestData } from '$types/index';
+	import type {
+		Column,
+		ColumnItem,
+		RowItem,
+		RowTool,
+		SortItem,
+	} from '$components/modules/InteractiveTable';
 	// IMPORTED LIB-UTILS
 	import { onMount } from 'svelte';
 	// IMPORTED UTILS
-	import { generateId } from '$utils/helpers';
 	import {
-		createCustomModal,
-		createErrorModal,
-		removeCustomModal,
-		createInfoModal,
 		createConfirmationModal,
+		createErrorModal,
+		createInfoModal,
+		createLoadingModal,
+		createSuccessModal,
+		removeModal,
 	} from '$stores/modalStates';
 	import { deleteRecoveryRequest, selectRecoveryRequests } from '$utils/supabase';
-	// IMPORTED LIB-COMPONENTS
-	import {
-		FloatingLabelInput,
-		Button,
-		TableHeadCell,
-		TableBodyRow,
-		TableBodyCell,
-	} from 'flowbite-svelte';
+	import { encrypt, decrypt } from '$utils';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
-	import Table from '$components/modules/Table.svelte';
+	import InteractiveTable from '$components/modules/InteractiveTable/InteractiveTable.svelte';
 
 	// PROPS
 	export let data: any;
 
 	// STATES
-	let recoveryRequests: RecoveryRequestData[] = [];
-	let filteredItems: RecoveryRequestData[];
-	let startingItem = 0;
-	let search = '';
-	let isLoading = false;
+	let items: RecoveryRequestData[] = [];
+	let loading = false;
+	let initialized = false;
+	let localStorageKey = 'config.recovery-requests';
 
-	// MODAL STATES
-	let modalId = generateId();
-	let modals = { adder: false, editor: false };
-	let target: RecoveryRequestData | null = null;
+	// TABLE STATES
+	let columns: Column[] = [
+		{ name: 'source', label: 'Email / Student ID', visible: true },
+		{ name: 'created_at', label: 'Created At', visible: true },
+	];
+	let sortItems: SortItem[] = [
+		{ name: 'source', label: 'Email / Student ID', type: 'none' },
+		{ name: 'created_at', label: 'Created At', type: 'none' },
+	];
+	$: rowItems = items.map((item) => {
+		const columnItems: ColumnItem[] = [
+			{
+				name: 'source',
+				label: 'Email / Student ID',
+				value: item.recoveryRequest.source,
+			},
+			{
+				name: 'created_at',
+				label: 'Created At',
+				value: new Date(item.recoveryRequest.created_at).toDateString(),
+			},
+		];
+		const tools: RowTool[] = [
+			{
+				label: 'Send Credentials',
+				icon: 'ph-bold ph-paper-plane-right',
+				handleClick: () =>
+					createInfoModal({
+						message: `Please send the account information to the corresponding email address or contact number of the recovery request. [Email: ${item.account.email}, Contact Number: ${item.account.contact_number}, Password: ${item.account.password}]`,
+					}),
+			},
+			{
+				label: 'Delete Recovery Request',
+				icon: 'ph-bold ph-trash',
+				handleClick: () =>
+					createConfirmationModal({
+						message: 'Are you sure you want to delete this recovery request?',
+						handleProceed: () => handleDelete(item.recoveryRequest.id),
+					}),
+			},
+		];
+		return { columnItems, tools } as RowItem;
+	});
 
-	// MODAL UTILS
-	const openAdderModal = () => {
-		modals.adder = true;
-		createCustomModal(modalId);
-	};
-	const closeAdderModal = () => {
-		modals.adder = false;
-		removeCustomModal(modalId);
-	};
-	const openEditorModal = (recoveryRequest: RecoveryRequestData) => {
-		createCustomModal(modalId);
-		modals.editor = true;
-		target = recoveryRequest;
-	};
-	const closeEditorModal = () => {
-		modals.editor = false;
-		removeCustomModal(modalId);
-	};
+	// REACTIVE STATES
+	$: {
+		// SAVE CHANGES TO LOCAL STORAGES
+		columns;
+		sortItems;
+		saveData();
+	}
 
 	// UTILS
-	const handleSearch = async () => {
-		isLoading = true;
+	const saveData = () => {
+		if (typeof localStorage === 'undefined' || !initialized) return;
+		const data = JSON.stringify({ columns, sortItems });
+		const encrypted = encrypt(data);
+		localStorage.setItem(localStorageKey, encrypted);
+	};
+	const loadData = () => {
 		try {
-			recoveryRequests = await selectRecoveryRequests({ search });
+			if (typeof localStorage === 'undefined') throw new Error();
+			const encrypted = localStorage.getItem(localStorageKey);
+			if (!encrypted) throw new Error();
+			const decrypted = decrypt(encrypted);
+			if (!decrypted) throw new Error();
+			const data = JSON.parse(decrypted);
+			if (data.columns) columns = data.columns;
+			if (data.sortItems) sortItems = data.sortItems;
+		} catch {}
+		initialized = true;
+	};
+	const handleRefresh = async () => {
+		loading = true;
+		try {
+			items = await selectRecoveryRequests({});
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
-		isLoading = false;
+		loading = false;
 	};
 	const handleDelete = async (id: string) => {
-		isLoading = true;
+		loading = true;
+		const modalId = createLoadingModal({ message: 'Deleting recovery request...' });
 		try {
 			await deleteRecoveryRequest(id);
-			await handleSearch();
+			await handleRefresh();
+			createSuccessModal({ message: 'Recover request was deleted successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
-		isLoading = false;
+		removeModal(modalId);
+		loading = false;
 	};
 
 	// LIFECYCLES
 	onMount(() => {
-		if (data.recoveryRequests) recoveryRequests = data.recoveryRequests;
+		if (data.recoveryRequests) items = data.recoveryRequests;
+		loadData();
 	});
 </script>
 
@@ -92,72 +142,4 @@
 	]}
 />
 
-<div class="p-4 pt-0 flex flex-col gap-4">
-	<div class="flex items-center justify-between">
-		<form
-			class="search w-full md:w-[50%] bg-white rounded-md shadow-md p-2 flex gap-2"
-			on:submit|preventDefault={handleSearch}
-		>
-			<FloatingLabelInput
-				style="outlined"
-				type="text"
-				label="Search Emails..."
-				bind:value={search}
-			/>
-			<Button class="w-[48px] h-[48px]" type="submit" disabled={isLoading}>
-				<i class="ti ti-search text-xl" />
-			</Button>
-		</form>
-	</div>
-	<Table items={recoveryRequests} bind:filteredItems bind:startingItem>
-		<svelte:fragment slot="table-head">
-			<TableHeadCell class="rounded-l-md">#</TableHeadCell>
-			<TableHeadCell>Email</TableHeadCell>
-			<TableHeadCell>Created At</TableHeadCell>
-			<TableHeadCell class="rounded-r-md">Tools</TableHeadCell>
-		</svelte:fragment>
-		<svelte:fragment slot="table-body">
-			{#if filteredItems && filteredItems.length}
-				{#each filteredItems as item, i}
-					<TableBodyRow>
-						<TableBodyCell>{startingItem + 1 + i}</TableBodyCell>
-						<TableBodyCell>{item.recoveryRequest.email}</TableBodyCell>
-						<TableBodyCell>
-							{new Date(item.recoveryRequest.created_at).toDateString()}
-						</TableBodyCell>
-						<TableBodyCell class="flex gap-2">
-							<Button
-								class="w-[25px] h-[25px] flex-center"
-								on:click={() =>
-									createInfoModal({
-										message: `Please send the account information to the corresponding email address or contact number of the recovery request. [Email: ${item.account.email}, Contact Number: ${item.account.contact_number}, Password: ${item.account.password}]`,
-									})}
-							>
-								<i class="ph-bold ph-paper-plane-right text-sm" />
-							</Button>
-							<Button
-								class="w-[25px] h-[25px] flex-center"
-								color="red"
-								on:click={() =>
-									createConfirmationModal({
-										message:
-											'Are you sure you want to delete this recovery request?',
-										handleProceed: async () =>
-											await handleDelete(item.recoveryRequest.id),
-									})}
-							>
-								<i class="ph-bold ph-trash text-sm" />
-							</Button>
-						</TableBodyCell>
-					</TableBodyRow>
-				{/each}
-			{/if}
-		</svelte:fragment>
-	</Table>
-</div>
-
-<style lang="scss">
-	:global(.search > div) {
-		flex-grow: 1;
-	}
-</style>
+<InteractiveTable bind:columns bind:sortItems bind:loading {...{ rowItems, handleRefresh }} />

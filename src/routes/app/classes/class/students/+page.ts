@@ -8,20 +8,20 @@ import { redirect } from '@sveltejs/kit';
 
 export const load = (async ({ url }) => {
 	try {
-		const professor_id = url.searchParams.get('professor_id');
+		const instructor_id = url.searchParams.get('instructor_id');
 		const course_class_id = url.searchParams.get('course_class_id');
-		if (!professor_id || !course_class_id) throw new Error();
-		let professor: Account;
+		if (!instructor_id || !course_class_id) throw new Error();
+		let instructor: Account;
 		let courseClass: CourseClassData;
 		let courseStudents: CourseStudentData[];
 		await Promise.all([
-			(professor = await selectAccount(professor_id)),
+			(instructor = await selectAccount(instructor_id)),
 			(courseClass = await selectCourseClass(course_class_id)),
 			(courseStudents = await selectCourseStudents({ course_class_id })),
 		]);
-		if (!professor) throw new Error();
-		return { professor, courseClass, courseStudents };
+		if (!instructor) throw new Error();
+		return { instructor, courseClass, courseStudents };
 	} catch {
-		throw redirect(300, '/app/classes?professor_id=' + url.searchParams.get('professor_id'));
+		throw redirect(300, '/app/classes?instructor_id=' + url.searchParams.get('instructor_id'));
 	}
 }) satisfies PageLoad;

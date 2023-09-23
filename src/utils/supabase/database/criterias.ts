@@ -23,7 +23,7 @@ export const selectCriteria = async (id: string) => {
 			`*, 
 			course_class: course_classes(
 				*, 
-				professor: accounts(*), 
+				instructor: accounts(*), 
 				course: courses(*)
 			)`,
 		)
@@ -45,7 +45,7 @@ export const selectCriterias = async ({
 			`*, 
 			course_class: course_classes(
 				*, 
-				professor: accounts(*), 
+				instructor: accounts(*), 
 				course: courses(*)
 			)`,
 		)

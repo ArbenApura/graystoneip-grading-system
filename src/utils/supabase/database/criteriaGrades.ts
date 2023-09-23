@@ -20,7 +20,7 @@ export const selectCriteriaGrade = async (id: string) => {
 					*, 
 					course_class: course_classes(
 						*, 
-						professor: accounts(*), 
+						instructor: accounts(*), 
 						course: courses(*)
 					)
 				)
@@ -29,7 +29,7 @@ export const selectCriteriaGrade = async (id: string) => {
 				*, 
 				course_class: course_classes(
 					*, 
-					professor: accounts(*), 
+					instructor: accounts(*), 
 					course: courses(*)
 				), 
 				enrollee: enrollees(
@@ -54,7 +54,7 @@ export const selectCriteriaGrades = async ({ course_class_id }: { course_class_i
 					*, 
 					course_class: course_classes(
 						*, 
-						professor: accounts(*), 
+						instructor: accounts(*), 
 						course: courses(*)
 					)
 				)
@@ -63,7 +63,7 @@ export const selectCriteriaGrades = async ({ course_class_id }: { course_class_i
 				*, 
 				course_class: course_classes(
 					*, 
-					professor: accounts(*), 
+					instructor: accounts(*), 
 					course: courses(*)
 				), 
 				enrollee: enrollees(

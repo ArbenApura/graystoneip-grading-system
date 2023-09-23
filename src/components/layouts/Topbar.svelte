@@ -15,8 +15,8 @@
 	$: href =
 		$account.account_type === 'student'
 			? '/app/grades?student_id=' + $account.id
-			: $account.account_type === 'professor'
-			? '/app/classes?professor_id=' + $account.id
+			: $account.account_type === 'instructor'
+			? '/app/classes?instructor_id=' + $account.id
 			: '/app/dashboard';
 
 	// UTILS

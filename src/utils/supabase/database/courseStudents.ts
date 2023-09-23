@@ -12,7 +12,7 @@ export const selectCourseStudent = async (id: string) => {
 	const { data, error } = await supabase
 		.from('course_students')
 		.select(
-			'*, course_class: course_classes(*, professor: accounts(*), course: courses(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
+			'*, course_class: course_classes(*, instructor: accounts(*), course: courses(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
 		)
 		.match({ id });
 	if (error) throw new Error(error.message);
@@ -40,7 +40,7 @@ export const selectCourseStudents = async ({
 	let query = supabase
 		.from('course_students')
 		.select(
-			'*, course_class: course_classes(*, professor: accounts(*), course: courses(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
+			'*, course_class: course_classes(*, instructor: accounts(*), course: courses(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
 		)
 		.order('created_at', { ascending: false });
 	if (course_class_id) query.match({ course_class_id });

@@ -12,7 +12,7 @@
 	import { Button, Modal, FloatingLabelInput, Badge, Spinner } from 'flowbite-svelte';
 
 	// PROPS
-	export let course: Course, handleClose: () => void, handleSearch: () => Promise<void>;
+	export let course: Course, handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
 	let code = course.code,
@@ -39,7 +39,7 @@
 				hours: hours || 0,
 				created_at: course.created_at,
 			});
-			await handleSearch();
+			await handleRefresh();
 			handleClose();
 			createSuccessModal({ message: 'Course was edited successfully!' });
 		} catch (error: any) {

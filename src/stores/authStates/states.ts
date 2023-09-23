@@ -11,8 +11,6 @@ export const DEFAULT_ACCOUNT: Account = {
 	middle_name: '',
 	full_name: '',
 	gender: '',
-	birth_date: 0,
-	address: '',
 	contact_number: '',
 	account_type: 'student',
 	avatar: '',
