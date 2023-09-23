@@ -38,7 +38,7 @@
 	// TABLE STATES
 	let columns: Column[] = [
 		{ name: 'name', label: 'Name', visible: true },
-		{ name: 'professor', label: 'Professor', visible: true },
+		{ name: 'instructor', label: 'Instructor', visible: true },
 		{ name: 'course_code', label: 'Course Code', visible: true },
 		{ name: 'course_description', label: 'Course Description', visible: true },
 		{ name: 'grade', label: 'Grade', visible: true },
@@ -47,7 +47,7 @@
 	];
 	let sortItems: SortItem[] = [
 		{ name: 'name', label: 'Name', type: 'asc' },
-		{ name: 'professor', label: 'Professor', type: 'none' },
+		{ name: 'instructor', label: 'Instructor', type: 'none' },
 		{ name: 'course_code', label: 'Course Code', type: 'none' },
 		{ name: 'grade', label: 'Grade', type: 'none' },
 		{ name: 'semester', label: 'Semester', type: 'none' },
@@ -77,7 +77,11 @@
 	$: rowItems = items.map((item) => {
 		const columnItems: ColumnItem[] = [
 			{ name: 'name', label: 'Name', value: item.course_class.name },
-			{ name: 'professor', label: 'Professor', value: item.course_class.professor.full_name },
+			{
+				name: 'instructor',
+				label: 'Instructor',
+				value: item.course_class.instructor.full_name,
+			},
 			{ name: 'course_code', label: 'Course Code', value: item.course_class.course.code },
 			{
 				name: 'course_description',
