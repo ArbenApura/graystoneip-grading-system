@@ -85,7 +85,7 @@
 		{ name: 'created_at', label: 'Created At', visible: true },
 	];
 	let sortItems: SortItem[] = [
-		{ name: 'id', label: 'Student ID', type: 'asc' },
+		{ name: 'id', label: 'Student ID', type: 'none' },
 		{ name: 'last_name', label: 'Last Name', type: 'asc' },
 		{ name: 'email', label: 'Email', type: 'none' },
 		{ name: 'created_at', label: 'Created At', type: 'none' },
