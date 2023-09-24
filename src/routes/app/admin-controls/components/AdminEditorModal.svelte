@@ -1,17 +1,14 @@
 <script lang="ts">
-	// IMPORTED ASSETS
-	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED TYPES
 	import type { Account } from '$types/index';
 	// IMPORTED UTILS
 	import {
 		createConfirmationModal,
 		createErrorModal,
-		createSuccessModal,
 		createVerificationModal,
 	} from '$stores/modalStates';
-	import { generateId, validateEmail, formatDate } from '$utils/helpers';
-	import { deleteAvatar, updateAccount, uploadAvatar } from '$utils/supabase';
+	import { validateEmail } from '$utils/helpers';
+	import { updateAccount } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		Button,
@@ -20,7 +17,6 @@
 		Badge,
 		Label,
 		Select,
-		Fileupload,
 		Spinner,
 	} from 'flowbite-svelte';
 
@@ -28,43 +24,26 @@
 	export let account: Account, handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
-	let files: FileList,
-		first_name = account.first_name,
+	let first_name = account.first_name,
 		last_name = account.last_name,
 		middle_name = account.middle_name,
 		gender = account.gender,
-		birth_date = formatDate(new Date(account.birth_date)),
 		contact_number = account.contact_number,
-		address = account.address,
 		email = account.email,
 		password = account.password,
 		repassword = account.password;
-	let selectedImage: string | ArrayBuffer | null = account.avatar || NoImagePNG;
 	let isLoading = false;
 
 	// REACTIVE STATES
 	$: full_name = first_name + ' ' + middle_name + ' ' + last_name;
 
 	// UTILS
-	const handleFileChange = (event: Event) => {
-		const target = event.target as HTMLInputElement;
-		const file = target.files && target.files[0];
-		if (file && file.type.startsWith('image/')) {
-			const reader = new FileReader();
-			reader.onload = () => {
-				selectedImage = reader.result;
-			};
-			reader.readAsDataURL(file);
-		}
-	};
 	const handleReset = () => {
 		first_name = account.first_name;
 		last_name = account.last_name;
 		middle_name = account.middle_name;
 		gender = account.gender;
-		birth_date = formatDate(new Date(account.birth_date));
 		contact_number = account.contact_number;
-		address = account.address;
 		email = account.email;
 		password = account.password;
 		repassword = account.password;
@@ -72,30 +51,22 @@
 	const handleSave = async () => {
 		isLoading = true;
 		try {
-			let avatar = account.avatar;
-			if (files && files.length) {
-				await deleteAvatar(avatar);
-				avatar = await uploadAvatar(files[0]);
-			}
-			await updateAccount({
+			await updateAccount(account.id, {
 				id: account.id,
 				last_name,
 				first_name,
 				middle_name,
 				full_name,
 				gender,
-				birth_date: new Date(birth_date).getTime(),
 				contact_number,
-				address,
 				account_type: account.account_type,
-				avatar,
+				avatar: account.avatar,
 				email,
 				password,
 				created_at: account.created_at,
 			});
 			await handleRefresh();
 			handleClose();
-			createSuccessModal({ message: 'Admin account was edited successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -109,9 +80,7 @@
 					first_name,
 					middle_name,
 					gender,
-					birth_date,
 					contact_number,
-					address,
 					email,
 					password,
 					repassword,
@@ -131,7 +100,7 @@
 	};
 </script>
 
-<Modal open={true} permanent={true} class="w-full" size="lg">
+<Modal open={true} permanent={true} class="w-full" size="md">
 	<svelte:fragment slot="header">
 		<div class="w-full flex items-center gap-4">
 			<Badge class="aspect-plus p-2"><i class="ti ti-edit text-[18px]" /></Badge>
@@ -141,22 +110,7 @@
 			</button>
 		</div>
 	</svelte:fragment>
-	<form class="grid grid-cols-1 lg:grid-cols-2 gap-4" on:submit|preventDefault={handleProceed}>
-		<div class="flex flex-col justify-between gap-8">
-			<Label>Avatar</Label>
-			<div class="mx-auto p-1 rounded-full border-[2px] border-blue-600">
-				<div
-					class="bg-gray-100 w-[200px] h-[200px] rounded-full bg-cover bg-center"
-					style="background-image: url({selectedImage || NoImagePNG})"
-				/>
-			</div>
-			<Fileupload
-				bind:files
-				on:change={handleFileChange}
-				inputClass="h-[48px] p-0 flex-center rounded-none border-b bg-transparent"
-				accept="image/*"
-			/>
-		</div>
+	<form class="grid grid-cols-1 gap-4" on:submit|preventDefault={handleProceed}>
 		<div class="flex flex-col gap-4">
 			<Label>Basic Info</Label>
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -192,28 +146,10 @@
 					]}
 				/>
 				<FloatingLabelInput
-					bind:value={birth_date}
-					style="outlined"
-					type="date"
-					label="Birth Date"
-					required
-				/>
-			</div>
-
-			<Label>Contact Info</Label>
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-				<FloatingLabelInput
 					bind:value={contact_number}
 					style="outlined"
 					type="text"
 					label="Contact No."
-					required
-				/>
-				<FloatingLabelInput
-					bind:value={address}
-					style="outlined"
-					type="text"
-					label="Address"
 					required
 				/>
 			</div>

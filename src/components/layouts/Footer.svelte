@@ -5,7 +5,7 @@
 
 <div class="bg-white rounded-md shadow-md p-6 flex flex-col gap-4">
 	<div class="flex items-center flex-col lg:flex-row gap-4 lg:gap-0">
-		<div class="flex items-center gap-4 flex-grow">
+		<div class="flex items-center text-center gap-4 flex-grow">
 			<p>Graystone Institute of the Philippines</p>
 		</div>
 		<div

@@ -27,7 +27,7 @@
 	<div class="flex flex-col md:flex-row md:grid md:grid-cols-2 gap-4">
 		<Input
 			class="bg-white shadow-md flex-grow order-2 md:order-1"
-			placeholder="Filter..."
+			placeholder="Search..."
 			disabled={loading}
 			bind:value={search}
 		/>

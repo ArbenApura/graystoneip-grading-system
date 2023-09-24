@@ -91,7 +91,7 @@
 	<svelte:fragment slot="header">
 		<div class="w-full flex items-center gap-4">
 			<Badge class="aspect-plus p-2"><i class="ph-bold ph-student text-[18px]" /></Badge>
-			<p class="text-xl text-black flex-grow">Update Enrollee</p>
+			<p class="text-xl text-black flex-grow">Edit Enrollee</p>
 			<button class="w-[34px] flex-center" on:click={handleClose}>
 				<i class="ti ti-x text-xl cursor-pointer hover:text-black" />
 			</button>
@@ -99,7 +99,7 @@
 	</svelte:fragment>
 	<form class="flex flex-col gap-4" on:submit|preventDefault={handleProceed}>
 		<div>
-			<Label class="mb-2">Student No.</Label>
+			<Label class="mb-2">Student ID</Label>
 			<Input
 				type="text"
 				placeholder="Input Student No."

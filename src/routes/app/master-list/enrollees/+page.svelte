@@ -139,7 +139,7 @@
 			},
 			{
 				label: 'Archive Enrollee',
-				icon: 'ph-bold ph-arrow-counter-clockwise',
+				icon: 'ph-bold ph-archive',
 				handleClick: () =>
 					createConfirmationModal({
 						message: 'Are you sure you want to archive this enrollee account?',

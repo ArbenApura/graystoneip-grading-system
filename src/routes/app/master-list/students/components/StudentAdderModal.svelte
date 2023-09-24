@@ -1,6 +1,4 @@
 <script lang="ts">
-	// IMPORTED ASSETS
-	import NoImagePNG from '$assets/images/no-image.png';
 	// IMPORTED UTILS
 	import {
 		createErrorModal,
@@ -8,13 +6,12 @@
 		createConfirmationModal,
 	} from '$stores/modalStates';
 	import { generateId, validateEmail } from '$utils/helpers';
-	import { insertAccount, uploadAvatar } from '$utils/supabase';
+	import { insertAccount } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		Button,
 		Modal,
 		FloatingLabelInput,
-		Fileupload,
 		Badge,
 		Select,
 		Label,
@@ -25,45 +22,28 @@
 	export let handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
-	let files: FileList,
-		id: string,
+	let id: string,
 		last_name: string,
 		first_name: string,
 		middle_name: string,
 		gender: string,
-		birth_date: string,
 		contact_number: string,
-		address: string,
 		email: string,
 		password: string,
 		repassword: string;
-	let selectedImage: string | ArrayBuffer | null = null;
 	let isLoading = false;
 
 	// REACTIVE STATES
 	$: full_name = first_name + ' ' + middle_name + ' ' + last_name;
 
 	// UTILS
-	const handleFileChange = (event: Event) => {
-		const target = event.target as HTMLInputElement;
-		const file = target.files && target.files[0];
-		if (file && file.type.startsWith('image/')) {
-			const reader = new FileReader();
-			reader.onload = () => {
-				selectedImage = reader.result;
-			};
-			reader.readAsDataURL(file);
-		}
-	};
 	const handleReset = () => {
 		id = '';
 		last_name = '';
 		first_name = '';
 		middle_name = '';
 		gender = '';
-		birth_date = '';
 		contact_number = '';
-		address = '';
 		email = '';
 		password = '';
 		repassword = '';
@@ -72,8 +52,6 @@
 		isLoading = true;
 		try {
 			const created_at = Date.now();
-			let avatar = '';
-			if (files && files.length) avatar = await uploadAvatar(files[0]);
 			await insertAccount({
 				id,
 				last_name,
@@ -83,7 +61,7 @@
 				gender,
 				contact_number,
 				account_type: 'student',
-				avatar,
+				avatar: '',
 				email,
 				password,
 				created_at,
@@ -125,7 +103,7 @@
 	};
 </script>
 
-<Modal open={true} permanent={true} class="w-full" size="lg">
+<Modal open={true} permanent={true} class="w-full" size="md">
 	<svelte:fragment slot="header">
 		<div class="w-full flex items-center gap-4">
 			<Badge class="aspect-plus p-2"><i class="ti ti-plus text-[18px]" /></Badge>
@@ -135,22 +113,7 @@
 			</button>
 		</div>
 	</svelte:fragment>
-	<form class="grid grid-cols-1 lg:grid-cols-2 gap-4" on:submit|preventDefault={handleProceed}>
-		<div class="flex flex-col justify-between gap-8">
-			<Label>Avatar</Label>
-			<div class="mx-auto p-1 rounded-full border-[2px] border-blue-600">
-				<div
-					class="bg-gray-100 w-[200px] h-[200px] rounded-full bg-cover bg-center"
-					style="background-image: url({selectedImage || NoImagePNG})"
-				/>
-			</div>
-			<Fileupload
-				bind:files
-				on:change={handleFileChange}
-				inputClass="h-[48px] p-0 flex-center rounded-none border-b bg-transparent"
-				accept="image/*"
-			/>
-		</div>
+	<form class="grid grid-cols-1 gap-4" on:submit|preventDefault={handleProceed}>
 		<div class="flex flex-col gap-4">
 			<Label>Basic Info</Label>
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
