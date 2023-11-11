@@ -12,13 +12,16 @@ export const selectCourseStudent = async (id: string) => {
 	const { data, error } = await supabase
 		.from('course_students')
 		.select(
-			'*, course_class: course_classes(*, instructor: accounts(*), course: courses(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
+			'*, course_class: course_classes(*, instructor: accounts(*), course: courses(*)), student_record: student_records(*, account: accounts(*), program: programs(*))',
 		)
 		.match({ id });
 	if (error) throw new Error(error.message);
 	if (!data || !data.length) throw new Error('Class not found!');
 	let courseStudent = data[0] as unknown as CourseStudentData;
-	if (!courseStudent.enrollee.is_archived || !courseStudent.enrollee.account.is_archived)
+	if (
+		!courseStudent.student_record.is_archived ||
+		!courseStudent.student_record.account.is_archived
+	)
 		throw new Error('Course student unavailable!');
 	return courseStudent;
 };
@@ -40,7 +43,7 @@ export const selectCourseStudents = async ({
 	let query = supabase
 		.from('course_students')
 		.select(
-			'*, course_class: course_classes(*, instructor: accounts(*), course: courses(*)), enrollee: enrollees(*, account: accounts(*), program: programs(*))',
+			'*, course_class: course_classes(*, instructor: accounts(*), course: courses(*)), student_record: student_records(*, account: accounts(*), program: programs(*))',
 		)
 		.order('created_at', { ascending: false });
 	if (course_class_id) query.match({ course_class_id });
@@ -54,10 +57,11 @@ export const selectCourseStudents = async ({
 	if (student_id) {
 		courseStudents = courseStudents.filter(
 			(courseStudent) =>
-				!courseStudent.enrollee.is_archived && !courseStudent.enrollee.account.is_archived,
+				!courseStudent.student_record.is_archived &&
+				!courseStudent.student_record.account.is_archived,
 		);
 		courseStudents = courseStudents.filter(
-			(courseStudent) => courseStudent.enrollee.account.id === student_id,
+			(courseStudent) => courseStudent.student_record.account.id === student_id,
 		);
 	}
 	return courseStudents;

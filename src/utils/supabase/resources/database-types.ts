@@ -89,12 +89,14 @@ export interface Database {
           {
             foreignKeyName: "course_classes_course_id_fkey"
             columns: ["course_id"]
+            isOneToOne: false
             referencedRelation: "courses"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "course_classes_instructor_id_fkey"
             columns: ["instructor_id"]
+            isOneToOne: false
             referencedRelation: "accounts"
             referencedColumns: ["id"]
           }
@@ -104,47 +106,49 @@ export interface Database {
         Row: {
           course_class_id: string | null
           created_at: number
-          enrollee_id: string | null
           grade: string | null
           id: string
           is_grade_released: boolean | null
           school_year: string | null
           search_key: string | null
           semester: string | null
+          student_record_id: string | null
         }
         Insert: {
           course_class_id?: string | null
           created_at: number
-          enrollee_id?: string | null
           grade?: string | null
           id: string
           is_grade_released?: boolean | null
           school_year?: string | null
           search_key?: string | null
           semester?: string | null
+          student_record_id?: string | null
         }
         Update: {
           course_class_id?: string | null
           created_at?: number
-          enrollee_id?: string | null
           grade?: string | null
           id?: string
           is_grade_released?: boolean | null
           school_year?: string | null
           search_key?: string | null
           semester?: string | null
+          student_record_id?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "course_students_course_class_id_fkey"
             columns: ["course_class_id"]
+            isOneToOne: false
             referencedRelation: "course_classes"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "course_students_enrollee_id_fkey"
-            columns: ["enrollee_id"]
-            referencedRelation: "enrollees"
+            foreignKeyName: "course_students_student_record_id_fkey"
+            columns: ["student_record_id"]
+            isOneToOne: false
+            referencedRelation: "student_records"
             referencedColumns: ["id"]
           }
         ]
@@ -208,18 +212,21 @@ export interface Database {
           {
             foreignKeyName: "criteria_grades_course_class_id_fkey"
             columns: ["course_class_id"]
+            isOneToOne: false
             referencedRelation: "course_classes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "criteria_grades_course_student_id_fkey"
             columns: ["course_student_id"]
+            isOneToOne: false
             referencedRelation: "course_students"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "criteria_grades_criteria_item_id_fkey"
             columns: ["criteria_item_id"]
+            isOneToOne: false
             referencedRelation: "criteria_items"
             referencedColumns: ["id"]
           }
@@ -251,6 +258,7 @@ export interface Database {
           {
             foreignKeyName: "criteria_items_criteria_id_fkey"
             columns: ["criteria_id"]
+            isOneToOne: false
             referencedRelation: "criterias"
             referencedColumns: ["id"]
           }
@@ -285,59 +293,8 @@ export interface Database {
           {
             foreignKeyName: "criterias_course_class_id_fkey"
             columns: ["course_class_id"]
+            isOneToOne: false
             referencedRelation: "course_classes"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      enrollees: {
-        Row: {
-          account_id: string | null
-          created_at: number
-          id: string
-          is_archived: boolean | null
-          program_id: string | null
-          school_year: string | null
-          search_key: string | null
-          section: string | null
-          semester: string | null
-          year: string | null
-        }
-        Insert: {
-          account_id?: string | null
-          created_at: number
-          id: string
-          is_archived?: boolean | null
-          program_id?: string | null
-          school_year?: string | null
-          search_key?: string | null
-          section?: string | null
-          semester?: string | null
-          year?: string | null
-        }
-        Update: {
-          account_id?: string | null
-          created_at?: number
-          id?: string
-          is_archived?: boolean | null
-          program_id?: string | null
-          school_year?: string | null
-          search_key?: string | null
-          section?: string | null
-          semester?: string | null
-          year?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "enrollees_account_id_fkey"
-            columns: ["account_id"]
-            referencedRelation: "accounts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "enrollees_program_id_fkey"
-            columns: ["program_id"]
-            referencedRelation: "programs"
             referencedColumns: ["id"]
           }
         ]
@@ -383,6 +340,60 @@ export interface Database {
           source?: string | null
         }
         Relationships: []
+      }
+      student_records: {
+        Row: {
+          account_id: string | null
+          created_at: number
+          id: string
+          is_archived: boolean | null
+          program_id: string | null
+          school_year: string | null
+          search_key: string | null
+          section: string | null
+          semester: string | null
+          year: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          created_at: number
+          id: string
+          is_archived?: boolean | null
+          program_id?: string | null
+          school_year?: string | null
+          search_key?: string | null
+          section?: string | null
+          semester?: string | null
+          year?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          created_at?: number
+          id?: string
+          is_archived?: boolean | null
+          program_id?: string | null
+          school_year?: string | null
+          search_key?: string | null
+          section?: string | null
+          semester?: string | null
+          year?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_records_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_records_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {

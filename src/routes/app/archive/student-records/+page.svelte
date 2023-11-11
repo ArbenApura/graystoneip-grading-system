@@ -1,6 +1,6 @@
 <script lang="ts">
 	// IMPORTED TYPES
-	import type { EnrolleeData } from '$types/index';
+	import type { StudentRecordData } from '$types/index';
 	import type {
 		Column,
 		ColumnItem,
@@ -20,7 +20,7 @@
 		createVerificationModal,
 		removeModal,
 	} from '$stores/modalStates';
-	import { unarchiveEnrollee, selectEnrollees } from '$utils/supabase';
+	import { unarchiveStudentRecord, selectStudentRecords } from '$utils/supabase';
 	import { encrypt, decrypt } from '$utils';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
@@ -30,11 +30,11 @@
 	export let data: any;
 
 	// STATES
-	let items: EnrolleeData[] = [];
+	let items: StudentRecordData[] = [];
 	let search = '';
 	let loading = false;
 	let initialized = false;
-	let localStorageKey = 'config.archive.enrollees';
+	let localStorageKey = 'config.archive.studentRecords';
 
 	// TABLE STATES
 	let columns: Column[] = [
@@ -110,11 +110,11 @@
 		];
 		const tools: RowTool[] = [
 			{
-				label: 'Unarchive Enrollee',
+				label: 'Unarchive StudentRecord',
 				icon: 'ph-bold ph-arrow-counter-clockwise',
 				handleClick: () =>
 					createConfirmationModal({
-						message: 'Are you sure you want to unarchive this enrollee account?',
+						message: 'Are you sure you want to unarchive this studentRecord account?',
 						handleProceed: () =>
 							createVerificationModal({
 								handleProceed: () => handleUnarchive(item.id),
@@ -158,7 +158,7 @@
 	const handleRefresh = async () => {
 		loading = true;
 		try {
-			items = await selectEnrollees({ search, is_archived: true });
+			items = await selectStudentRecords({ search, is_archived: true });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -166,11 +166,11 @@
 	};
 	const handleUnarchive = async (id: string) => {
 		loading = true;
-		const modalId = createLoadingModal({ message: 'Unarchiving enrollee...' });
+		const modalId = createLoadingModal({ message: 'Unarchiving studentRecord...' });
 		try {
-			await unarchiveEnrollee(id);
+			await unarchiveStudentRecord(id);
 			await handleRefresh();
-			createSuccessModal({ message: 'Enrollee account was unarchived successfully!' });
+			createSuccessModal({ message: 'StudentRecord account was unarchived successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -180,7 +180,7 @@
 
 	// LIFECYCLES
 	onMount(() => {
-		if (data.enrollees) items = data.enrollees;
+		if (data.studentRecords) items = data.studentRecords;
 		loadData();
 	});
 </script>
@@ -188,7 +188,7 @@
 <Header
 	breadcrumbItems={[
 		{ icon: 'ti ti-archive', label: 'Archive', href: '' },
-		{ label: 'Enrollees', href: '/app/archive/enrollees' },
+		{ label: 'StudentRecords', href: '/app/archive/studentRecords' },
 	]}
 />
 

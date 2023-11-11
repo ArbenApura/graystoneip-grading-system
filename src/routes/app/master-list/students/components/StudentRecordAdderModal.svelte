@@ -13,7 +13,7 @@
 	import { generateId } from '$utils/helpers';
 	// IMPORTED LIB-COMPONENTS
 	import { Button, Modal, Input, Badge, Select, Label, Spinner } from 'flowbite-svelte';
-	import { insertEnrollee } from '$utils/supabase';
+	import { insertStudentRecord } from '$utils/supabase';
 
 	// PROPS
 	export let account: Account, handleClose: () => void, handleRefresh: () => Promise<void>;
@@ -47,7 +47,7 @@
 			const search_key = `${account.full_name} ${program?.code} ${school_year}`;
 			const id = generateId();
 			const created_at = Date.now();
-			await insertEnrollee({
+			await insertStudentRecord({
 				id,
 				account_id: account.id,
 				program_id,

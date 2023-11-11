@@ -1,6 +1,6 @@
 <script lang="ts">
 	// IMPORTED TYPES
-	import type { EnrolleeData } from '$types/master-list';
+	import type { StudentRecordData } from '$types/master-list';
 	import type {
 		Column,
 		ColumnItem,
@@ -12,7 +12,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	// IMPORTED UTILS
-	import { insertCourseStudent, selectEnrollees } from '$utils/supabase';
+	import { insertCourseStudent, selectStudentRecords } from '$utils/supabase';
 	import {
 		createConfirmationModal,
 		createErrorModal,
@@ -28,7 +28,7 @@
 	export let handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
-	let items: EnrolleeData[] = [];
+	let items: StudentRecordData[] = [];
 	let loading = false;
 	let initialized = false;
 	let localStorageKey = 'config.classes.class.students.modal.adder';
@@ -133,7 +133,7 @@
 	const handleSearch = async () => {
 		loading = true;
 		try {
-			items = await selectEnrollees({
+			items = await selectStudentRecords({
 				semester: $page.data.courseClass.semester,
 				school_year: $page.data.courseClass.school_year,
 				not_in_course_class_id: $page.data.courseClass.id,
@@ -143,7 +143,7 @@
 		}
 		loading = false;
 	};
-	const handleAdd = async (enrollee: EnrolleeData) => {
+	const handleAdd = async (studentRecord: StudentRecordData) => {
 		loading = true;
 		try {
 			const id = generateId();
@@ -151,8 +151,8 @@
 			await insertCourseStudent({
 				id,
 				course_class_id: $page.data.courseClass.id,
-				enrollee_id: enrollee.id,
-				search_key: `${enrollee.account.full_name} ${enrollee.program.code}`,
+				student_record_id: studentRecord.id,
+				search_key: `${studentRecord.account.full_name} ${studentRecord.program.code}`,
 				semester: $page.data.courseClass.semester,
 				school_year: $page.data.courseClass.school_year,
 				grade: '',

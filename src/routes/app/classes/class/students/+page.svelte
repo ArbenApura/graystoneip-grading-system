@@ -87,22 +87,30 @@
 	];
 	$: rowItems = items.map((item) => {
 		const columnItems: ColumnItem[] = [
-			{ name: 'id', label: 'Student ID', value: item.enrollee.account.id },
-			{ name: 'last_name', label: 'Last Name', value: item.enrollee.account.last_name },
-			{ name: 'first_name', label: 'First Name', value: item.enrollee.account.first_name },
-			{ name: 'middle_name', label: 'Middle Name', value: item.enrollee.account.middle_name },
-			{ name: 'gender', label: 'Gender', value: item.enrollee.account.gender },
+			{ name: 'id', label: 'Student ID', value: item.student_record.account.id },
+			{ name: 'last_name', label: 'Last Name', value: item.student_record.account.last_name },
+			{
+				name: 'first_name',
+				label: 'First Name',
+				value: item.student_record.account.first_name,
+			},
+			{
+				name: 'middle_name',
+				label: 'Middle Name',
+				value: item.student_record.account.middle_name,
+			},
+			{ name: 'gender', label: 'Gender', value: item.student_record.account.gender },
 			{
 				name: 'contact_number',
 				label: 'Contact Number',
-				value: item.enrollee.account.contact_number,
+				value: item.student_record.account.contact_number,
 			},
-			{ name: 'email', label: 'Email', value: item.enrollee.account.email },
+			{ name: 'email', label: 'Email', value: item.student_record.account.email },
 			{ name: 'semester', label: 'Semester', value: item.semester },
 			{ name: 'school_year', label: 'School Year', value: item.school_year },
-			{ name: 'program', label: 'Program', value: item.enrollee.program.code },
-			{ name: 'year', label: 'Year', value: item.enrollee.year },
-			{ name: 'section', label: 'Section', value: item.enrollee.section },
+			{ name: 'program', label: 'Program', value: item.student_record.program.code },
+			{ name: 'year', label: 'Year', value: item.student_record.year },
+			{ name: 'section', label: 'Section', value: item.student_record.section },
 			{
 				name: 'created_at',
 				label: 'Enrolled At',

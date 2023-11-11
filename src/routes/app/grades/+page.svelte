@@ -19,7 +19,7 @@
 		createSuccessModal,
 		removeModal,
 	} from '$stores/modalStates';
-	import { unarchiveEnrollee, selectCourseStudents } from '$utils/supabase';
+	import { unarchiveStudentRecord, selectCourseStudents } from '$utils/supabase';
 	import { encrypt, decrypt } from '$utils';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';

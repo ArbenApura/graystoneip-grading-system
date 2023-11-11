@@ -18,7 +18,7 @@ export type Account = {
 	is_archived?: boolean;
 	created_at: number;
 };
-export type Enrollee = {
+export type StudentRecord = {
 	id: string;
 	account_id: string;
 	program_id: string;
@@ -30,7 +30,7 @@ export type Enrollee = {
 	is_archived?: boolean;
 	created_at: number;
 };
-export type EnrolleeData = Enrollee & {
+export type StudentRecordData = StudentRecord & {
 	account: Account;
 	program: Program;
 };

@@ -2,7 +2,7 @@
 	// IMPORTED LIB-TYPES
 	import type { Row } from 'write-excel-file';
 	// IMPORTED TYPES
-	import type { EnrolleeData } from '$types/index';
+	import type { StudentRecordData } from '$types/index';
 	import type {
 		Column,
 		ColumnItem,
@@ -25,14 +25,14 @@
 		removeCustomModal,
 		removeModal,
 	} from '$stores/modalStates';
-	import { archiveEnrollee, selectEnrollees } from '$utils/supabase';
+	import { archiveStudentRecord, selectStudentRecords } from '$utils/supabase';
 	import { encrypt, decrypt, generateId } from '$utils';
 	// IMPORTED LIB-COMPONENTS
 	import { Button, Tooltip } from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
 	import InteractiveTable from '$components/modules/InteractiveTable/InteractiveTable.svelte';
-	import EnrolleeEditorModal from './components/EnrolleeEditorModal.svelte';
+	import StudentRecordEditorModal from './components/StudentRecordEditorModal.svelte';
 
 	// PROPS
 	export let data: any;
@@ -40,13 +40,13 @@
 	// MODAL STATES
 	let modalId = generateId();
 	let modals = { editor: false };
-	let target: EnrolleeData | null = null;
+	let target: StudentRecordData | null = null;
 
 	// MODAL UTILS
-	const openEditorModal = (enrollee: EnrolleeData) => {
+	const openEditorModal = (studentRecord: StudentRecordData) => {
 		createCustomModal(modalId);
 		modals.editor = true;
-		target = enrollee;
+		target = studentRecord;
 	};
 	const closeEditorModal = () => {
 		modals.editor = false;
@@ -54,10 +54,10 @@
 	};
 
 	// STATES
-	let items: EnrolleeData[] = [];
+	let items: StudentRecordData[] = [];
 	let loading = false;
 	let initialized = false;
-	let localStorageKey = 'config.master-list.enrollees';
+	let localStorageKey = 'config.master-list.student-records';
 
 	// TABLE STATES
 	let columns: Column[] = [
@@ -133,16 +133,16 @@
 		];
 		const tools: RowTool[] = [
 			{
-				label: 'Edit Enrollee',
+				label: 'Edit Student Record',
 				icon: 'ph-bold ph-pen',
 				handleClick: () => openEditorModal(item),
 			},
 			{
-				label: 'Archive Enrollee',
+				label: 'Archive Student Record',
 				icon: 'ph-bold ph-archive',
 				handleClick: () =>
 					createConfirmationModal({
-						message: 'Are you sure you want to archive this enrollee account?',
+						message: 'Are you sure you want to archive this Student Record?',
 						handleProceed: () => handleArchive(item.id),
 					}),
 			},
@@ -183,7 +183,7 @@
 	const handleRefresh = async () => {
 		loading = true;
 		try {
-			items = await selectEnrollees({});
+			items = await selectStudentRecords({});
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -191,11 +191,11 @@
 	};
 	const handleArchive = async (id: string) => {
 		loading = true;
-		const modalId = createLoadingModal({ message: 'Archiving enrollee...' });
+		const modalId = createLoadingModal({ message: 'Archiving Student Record...' });
 		try {
-			await archiveEnrollee(id);
+			await archiveStudentRecord(id);
 			await handleRefresh();
-			createSuccessModal({ message: 'Enrollee was archived successfully!' });
+			createSuccessModal({ message: 'Student Record was archived successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -222,7 +222,7 @@
 				}
 				rows.push(row_data);
 			}
-			await writeXlsxFile([...rows], { fileName: `Enrollees.xlsx` });
+			await writeXlsxFile([...rows], { fileName: `StudentRecords.xlsx` });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -230,7 +230,7 @@
 
 	// LIFECYCLES
 	onMount(() => {
-		if (data.enrollees) items = data.enrollees;
+		if (data.studentRecords) items = data.studentRecords;
 		loadData();
 	});
 </script>
@@ -238,13 +238,17 @@
 <Header
 	breadcrumbItems={[
 		{ icon: 'ph-bold ph-user-list', label: 'Master List', href: '' },
-		{ label: 'Enrollees', href: '/app/master-list/enrollees' },
+		{ label: 'Student Records', href: '/app/master-list/student-records' },
 	]}
 />
 
 {#if target}
 	{#if modals.editor}
-		<EnrolleeEditorModal enrollee={target} handleClose={closeEditorModal} {handleRefresh} />
+		<StudentRecordEditorModal
+			studentRecord={target}
+			handleClose={closeEditorModal}
+			{handleRefresh}
+		/>
 	{/if}
 {/if}
 
@@ -254,7 +258,7 @@
 	disabled={loading}
 	on:click={() =>
 		createConfirmationModal({
-			message: 'Are you sure you want to export the enrollees?',
+			message: 'Are you sure you want to export the Student Records?',
 			handleProceed: handleExport,
 		})}
 >

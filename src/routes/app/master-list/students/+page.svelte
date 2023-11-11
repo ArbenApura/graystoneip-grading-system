@@ -28,7 +28,7 @@
 	import InteractiveTable from '$components/modules/InteractiveTable/InteractiveTable.svelte';
 	import StudentAdderModal from './components/StudentAdderModal.svelte';
 	import StudentEditorModal from './components/StudentEditorModal.svelte';
-	import EnrolleeAdderModal from './components/EnrolleeAdderModal.svelte';
+	import StudentRecordAdderModal from './components/StudentRecordAdderModal.svelte';
 
 	// PROPS
 	export let data: any;
@@ -210,7 +210,11 @@
 {/if}
 {#if target}
 	{#if modals.enroller}
-		<EnrolleeAdderModal account={target} handleClose={closeEnrollerModal} {handleRefresh} />
+		<StudentRecordAdderModal
+			account={target}
+			handleClose={closeEnrollerModal}
+			{handleRefresh}
+		/>
 	{/if}
 {/if}
 

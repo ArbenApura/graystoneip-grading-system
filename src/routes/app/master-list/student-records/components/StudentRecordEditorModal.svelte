@@ -1,6 +1,6 @@
 <script lang="ts">
 	// IMPORTED TYPES
-	import type { Account, EnrolleeData } from '$types/master-list';
+	import type { Account, StudentRecordData } from '$types/master-list';
 	import type { Course, Program } from '$types/curriculum';
 	// IMPORTED LIB-UTILS
 	import { page } from '$app/stores';
@@ -12,18 +12,20 @@
 	} from '$stores/modalStates';
 	// IMPORTED LIB-COMPONENTS
 	import { Button, Modal, Input, Badge, Select, Label, Spinner } from 'flowbite-svelte';
-	import { updateEnrollee } from '$utils/supabase';
+	import { updateStudentRecord } from '$utils/supabase';
 	import { account } from '$stores/authStates';
 
 	// PROPS
-	export let enrollee: EnrolleeData, handleClose: () => void, handleRefresh: () => Promise<void>;
+	export let studentRecord: StudentRecordData,
+		handleClose: () => void,
+		handleRefresh: () => Promise<void>;
 
 	// STATES
-	let program_id = enrollee.program_id,
-		year = enrollee.year,
-		section = enrollee.section,
-		semester = enrollee.semester,
-		school_year = enrollee.school_year;
+	let program_id = studentRecord.program_id,
+		year = studentRecord.year,
+		section = studentRecord.section,
+		semester = studentRecord.semester,
+		school_year = studentRecord.school_year;
 	let isLoading = false;
 	let programItems = ($page.data.programs || []).map((program: Program) => ({
 		name: program.code + ' - ' + program.description,
@@ -43,26 +45,26 @@
 
 	// UTILS
 	const handleReset = () => {
-		program_id = enrollee.program_id;
-		year = enrollee.year;
-		section = enrollee.section;
-		semester = enrollee.semester;
-		school_year = enrollee.school_year;
+		program_id = studentRecord.program_id;
+		year = studentRecord.year;
+		section = studentRecord.section;
+		semester = studentRecord.semester;
+		school_year = studentRecord.school_year;
 	};
 	const handleSave = async () => {
 		isLoading = true;
 		try {
-			const search_key = `${enrollee.account.full_name} ${program?.code} ${school_year}`;
-			await updateEnrollee({
-				id: enrollee.id,
-				account_id: enrollee.account.id,
+			const search_key = `${studentRecord.account.full_name} ${program?.code} ${school_year}`;
+			await updateStudentRecord({
+				id: studentRecord.id,
+				account_id: studentRecord.account.id,
 				program_id,
 				year,
 				section,
 				semester,
 				school_year,
 				search_key,
-				created_at: enrollee.created_at,
+				created_at: studentRecord.created_at,
 			});
 			await handleRefresh();
 			handleClose();
@@ -91,7 +93,7 @@
 	<svelte:fragment slot="header">
 		<div class="w-full flex items-center gap-4">
 			<Badge class="aspect-plus p-2"><i class="ph-bold ph-student text-[18px]" /></Badge>
-			<p class="text-xl text-black flex-grow">Edit Enrollee</p>
+			<p class="text-xl text-black flex-grow">Edit Student Record</p>
 			<button class="w-[34px] flex-center" on:click={handleClose}>
 				<i class="ti ti-x text-xl cursor-pointer hover:text-black" />
 			</button>
@@ -103,7 +105,7 @@
 			<Input
 				type="text"
 				placeholder="Input Student No."
-				value={enrollee.account.id}
+				value={studentRecord.account.id}
 				required
 				disabled
 			/>

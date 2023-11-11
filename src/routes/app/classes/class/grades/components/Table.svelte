@@ -263,14 +263,15 @@
 				{#each course_students as course_student, i}
 					<tr>
 						<td class="text-center"><p>{i + 1}</p></td>
-						<td class="text-left"><p>{course_student.enrollee.account.id}</p></td>
-						<td class="text-left"><p>{course_student.enrollee.account.last_name}</p></td
+						<td class="text-left"><p>{course_student.student_record.account.id}</p></td>
+						<td class="text-left"
+							><p>{course_student.student_record.account.last_name}</p></td
 						>
 						<td class="text-left">
-							<p>{course_student.enrollee.account.first_name}</p>
+							<p>{course_student.student_record.account.first_name}</p>
 						</td>
 						<td class="text-left">
-							<p>{course_student.enrollee.account.middle_name}</p>
+							<p>{course_student.student_record.account.middle_name}</p>
 						</td>
 						{#each advance_criterias as advance_criteria}
 							{#if maximizedIds.includes(advance_criteria.criteria.id)}

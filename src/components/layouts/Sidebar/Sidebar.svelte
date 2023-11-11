@@ -83,9 +83,9 @@
 					contents: [],
 				},
 				{
-					label: 'Enrollees',
+					label: 'Student Records',
 					icon: 'ph-bold ph-user-list',
-					location: '/app/master-list/enrollees',
+					location: '/app/master-list/student-records',
 					params: '',
 					isOpen: false,
 					isVisible: true,
@@ -166,9 +166,9 @@
 					contents: [],
 				},
 				{
-					label: 'Enrollees',
+					label: 'Student Records',
 					icon: 'ph-bold ph-user-list',
-					location: '/app/archive/enrollees',
+					location: '/app/archive/student-records',
 					params: '',
 					isOpen: false,
 					isVisible: true,

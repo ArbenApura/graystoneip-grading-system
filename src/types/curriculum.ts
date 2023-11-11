@@ -1,5 +1,5 @@
 // IMPORTED TYPES
-import type { Account, Enrollee, EnrolleeData } from './master-list';
+import type { Account, StudentRecord, StudentRecordData } from './master-list';
 
 // TYPES
 export type Program = {
@@ -34,7 +34,7 @@ export type CourseClassData = CourseClass & {
 export type CourseStudent = {
 	id: string;
 	course_class_id: string;
-	enrollee_id: string;
+	student_record_id: string;
 	search_key: string;
 	semester: string;
 	school_year: string;
@@ -43,7 +43,7 @@ export type CourseStudent = {
 	created_at: number;
 };
 export type CourseStudentData = CourseStudent & {
-	enrollee: EnrolleeData;
+	student_record: StudentRecordData;
 	course_class: CourseClassData;
 };
 export type Criteria = {

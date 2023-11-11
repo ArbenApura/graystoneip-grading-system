@@ -1,10 +1,10 @@
 // IMPORTED LIB-TYPES
 import type { PageLoad } from './$types';
 // IMPORTED UTILS
-import { selectEnrollees, selectPrograms } from '$utils/supabase';
+import { selectStudentRecords, selectPrograms } from '$utils/supabase';
 
 export const load = (async () => {
-	const enrollees = await selectEnrollees({ is_archived: true });
+	const studentRecords = await selectStudentRecords({ is_archived: true });
 	const programs = await selectPrograms({ is_archived: true });
-	return { enrollees, programs };
+	return { studentRecords, programs };
 }) satisfies PageLoad;
