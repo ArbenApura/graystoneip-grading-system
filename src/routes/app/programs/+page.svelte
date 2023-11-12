@@ -164,12 +164,7 @@
 	});
 </script>
 
-<Header
-	breadcrumbItems={[
-		{ icon: 'ti ti-list-details', label: 'Curriculum', href: '' },
-		{ label: 'Programs', href: '/app/curriculum/programs' },
-	]}
-/>
+<Header breadcrumbItems={[{ icon: 'ti ti-school', label: 'Programs', href: '' }]} />
 
 {#if modals.adder}
 	<ProgramAdderModal handleClose={closeAdderModal} {handleRefresh} />

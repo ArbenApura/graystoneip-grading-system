@@ -14,7 +14,7 @@ export type Course = {
 	code: string;
 	description: string;
 	units: number;
-	hours: number;
+	mode: string;
 	is_archived?: boolean;
 	created_at: number;
 };

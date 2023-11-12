@@ -44,7 +44,7 @@
 	let search = '';
 	let loading = false;
 	let initialized = false;
-	let localStorageKey = 'config.classes';
+	let localStorageKey = 'config.classes_v1';
 
 	// MODAL STATES
 	let modalId = generateId();
@@ -74,6 +74,7 @@
 	let columns: Column[] = [
 		{ name: 'name', label: 'Name', visible: true },
 		{ name: 'instructor', label: 'Instructor', visible: true },
+		{ name: 'course', label: 'Course', visible: true },
 		{ name: 'semester', label: 'Semester', visible: true },
 		{ name: 'school_year', label: 'School Year', visible: true },
 		{ name: 'created_at', label: 'Enrolled At', visible: true },
@@ -81,6 +82,7 @@
 	let sortItems: SortItem[] = [
 		{ name: 'name', label: 'Name', type: 'asc' },
 		{ name: 'instructor', label: 'Instructor', type: 'none' },
+		{ name: 'course', label: 'Course', type: 'none' },
 		{ name: 'semester', label: 'Semester', type: 'none' },
 		{ name: 'school_year', label: 'School Year', type: 'none' },
 		{ name: 'created_at', label: 'Enrolled At', type: 'none' },
@@ -110,6 +112,7 @@
 		const columnItems: ColumnItem[] = [
 			{ name: 'name', label: 'Name', value: item.name },
 			{ name: 'instructor', label: 'Instructor', value: item.instructor.full_name },
+			{ name: 'course', label: 'Course', value: item.course.code },
 			{ name: 'semester', label: 'Semester', value: item.semester },
 			{ name: 'school_year', label: 'School Year', value: item.school_year },
 			{

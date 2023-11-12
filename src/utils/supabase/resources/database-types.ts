@@ -158,27 +158,27 @@ export interface Database {
           code: string | null
           created_at: number
           description: string | null
-          hours: number | null
           id: string
           is_archived: boolean | null
+          mode: string | null
           units: number | null
         }
         Insert: {
           code?: string | null
           created_at: number
           description?: string | null
-          hours?: number | null
           id: string
           is_archived?: boolean | null
+          mode?: string | null
           units?: number | null
         }
         Update: {
           code?: string | null
           created_at?: number
           description?: string | null
-          hours?: number | null
           id?: string
           is_archived?: boolean | null
+          mode?: string | null
           units?: number | null
         }
         Relationships: []

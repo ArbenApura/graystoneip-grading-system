@@ -61,21 +61,21 @@
 	let search = '';
 	let loading = false;
 	let initialized = false;
-	let localStorageKey = 'config.curriculum.courses';
+	let localStorageKey = 'config.curriculum.courses_v1';
 
 	// TABLE STATES
 	let columns: Column[] = [
 		{ name: 'code', label: 'Code', visible: true },
 		{ name: 'description', label: 'Description', visible: true },
 		{ name: 'units', label: 'Units', visible: true },
-		{ name: 'hours', label: 'Hours', visible: true },
+		{ name: 'mode', label: 'Mode', visible: true },
 		{ name: 'created_at', label: 'Created At', visible: true },
 	];
 	let sortItems: SortItem[] = [
 		{ name: 'code', label: 'Code', type: 'asc' },
 		{ name: 'description', label: 'Description', type: 'none' },
 		{ name: 'units', label: 'Units', type: 'none' },
-		{ name: 'hours', label: 'Hours', type: 'none' },
+		{ name: 'mode', label: 'Mode', type: 'none' },
 		{ name: 'created_at', label: 'Created At', type: 'none' },
 	];
 	$: rowItems = items.map((item) => {
@@ -83,7 +83,7 @@
 			{ name: 'code', label: 'Code', value: item.code },
 			{ name: 'description', label: 'Description', value: item.description },
 			{ name: 'units', label: 'Units', value: item.units.toString() },
-			{ name: 'hours', label: 'Hours', value: item.hours.toString() },
+			{ name: 'mode', label: 'Mode', value: item.mode },
 			{
 				name: 'created_at',
 				label: 'Created At',
@@ -170,12 +170,7 @@
 	});
 </script>
 
-<Header
-	breadcrumbItems={[
-		{ icon: 'ti ti-list-details', label: 'Curriculum', href: '' },
-		{ label: 'Courses', href: '/app/curriculum/courses' },
-	]}
-/>
+<Header breadcrumbItems={[{ icon: 'ti ti-books', label: 'Courses', href: '' }]} />
 
 {#if modals.adder}
 	<CourseAdderModal handleClose={closeAdderModal} {handleRefresh} />

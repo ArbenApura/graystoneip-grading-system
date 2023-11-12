@@ -1,47 +1,45 @@
 <script lang="ts">
-	// IMPORTED TYPES
-	import type { Course } from '$types/curriculum';
 	// IMPORTED UTILS
 	import {
 		createConfirmationModal,
 		createErrorModal,
 		createSuccessModal,
 	} from '$stores/modalStates';
-	import { updateCourse } from '$utils/supabase';
+	import { generateId } from '$utils/helpers';
+	import { insertCourse } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
-	import { Button, Modal, FloatingLabelInput, Badge, Spinner } from 'flowbite-svelte';
+	import { Button, Modal, FloatingLabelInput, Badge, Spinner, Select } from 'flowbite-svelte';
 
 	// PROPS
-	export let course: Course, handleClose: () => void, handleRefresh: () => Promise<void>;
+	export let handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
-	let code = course.code,
-		description = course.description,
-		hours = course.hours,
-		units = course.units;
+	let code: string, description: string, units: number, mode: string;
 	let isLoading = false;
 
 	// UTILS
 	const handleReset = () => {
-		code = course.code;
-		description = course.description;
-		hours = course.hours;
-		units = course.units;
+		code = '';
+		description = '';
+		units = 0;
+		mode = '';
 	};
 	const handleSave = async () => {
 		isLoading = true;
 		try {
-			await updateCourse({
-				id: course.id,
+			const id = generateId();
+			const created_at = Date.now();
+			await insertCourse({
+				id,
 				code,
 				description,
 				units: units || 0,
-				hours: hours || 0,
-				created_at: course.created_at,
+				mode,
+				created_at,
 			});
 			await handleRefresh();
 			handleClose();
-			createSuccessModal({ message: 'Course was edited successfully!' });
+			createSuccessModal({ message: 'Course was created successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -51,7 +49,7 @@
 		try {
 			if ([code, description].some((v) => !v)) throw new Error('The form is incomplete!');
 			createConfirmationModal({
-				message: 'Are you sure you want to save the changes?',
+				message: 'Are you sure you want to proceed?',
 				handleProceed: handleSave,
 			});
 		} catch (error: any) {
@@ -65,7 +63,7 @@
 	<svelte:fragment slot="header">
 		<div class="w-full flex items-center gap-4">
 			<Badge class="aspect-plus p-2"><i class="ti ti-plus text-[18px]" /></Badge>
-			<p class="text-xl text-black flex-grow">Edit Course</p>
+			<p class="text-xl text-black flex-grow">Add Course</p>
 			<button class="w-[34px] flex-center" on:click={handleClose}>
 				<i class="ti ti-x text-xl cursor-pointer hover:text-black" />
 			</button>
@@ -96,12 +94,15 @@
 				label="Units"
 				required
 			/>
-			<FloatingLabelInput
-				bind:value={hours}
-				style="outlined"
-				type="number"
-				label="Hours"
+			<Select
+				bind:value={mode}
+				placeholder="Select Mode"
 				required
+				items={[
+					{ name: 'Lecture & Laboratory', value: 'Lecture & Laboratory' },
+					{ name: 'Lecture Only', value: 'Lecture Only' },
+					{ name: 'Laboratory Only', value: 'Laboratory Only' },
+				]}
 			/>
 		</div>
 		<button type="submit" hidden />
