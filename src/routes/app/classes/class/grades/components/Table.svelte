@@ -18,14 +18,21 @@
 		createConfirmationModal,
 		createCustomModal,
 		createErrorModal,
+		createLoadingModal,
+		createSuccessModal,
 		removeCustomModal,
+		removeModal,
 	} from '$stores/modalStates';
 	import { generateId } from '$utils/helpers';
+	import { modifiedCriterias, modifiedCriteriaItems, handleReset } from './ScoreItem.svelte';
 	// IMPORTED LIB-COMPONENTS
 	import { Button, Tooltip } from 'flowbite-svelte';
+	// IMPORTED COMPONENTS
 	import CriteriaItemEditorModal from './CriteriaItemEditorModal.svelte';
 	import CriteriaGradeAdderModal from './CriteriaGradeAdderModal.svelte';
 	import CriteriaGradeEditorModal from './CriteriaGradeEditorModal.svelte';
+	import ScoreItem from './ScoreItem.svelte';
+	import { updateCriteriaGrade, updateCriteriaGradeScore } from '$utils';
 
 	// PROPS
 	export let advance_criterias: AdvanceCriteria[],
@@ -65,20 +72,18 @@
 		modals.gradeAdder = false;
 		removeCustomModal(modalId);
 	};
-	const openGradeEditorModal = (target: [CriteriaItemData, CriteriaGradeData]) => {
-		createCustomModal(modalId);
-		modals.gradeEditor = true;
-		gradeEditorTarget = target;
-	};
 	const closeGradeEditorModal = () => {
 		modals.gradeEditor = false;
 		removeCustomModal(modalId);
 	};
 
 	// UTILS
-	const handleMaximize = (id: string) => (maximizedIds = [...maximizedIds, id]);
-	const handleMinimize = (id: string) =>
-		(maximizedIds = maximizedIds.filter((id_) => id_ !== id));
+	const handleMaximize = (id: string) => {
+		maximizedIds = [...maximizedIds, id];
+	};
+	const handleMinimize = (id: string) => {
+		maximizedIds = maximizedIds.filter((id_) => id_ !== id);
+	};
 	const getTotalPercentage = (
 		advance_criteria_items: AdvanceCriteriaItem[],
 		criteria_percentage: number,
@@ -148,8 +153,46 @@
 			createErrorModal({ message: error.message });
 		}
 	};
+	const handleToggle = (criteria_id: string) => {
+		if (maximizedIds.includes(criteria_id)) {
+			if ($modifiedCriterias.includes(criteria_id))
+				createConfirmationModal({
+					message: 'Are you sure you want to proceed without saving the changes?',
+					handleProceed: () => handleMinimize(criteria_id),
+				});
+			else handleMinimize(criteria_id);
+		} else handleMaximize(criteria_id);
+	};
+	const handleSave = async () => {
+		const id = createLoadingModal({ message: 'Saving changes...' });
+		try {
+			for (let item of $modifiedCriteriaItems) {
+				await updateCriteriaGradeScore(item.criteria_grade_id, item.score);
+			}
+			await handleSearch();
+			handleReset();
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		removeModal(id);
+	};
 </script>
 
+{#if $modifiedCriteriaItems.length}
+	<Button
+		class={`w-[48px] h-[48px] shadow-md fixed bottom-[16px] right-[148px] z-20}`}
+		pill={true}
+		disabled={isLoading}
+		on:click={() =>
+			createConfirmationModal({
+				message: 'Are you sure you want to save the changes?',
+				handleProceed: handleSave,
+			})}
+	>
+		<i class="ph-bold ph-download-simple text-xl" />
+	</Button>
+	<Tooltip class="text-xs whitespace-nowrap z-[100]" color="light" placement="top">Save</Tooltip>
+{/if}
 <Button
 	class={`w-[48px] h-[48px] shadow-md fixed bottom-[16px] right-[82px] z-20}`}
 	pill={true}
@@ -170,7 +213,12 @@
 			<thead>
 				{#if advance_criterias.length}
 					<tr>
-						<th colspan="5"><p>&nbsp;</p></th>
+						<th colspan="5">
+							<div class="flex-center gap-2 p-2">
+								<span class="w-3 h-3 border rounded-[4px] bg-gray-400" />
+								<p class="text-xs">Modified</p>
+							</div>
+						</th>
 						{#each advance_criterias as advance_criteria}
 							<th
 								colspan={maximizedIds.includes(advance_criteria.criteria.id)
@@ -180,9 +228,7 @@
 								<Button
 									class="p-1 rounded-sm"
 									size="sm"
-									on:click={maximizedIds.includes(advance_criteria.criteria.id)
-										? () => handleMinimize(advance_criteria.criteria.id)
-										: () => handleMaximize(advance_criteria.criteria.id)}
+									on:click={() => handleToggle(advance_criteria.criteria.id)}
 								>
 									<i
 										class="ph-bold ph-corners-{maximizedIds.includes(
@@ -260,7 +306,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each course_students as course_student, i}
+				{#each course_students as course_student, i (course_student.id)}
 					<tr>
 						<td class="text-center"><p>{i + 1}</p></td>
 						<td class="text-left"><p>{course_student.student_record.account.id}</p></td>
@@ -273,24 +319,17 @@
 						<td class="text-left">
 							<p>{course_student.student_record.account.middle_name}</p>
 						</td>
-						{#each advance_criterias as advance_criteria}
+						{#each advance_criterias as advance_criteria (advance_criteria.criteria.id)}
 							{#if maximizedIds.includes(advance_criteria.criteria.id)}
 								{#if advance_criteria.advance_criteria_items.length}
-									{#each advance_criteria.advance_criteria_items.sort((a, b) => a.criteria_item.created_at - b.criteria_item.created_at) as advance_criteria_item}
+									{#each advance_criteria.advance_criteria_items.sort((a, b) => a.criteria_item.created_at - b.criteria_item.created_at) as advance_criteria_item (advance_criteria_item.criteria_item.id)}
 										{#if advance_criteria_item.criteria_grades.filter((criteria_grade) => criteria_grade.course_student_id === course_student.id).length}
-											{#each advance_criteria_item.criteria_grades as criteria_grade}
+											{#each advance_criteria_item.criteria_grades as criteria_grade (criteria_grade.id)}
 												{#if criteria_grade.course_student_id === course_student.id}
-													<td
-														class="text-center"
-														data-input
-														on:click={() =>
-															openGradeEditorModal([
-																advance_criteria_item.criteria_item,
-																criteria_grade,
-															])}
-													>
-														<p>{criteria_grade.score}</p>
-													</td>
+													<ScoreItem
+														{criteria_grade}
+														criteria_id={advance_criteria.criteria.id}
+													/>
 												{/if}
 											{/each}
 										{:else}
@@ -396,21 +435,6 @@
 		}
 		tr:nth-child(even) {
 			@apply bg-gray-50;
-		}
-	}
-	[data-input] {
-		@apply p-0;
-		input {
-			@apply w-full h-full text-xs bg-transparent border-none;
-			text-align: inherit;
-			&::-webkit-outer-spin-button,
-			&::-webkit-inner-spin-button {
-				-webkit-appearance: none;
-				margin: 0;
-			}
-			&[type='number'] {
-				-moz-appearance: textfield;
-			}
 		}
 	}
 </style>

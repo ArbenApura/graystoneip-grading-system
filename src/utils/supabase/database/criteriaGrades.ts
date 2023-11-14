@@ -89,6 +89,10 @@ export const updateCriteriaGrade = async (criteriaGrade: CriteriaGrade) => {
 		.match({ id: criteriaGrade.id });
 	if (error) throw new Error(error.message);
 };
+export const updateCriteriaGradeScore = async (id: string, score: number) => {
+	const { error } = await supabase.from('criteria_grades').update({ score }).match({ id });
+	if (error) throw new Error(error.message);
+};
 export const observeCriteriaGradeScore = async (criteria_item_id: string, total: number) => {
 	const { error } = await supabase
 		.from('criteria_grades')

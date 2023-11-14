@@ -1,5 +1,5 @@
 // IMPORTED TYPES
-import type { Account, StudentRecord, StudentRecordData } from './master-list';
+import type { Account, StudentRecordData } from './master-list';
 
 // TYPES
 export type Program = {
