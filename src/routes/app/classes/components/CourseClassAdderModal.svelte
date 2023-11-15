@@ -80,8 +80,8 @@
 	</svelte:fragment>
 	<form class="flex flex-col gap-4" on:submit|preventDefault={handleProceed}>
 		<div>
-			<Label class="mb-2">Name</Label>
-			<Input type="text" placeholder="Input Name" required bind:value={name} />
+			<Label class="mb-2">Class Name</Label>
+			<Input type="text" placeholder="Input Class Name" required bind:value={name} />
 		</div>
 		<div>
 			<Label class="mb-2">Course</Label>

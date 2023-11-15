@@ -33,11 +33,11 @@
 	let search = '';
 	let loading = false;
 	let initialized = false;
-	let localStorageKey = 'config.grades';
+	let localStorageKey = 'config.grades_v1';
 
 	// TABLE STATES
 	let columns: Column[] = [
-		{ name: 'name', label: 'Name', visible: true },
+		{ name: 'name', label: 'Class Name', visible: true },
 		{ name: 'instructor', label: 'Instructor', visible: true },
 		{ name: 'course_code', label: 'Course Code', visible: true },
 		{ name: 'course_description', label: 'Course Description', visible: true },
@@ -46,7 +46,7 @@
 		{ name: 'school_year', label: 'School Year', visible: true },
 	];
 	let sortItems: SortItem[] = [
-		{ name: 'name', label: 'Name', type: 'asc' },
+		{ name: 'name', label: 'Class Name', type: 'asc' },
 		{ name: 'instructor', label: 'Instructor', type: 'none' },
 		{ name: 'course_code', label: 'Course Code', type: 'none' },
 		{ name: 'grade', label: 'Grade', type: 'none' },
@@ -76,7 +76,7 @@
 	];
 	$: rowItems = items.map((item) => {
 		const columnItems: ColumnItem[] = [
-			{ name: 'name', label: 'Name', value: item.course_class.name },
+			{ name: 'name', label: 'Class Name', value: item.course_class.name },
 			{
 				name: 'instructor',
 				label: 'Instructor',

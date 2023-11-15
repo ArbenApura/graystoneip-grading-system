@@ -52,7 +52,7 @@
 			<Button color="red" disabled={isLoading} on:click={handleClose}>Cancel</Button>
 			<Button
 				id="confirm-btn-{modal.id}"
-				color="green"
+				color="primary"
 				disabled={isLoading}
 				on:click={handleConfirm}
 			>
