@@ -107,7 +107,7 @@
 		];
 		const tools: RowTool[] = [
 			{
-				label: 'View Student',
+				label: 'View Student Info',
 				icon: 'ph-bold ph-eye',
 				href: `/app/grades?student_id=${item.id}`,
 			},

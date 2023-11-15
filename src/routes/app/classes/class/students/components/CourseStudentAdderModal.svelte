@@ -196,7 +196,8 @@
 	</div>
 	<svelte:fragment slot="footer">
 		<div class="w-full flex items-center justify-end gap-4">
-			<Button size="sm" color="blue" disabled={loading} on:click={handleClose}>Done</Button>
+			<Button size="sm" color="primary" disabled={loading} on:click={handleClose}>Done</Button
+			>
 		</div>
 	</svelte:fragment>
 </Modal>

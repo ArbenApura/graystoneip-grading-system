@@ -107,7 +107,7 @@
 			<Button
 				class="col-span-2"
 				size="sm"
-				color="green"
+				color="primary"
 				disabled={isLoading}
 				on:click={handleSave}
 			>

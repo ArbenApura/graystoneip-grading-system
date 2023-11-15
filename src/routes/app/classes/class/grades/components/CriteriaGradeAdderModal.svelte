@@ -88,7 +88,7 @@
 			<Button size="sm" color="red" disabled={isLoading} on:click={handleClose}>
 				Cancel
 			</Button>
-			<Button size="sm" color="green" disabled={isLoading} on:click={handleSave}>
+			<Button size="sm" color="primary" disabled={isLoading} on:click={handleSave}>
 				{#if isLoading}
 					<Spinner class="mr-3" size="4" color="white" />Loading
 				{:else}

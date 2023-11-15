@@ -44,7 +44,7 @@
 	let search = '';
 	let loading = false;
 	let initialized = false;
-	let localStorageKey = 'config.classes_v1';
+	let localStorageKey = 'config.classes_v2';
 
 	// MODAL STATES
 	let modalId = generateId();
@@ -72,7 +72,7 @@
 
 	// TABLE STATES
 	let columns: Column[] = [
-		{ name: 'name', label: 'Name', visible: true },
+		{ name: 'name', label: 'Class Name', visible: true },
 		{ name: 'instructor', label: 'Instructor', visible: true },
 		{ name: 'course', label: 'Course', visible: true },
 		{ name: 'semester', label: 'Semester', visible: true },
@@ -80,7 +80,7 @@
 		{ name: 'created_at', label: 'Enrolled At', visible: true },
 	];
 	let sortItems: SortItem[] = [
-		{ name: 'name', label: 'Name', type: 'asc' },
+		{ name: 'name', label: 'Class Name', type: 'asc' },
 		{ name: 'instructor', label: 'Instructor', type: 'none' },
 		{ name: 'course', label: 'Course', type: 'none' },
 		{ name: 'semester', label: 'Semester', type: 'none' },
@@ -110,7 +110,7 @@
 	];
 	$: rowItems = items.map((item) => {
 		const columnItems: ColumnItem[] = [
-			{ name: 'name', label: 'Name', value: item.name },
+			{ name: 'name', label: 'Class Name', value: item.name },
 			{ name: 'instructor', label: 'Instructor', value: item.instructor.full_name },
 			{ name: 'course', label: 'Course', value: item.course.code },
 			{ name: 'semester', label: 'Semester', value: item.semester },
