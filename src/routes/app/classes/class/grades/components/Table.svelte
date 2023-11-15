@@ -305,9 +305,9 @@
 					<th><p>{term} GRADE</p></th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody >
 				{#each course_students as course_student, i (course_student.id)}
-					<tr>
+					<tr >
 						<td class="text-center"><p>{i + 1}</p></td>
 						<td class="text-left"><p>{course_student.student_record.account.id}</p></td>
 						<td class="text-left"

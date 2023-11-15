@@ -68,7 +68,7 @@
 	});
 </script>
 
-<td data-input data-modified={modified}>
+<td class="relative" data-input data-modified={modified}>
 	<input type="number" bind:value={score} />
 	<span class="absolute opacity-0 -z-1">{score}</span>
 </td>
