@@ -99,7 +99,7 @@
 			location: '/app/courses',
 			params: '',
 			isOpen: false,
-			isVisible: true,
+			isVisible: $account.account_type === 'admin',
 			contents: [],
 		},
 		{
@@ -108,7 +108,7 @@
 			location: '/app/programs',
 			params: '',
 			isOpen: false,
-			isVisible: true,
+			isVisible: $account.account_type === 'admin',
 			contents: [],
 		},
 		{
