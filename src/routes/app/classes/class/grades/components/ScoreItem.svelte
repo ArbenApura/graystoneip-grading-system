@@ -7,6 +7,8 @@
 		criteria_item_id: string;
 		criteria_grade_id: string;
 		score: number;
+		course_class_id?: string;
+		course_student_id?: string;
 	};
 
 	// STATES
@@ -14,12 +16,21 @@
 	export const modifiedCriteriaItems = writable<ModifiedItem[]>([]);
 
 	// UTILS
-	const addCriteria = (id: string) => modifiedCriterias.update((values) => [...values, id]);
-	const removeCriteria = (id: string) =>
+	export const addCriteria = (id: string) =>
+		modifiedCriterias.update((values) => [...values, id]);
+	export const removeCriteria = (id: string) =>
 		modifiedCriterias.update((values) => values.filter((value) => value !== id));
-	const addCriteriaItem = (item: ModifiedItem) =>
-		modifiedCriteriaItems.update((values) => [...values, item]);
-	const removeCriteriaItem = (id: string) =>
+	export const addCriteriaItem = (item: ModifiedItem) =>
+		modifiedCriteriaItems.update((values) =>
+			values.some((value) => value.criteria_grade_id === item.criteria_grade_id)
+				? values.map((value) => {
+						if (value.criteria_grade_id !== item.criteria_grade_id) return value;
+						value.score = item.score;
+						return value;
+				  })
+				: [...values, item],
+		);
+	export const removeCriteriaItem = (id: string) =>
 		modifiedCriteriaItems.update((values) =>
 			values.filter((value) => value.criteria_item_id !== id),
 		);
@@ -71,7 +82,7 @@
 <td class="relative" data-input data-modified={modified}>
 	<input type="number" bind:value={score} />
 	<span class="absolute opacity-0 -z-1">{score}</span>
-</td>	
+</td>
 
 <style lang="scss">
 	[data-input] {

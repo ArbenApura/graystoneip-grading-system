@@ -135,7 +135,6 @@
 					const cell = row.cells[j];
 					row_data.push({
 						value: cell.innerText,
-						type: String,
 						fontWeight: i === 0 ? 'bold' : undefined,
 						backgroundColor: i === 0 ? '#60a5fa' : undefined,
 					});

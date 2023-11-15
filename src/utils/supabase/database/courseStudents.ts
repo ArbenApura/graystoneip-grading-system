@@ -44,8 +44,7 @@ export const selectCourseStudents = async ({
 		.from('course_students')
 		.select(
 			'*, course_class: course_classes(*, instructor: accounts(*), course: courses(*)), student_record: student_records(*, account: accounts(*), program: programs(*))',
-		)
-		.order('created_at', { ascending: false });
+		);
 	if (course_class_id) query.match({ course_class_id });
 	if (not_in_course_class_id) query.neq('course_class_id', not_in_course_class_id);
 	if (search) query.ilike('search_key', `%${search}%`);
@@ -64,6 +63,13 @@ export const selectCourseStudents = async ({
 			(courseStudent) => courseStudent.student_record.account.id === student_id,
 		);
 	}
+	courseStudents = courseStudents.sort((a, b) => {
+		const a_last_name = a.student_record.account.last_name.toLowerCase();
+		const b_last_name = b.student_record.account.last_name.toLowerCase();
+		if (a_last_name > b_last_name) return 1;
+		if (a_last_name < b_last_name) return -1;
+		return 0;
+	});
 	return courseStudents;
 };
 export const deleteCourseStudent = async (id: string) => {

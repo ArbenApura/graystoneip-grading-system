@@ -25,6 +25,7 @@
 	} from '$stores/modalStates';
 	import { generateId } from '$utils/helpers';
 	import { modifiedCriterias, modifiedCriteriaItems, handleReset } from './ScoreItem.svelte';
+	import { insertCriteriaGrade, updateCriteriaGrade, updateCriteriaGradeScore } from '$utils';
 	// IMPORTED LIB-COMPONENTS
 	import { Button, Tooltip } from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
@@ -32,7 +33,7 @@
 	import CriteriaGradeAdderModal from './CriteriaGradeAdderModal.svelte';
 	import CriteriaGradeEditorModal from './CriteriaGradeEditorModal.svelte';
 	import ScoreItem from './ScoreItem.svelte';
-	import { updateCriteriaGrade, updateCriteriaGradeScore } from '$utils';
+	import NewScoreItem from './NewScoreItem.svelte';
 
 	// PROPS
 	export let advance_criterias: AdvanceCriteria[],
@@ -132,7 +133,6 @@
 					const cell = row.cells[j];
 					row_data.push({
 						value: cell.innerText,
-						type: String,
 						span: cell.colSpan,
 						align: i === 1 ? 'center' : 'left',
 						fontWeight: i === 1 || i === 2 ? 'bold' : undefined,
@@ -167,7 +167,18 @@
 		const id = createLoadingModal({ message: 'Saving changes...' });
 		try {
 			for (let item of $modifiedCriteriaItems) {
-				await updateCriteriaGradeScore(item.criteria_grade_id, item.score);
+				if (item.course_student_id) {
+					const created_at = Date.now();
+					if (!item.course_class_id || !item.course_student_id) continue;
+					await insertCriteriaGrade({
+						id: item.criteria_grade_id,
+						course_class_id: item.course_class_id,
+						criteria_item_id: item.criteria_item_id,
+						course_student_id: item.course_student_id,
+						score: item.score,
+						created_at,
+					});
+				} else await updateCriteriaGradeScore(item.criteria_grade_id, item.score);
 			}
 			await handleSearch();
 			handleReset();
@@ -305,9 +316,9 @@
 					<th><p>{term} GRADE</p></th>
 				</tr>
 			</thead>
-			<tbody >
+			<tbody>
 				{#each course_students as course_student, i (course_student.id)}
-					<tr >
+					<tr>
 						<td class="text-center"><p>{i + 1}</p></td>
 						<td class="text-left"><p>{course_student.student_record.account.id}</p></td>
 						<td class="text-left"
@@ -333,17 +344,13 @@
 												{/if}
 											{/each}
 										{:else}
-											<td
-												class="text-center"
-												data-input
-												on:click={() =>
-													openGradeAdderModal([
-														advance_criteria_item.criteria_item,
-														course_student,
-													])}
-											>
-												<p />
-											</td>
+											<NewScoreItem
+												criteria_id={advance_criteria.criteria.id}
+												criteria_item={advance_criteria_item.criteria_item}
+												course_class_id={advance_criteria.criteria
+													.course_class_id}
+												course_student_id={course_student.id}
+											/>
 										{/if}
 									{/each}
 								{:else}

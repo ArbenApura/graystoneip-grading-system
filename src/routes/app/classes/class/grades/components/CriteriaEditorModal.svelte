@@ -107,14 +107,14 @@
 			</Button>
 			<Button
 				size="sm"
-				color="blue"
+				color="primary"
 				disabled={isLoading}
 				on:click={() => (isAdderModalOpen = true)}>Add</Button
 			>
 			<Button
 				class="col-span-2"
 				size="sm"
-				color="primary"
+				color="green"
 				disabled={isLoading}
 				on:click={handleSave}
 			>
