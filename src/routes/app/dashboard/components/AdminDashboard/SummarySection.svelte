@@ -52,7 +52,7 @@
 			<p>Students</p>
 		</div>
 	</a>
-	<a class="item" href="/app/curriculum/courses">
+	<a class="item" href="/app/courses">
 		<img src={CoursesPNG} alt="" />
 		<div class="details">
 			<p>
@@ -67,7 +67,7 @@
 			<p>Courses</p>
 		</div>
 	</a>
-	<a class="item" href="/app/curriculum/programs">
+	<a class="item" href="/app/programs">
 		<img src={ProgramsPNG} alt="" />
 		<div class="details">
 			<p>
