@@ -81,7 +81,7 @@
 				<p>+ {students}</p>
 			</div>
 		</a>
-		<a class="item bg-yellow-300 hover:bg-yellow-400" href="/app/curriculum/courses">
+		<a class="item bg-yellow-300 hover:bg-yellow-400" href="/app/courses">
 			<Badge class="aspect-square p-2" color="yellow">
 				<i class="ti ti-books text-[18px]" />
 			</Badge>
@@ -90,7 +90,7 @@
 				<p>+ {courses}</p>
 			</div>
 		</a>
-		<a class="item bg-green-500 hover:bg-green-600" href="/app/curriculum/programs">
+		<a class="item bg-green-500 hover:bg-green-600" href="/app/programs">
 			<Badge class="aspect-square p-2" color="green">
 				<i class="ti ti-school text-[18px]" />
 			</Badge>
