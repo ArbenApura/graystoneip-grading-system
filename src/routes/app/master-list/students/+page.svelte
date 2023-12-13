@@ -112,7 +112,7 @@
 				href: `/app/grades?student_id=${item.id}`,
 			},
 			{
-				label: 'Enroll Student',
+				label: 'Add New Record',
 				icon: 'ph-bold ph-student',
 				handleClick: () => openEnrollerModal(item),
 			},
