@@ -37,7 +37,7 @@ export const selectCriterias = async ({
 	term,
 }: {
 	course_class_id: string;
-	term: string;
+	term?: string;
 }) => {
 	let query = supabase
 		.from('criterias')

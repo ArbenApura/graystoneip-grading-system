@@ -1,6 +1,8 @@
 <script lang="ts">
 	// IMPORTED TYPES
 	import type { CriteriaItemData } from '$types/curriculum';
+	// IMPORTED LIB-UTILS
+	import { page } from '$app/stores';
 	// IMPORTED UTILS
 	import {
 		createConfirmationModal,
@@ -9,7 +11,7 @@
 	} from '$stores/modalStates';
 	import { deleteCriteriaItem, updateCriteriaItem } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
-	import { Button, Modal, FloatingLabelInput, Badge, Spinner } from 'flowbite-svelte';
+	import { Button, Modal, FloatingLabelInput, Badge, Spinner, Checkbox } from 'flowbite-svelte';
 
 	// PROPS
 	export let criteria_item: CriteriaItemData,
@@ -18,8 +20,8 @@
 
 	// STATES
 	let name = criteria_item.name,
-		total = criteria_item.total.toString();
-	let isAdderModalOpen = false;
+		total = criteria_item.total.toString(),
+		isAssessment = criteria_item.is_assessment;
 	let isLoading = false;
 
 	// UTILS
@@ -32,7 +34,17 @@
 		try {
 			if ([name, total].some((v) => !v)) throw new Error('The form is incomplete!');
 			const { id, criteria_id, created_at } = criteria_item;
-			await updateCriteriaItem({ id, criteria_id, name, total: parseInt(total), created_at });
+			await updateCriteriaItem({
+				id,
+				criteria_id,
+				name,
+				total: parseInt(total),
+				is_assessment: isAssessment,
+				is_open: criteria_item.is_open,
+				title: criteria_item.title || name,
+				description: criteria_item.description,
+				created_at,
+			});
 			await handleSearch();
 			handleClose();
 			createSuccessModal({ message: 'Criteria item was edited successfully!' });
@@ -66,7 +78,7 @@
 		</div>
 	</svelte:fragment>
 	<form class="flex flex-col gap-4" on:submit|preventDefault={handleSave}>
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+		<div class={!isAssessment ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : ''}>
 			<FloatingLabelInput
 				bind:value={name}
 				style="outlined"
@@ -74,14 +86,19 @@
 				label="Name"
 				required
 			/>
-			<FloatingLabelInput
-				bind:value={total}
-				style="outlined"
-				type="number"
-				label="Total"
-				required
-			/>
+			{#if !isAssessment}
+				<FloatingLabelInput
+					bind:value={total}
+					style="outlined"
+					type="number"
+					label="Total"
+					required
+				/>
+			{/if}
 		</div>
+		{#if isAssessment}
+			<Checkbox checked disabled>Make as assessment?</Checkbox>
+		{/if}
 		<button type="submit" hidden />
 	</form>
 	<svelte:fragment slot="footer">
@@ -89,6 +106,20 @@
 			<Button size="sm" color="alternative" disabled={isLoading} on:click={handleReset}>
 				Reset
 			</Button>
+			{#if isAssessment}
+				<Button
+					size="sm"
+					color="purple"
+					href={'/app/classes/class/assessments/assessment/?instructor_id=' +
+						$page.data.instructor.id +
+						'&course_class_id=' +
+						$page.data.courseClass.id +
+						'&assessment_id=' +
+						criteria_item.id}
+				>
+					View
+				</Button>
+			{/if}
 			<Button size="sm" color="red" disabled={isLoading} on:click={handleClose}>
 				Cancel
 			</Button>
@@ -105,7 +136,7 @@
 				Delete
 			</Button>
 			<Button
-				class="col-span-2"
+				class={isAssessment ? 'col-span-2' : ''}
 				size="sm"
 				color="primary"
 				disabled={isLoading}

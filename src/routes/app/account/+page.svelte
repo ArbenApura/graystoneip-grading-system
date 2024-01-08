@@ -6,7 +6,7 @@
 	// IMPORTED STATES
 	import { account, login } from '$stores/authStates';
 	// IMPORTED UTILS
-	import { formatDate, validateEmail } from '$utils/helpers';
+	import { validateEmail } from '$utils/helpers';
 	import {
 		createConfirmationModal,
 		createErrorModal,

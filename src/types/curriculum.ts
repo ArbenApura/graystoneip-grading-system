@@ -1,5 +1,5 @@
 // IMPORTED TYPES
-import type { Account, StudentRecordData } from './master-list';
+import type { Account, StudentRecord, StudentRecordData } from './master-list';
 
 // TYPES
 export type Program = {
@@ -62,6 +62,11 @@ export type CriteriaItem = {
 	criteria_id: string;
 	name: string;
 	total: number;
+	is_assessment: boolean;
+	is_open: boolean;
+	questions: AssessmentQuestion[];
+	title: string;
+	description: string;
 	created_at: number;
 };
 export type CriteriaItemData = CriteriaItem & {
@@ -86,4 +91,24 @@ export type AdvanceCriteriaItem = {
 export type AdvanceCriteria = {
 	criteria: CriteriaData;
 	advance_criteria_items: AdvanceCriteriaItem[];
+};
+export type AssessmentQuestionType = 'multiple-choice' | 'short-answer';
+export type AssessmentQuestionChoice = {
+	id: string;
+	letter: string;
+	label: string;
+};
+export type AssessmentQuestion = {
+	id: string;
+	question: string;
+	type: AssessmentQuestionType;
+	order: number;
+	choices: AssessmentQuestionChoice[];
+	answers: string[];
+	points: number;
+};
+export type AssessmentStudentItem = {
+	student_records: (StudentRecord & {
+		course_students: CourseStudent[];
+	})[];
 };

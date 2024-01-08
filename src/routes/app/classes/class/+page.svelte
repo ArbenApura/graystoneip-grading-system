@@ -2,6 +2,7 @@
 	// IMPORTED ASSETS
 	import StudentsPNG from '$assets/storysets/Students-rafiki.png';
 	import GradesPNG from '$assets/storysets/Grades-bro.png';
+	import AssessmentsPNG from '$assets/storysets/Exams-bro.png';
 	// IMPORTED STATES
 	import { isMD, isXL } from '$stores/mediaStates';
 	import { isOpen } from '$stores/sidebarStates';
@@ -35,7 +36,7 @@
 	<div
 		class="grid grid-cols-1
         {$isOpen && $isMD ? 'sm:grid-cols-1' : 'sm:grid-cols-2'} 
-        {$isOpen && $isXL ? 'xl:grid-cols-2' : 'xl:grid-cols-4'}
+        {$isOpen && $isXL ? 'xl:grid-cols-2' : 'xl:grid-cols-3'}
         gap-4"
 	>
 		<a class="item" href="{$page.url.pathname}/students{$page.url.search}">
@@ -57,6 +58,12 @@
 			<img src={GradesPNG} alt="" />
 			<div class="p-8">
 				<p>Grades</p>
+			</div>
+		</a>
+		<a class="item" href="{$page.url.pathname}/assessments{$page.url.search}">
+			<img src={AssessmentsPNG} alt="" />
+			<div class="p-8">
+				<p>Assessments</p>
 			</div>
 		</a>
 	</div>

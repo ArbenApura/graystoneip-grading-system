@@ -10,7 +10,7 @@
 	import { generateId } from '$utils/helpers';
 	import { insertCriteriaItem } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
-	import { Button, Modal, FloatingLabelInput, Badge, Spinner } from 'flowbite-svelte';
+	import { Button, Modal, FloatingLabelInput, Badge, Spinner, Checkbox } from 'flowbite-svelte';
 
 	// PROPS
 	export let criteria: CriteriaData,
@@ -19,7 +19,7 @@
 		handleSearch: () => Promise<void>;
 
 	// STATES
-	let name: string, total: string;
+	let name: string, total: string, isAssessment: boolean;
 	let isLoading = false;
 
 	// UTILS
@@ -36,7 +36,11 @@
 				id,
 				criteria_id: criteria.id,
 				name,
-				total: parseInt(total),
+				total: isAssessment ? 0 : parseInt(total),
+				is_assessment: isAssessment,
+				is_open: false,
+				title: name,
+				description: '',
 				created_at,
 			});
 			await handleSearch();
@@ -50,7 +54,8 @@
 	};
 	const handleProceed = async () => {
 		try {
-			if ([name, total].some((v) => !v)) throw new Error('The form is incomplete!');
+			if ((isAssessment ? [name] : [name, total]).some((v) => !v))
+				throw new Error('The form is incomplete!');
 			createConfirmationModal({
 				message: 'Are you sure you want to proceed?',
 				handleProceed: handleSave,
@@ -73,7 +78,7 @@
 		</div>
 	</svelte:fragment>
 	<form class="flex flex-col gap-4" on:submit|preventDefault={handleProceed}>
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+		<div class={!isAssessment ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : ''}>
 			<FloatingLabelInput
 				bind:value={name}
 				style="outlined"
@@ -81,14 +86,17 @@
 				label="Name"
 				required
 			/>
-			<FloatingLabelInput
-				bind:value={total}
-				style="outlined"
-				type="number"
-				label="Total"
-				required
-			/>
+			{#if !isAssessment}
+				<FloatingLabelInput
+					bind:value={total}
+					style="outlined"
+					type="number"
+					label="Total"
+					required
+				/>
+			{/if}
 		</div>
+		<Checkbox bind:checked={isAssessment}>Make as assessment?</Checkbox>
 		<button type="submit" hidden />
 	</form>
 	<svelte:fragment slot="footer">

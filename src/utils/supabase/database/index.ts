@@ -8,3 +8,4 @@ export * from './recoveryRequests';
 export * from './criterias';
 export * from './criteriaItems';
 export * from './criteriaGrades';
+export * from './assessments';

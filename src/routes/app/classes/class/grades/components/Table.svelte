@@ -340,6 +340,7 @@
 													<ScoreItem
 														{criteria_grade}
 														criteria_id={advance_criteria.criteria.id}
+														criteria_item={advance_criteria_item.criteria_item}
 													/>
 												{/if}
 											{/each}

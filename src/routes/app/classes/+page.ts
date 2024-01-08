@@ -12,11 +12,7 @@ export const load = (async ({ url }) => {
 	let courses: Course[] = [];
 	let instructor: Account;
 	await Promise.all([
-		(courseClasses = await selectCourseClasses({
-			semester: '1st',
-			school_year: '2023-2024',
-			instructor_id: instructor_id,
-		})),
+		(courseClasses = await selectCourseClasses({ instructor_id: instructor_id })),
 		(courses = await selectCourses({})),
 		(instructor = await selectAccount(instructor_id)),
 	]);

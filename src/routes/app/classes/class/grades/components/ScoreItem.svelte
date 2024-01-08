@@ -42,12 +42,14 @@
 
 <script lang="ts">
 	// IMPORTED TYPES
-	import type { CriteriaGradeData } from '$types';
+	import type { CriteriaGradeData, CriteriaItemData } from '$types';
 	// IMPORTED LIB-UTILS
 	import { onMount } from 'svelte';
 
 	// PROPS
-	export let criteria_grade: CriteriaGradeData, criteria_id: string;
+	export let criteria_grade: CriteriaGradeData,
+		criteria_id: string,
+		criteria_item: CriteriaItemData;
 
 	// STATES
 	let score = criteria_grade.score;
@@ -79,8 +81,13 @@
 	});
 </script>
 
-<td class="relative" data-input data-modified={modified}>
-	<input type="number" bind:value={score} />
+<td
+	class="relative"
+	data-input
+	data-modified={modified}
+	data-is-assessment={criteria_item.is_assessment}
+>
+	<input type="number" disabled={criteria_item.is_assessment} bind:value={score} />
 	<span class="absolute opacity-0 -z-1">{score}</span>
 </td>
 
@@ -107,10 +114,12 @@
 	th,
 	td {
 		@apply text-xs border min-w-[60px] whitespace-nowrap;
-		&[data-input] {
-			@apply cursor-pointer hover:outline outline-1 outline-blue-500;
-			&[data-modified='true'] {
-				@apply outline-gray-500;
+		&[data-is-assessment='false'] {
+			&[data-input] {
+				@apply cursor-pointer hover:outline outline-1 outline-blue-500;
+				&[data-modified='true'] {
+					@apply outline-gray-500;
+				}
 			}
 		}
 		& > p {

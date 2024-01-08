@@ -48,6 +48,15 @@
 			contents: [],
 		},
 		{
+			label: 'Assessments',
+			icon: 'ph-bold ph-list-checks',
+			location: '/app/assessments',
+			params: `?student_id=${$account.id}`,
+			isOpen: false,
+			isVisible: $account.account_type === 'student',
+			contents: [],
+		},
+		{
 			label: 'Classes',
 			icon: 'ph-bold ph-chalkboard',
 			location: '/app/classes',

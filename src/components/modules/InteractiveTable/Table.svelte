@@ -122,7 +122,7 @@
 		<Table.Body>
 			{#each sliced as rowItem, i}
 				<Table.Row>
-					<Table.Cell class="-0">{start + i + 1}</Table.Cell>
+					<Table.Cell>{start + i + 1}</Table.Cell>
 					{#if toolPosition === 'front'}
 						<TableToolBody {...{ rowItem, loading }} />
 					{/if}
