@@ -33,7 +33,7 @@
 	let search = '';
 	let loading = false;
 	let initialized = false;
-	let localStorageKey = 'config.grades_v1';
+	let localStorageKey = 'config.grades_v2';
 
 	// TABLE STATES
 	let columns: Column[] = [
@@ -59,7 +59,7 @@
 			name: 'semester',
 			items: [
 				{ label: '1st', match: '1st', active: true },
-				{ label: '2nd', match: '2nd', active: false },
+				{ label: '2nd', match: '2nd', active: true },
 			],
 		},
 		{
@@ -67,10 +67,10 @@
 			name: 'school_year',
 			items: [
 				{ label: '2023-2024', match: '2023-2024', active: true },
-				{ label: '2024-2025', match: '2024-2025', active: false },
-				{ label: '2025-2026', match: '2025-2026', active: false },
-				{ label: '2026-2027', match: '2026-2027', active: false },
-				{ label: '2027-2028', match: '2027-2028', active: false },
+				{ label: '2024-2025', match: '2024-2025', active: true },
+				{ label: '2025-2026', match: '2025-2026', active: true },
+				{ label: '2026-2027', match: '2026-2027', active: true },
+				{ label: '2027-2028', match: '2027-2028', active: true },
 			],
 		},
 	];

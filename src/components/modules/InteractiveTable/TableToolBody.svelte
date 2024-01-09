@@ -34,4 +34,6 @@
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</Table.Cell>
+{:else}
+	<Table.Cell />
 {/if}

@@ -38,7 +38,7 @@
 	let items: CriteriaItemData[] = [];
 	let loading = false;
 	let initialized = false;
-	let localStorageKey = 'config.classes.class.assessments';
+	let localStorageKey = 'config.classes.class.assessments_v1';
 
 	// TABLE STATES
 	let columns: Column[] = [
@@ -55,12 +55,22 @@
 		{ name: 'status', label: 'Status', type: 'none' },
 		{ name: 'created_at', label: 'Created At', type: 'asc' },
 	];
+	let filterGroups: FilterGroup[] = [
+		{
+			name: 'status',
+			label: 'Status',
+			items: [
+				{ label: 'Open', match: 'Open', active: true },
+				{ label: 'Closed', match: 'Closed', active: true },
+			],
+		},
+	];
 	$: rowItems = items.map((item) => {
 		const columnItems: ColumnItem[] = [
 			{ name: 'criteria', label: 'Criteria', value: item.criteria.name },
 			{ name: 'name', label: 'Name', value: item.name },
 			{ name: 'total', label: 'Total', value: item.total.toString() },
-			{ name: 'status', label: 'Status', value: item.is_open ? 'Open' : 'Close' },
+			{ name: 'status', label: 'Status', value: item.is_open ? 'Open' : 'Closed' },
 			{
 				name: 'created_at',
 				label: 'Created At',
@@ -116,13 +126,14 @@
 		// SAVE CHANGES TO LOCAL STORAGES
 		columns;
 		sortItems;
+		filterGroups;
 		saveData();
 	}
 
 	// UTILS
 	const saveData = () => {
 		if (typeof localStorage === 'undefined' || !initialized) return;
-		const data = JSON.stringify({ columns, sortItems });
+		const data = JSON.stringify({ columns, sortItems, filterGroups });
 		const encrypted = encrypt(data);
 		localStorage.setItem(localStorageKey, encrypted);
 	};
@@ -136,6 +147,7 @@
 			const data = JSON.parse(decrypted);
 			if (data.columns) columns = data.columns;
 			if (data.sortItems) sortItems = data.sortItems;
+			if (data.filterGroups) filterGroups = data.filterGroups;
 		} catch {}
 		initialized = true;
 	};
@@ -223,4 +235,10 @@
 	]}
 />
 
-<InteractiveTable bind:columns bind:sortItems bind:loading {...{ rowItems, handleRefresh }} />
+<InteractiveTable
+	bind:columns
+	bind:sortItems
+	bind:filterGroups
+	bind:loading
+	{...{ rowItems, handleRefresh }}
+/>

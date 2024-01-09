@@ -1,9 +1,10 @@
 <script lang="ts">
 	// IMPORTED TYPES
-	import type { CriteriaItemData } from '$types/index';
+	import type { CriteriaGradeData, CriteriaItemData } from '$types/index';
 	import type {
 		Column,
 		ColumnItem,
+		FilterGroup,
 		RowItem,
 		RowTool,
 		SortItem,
@@ -13,7 +14,7 @@
 	import { page } from '$app/stores';
 	// IMPORTED UTILS
 	import { createErrorModal } from '$stores/modalStates';
-	import { selectAssessmentsByStudentId } from '$utils/supabase';
+	import { selectAssessmentsByStudentId, selectCriteriaGrades } from '$utils/supabase';
 	import { encrypt, decrypt } from '$utils';
 	// IMPORTED COMPONENTS
 	import Header from '$components/layouts/Header';
@@ -23,10 +24,11 @@
 	export let data;
 
 	// STATES
+	let criteria_grades = data.criteria_grades;
 	let items: CriteriaItemData[] = [];
 	let loading = false;
 	let initialized = false;
-	let localStorageKey = 'config.assessments';
+	let localStorageKey = 'config.assessments_v1';
 
 	// TABLE STATES
 	let columns: Column[] = [
@@ -47,16 +49,28 @@
 		{ name: 'status', label: 'Status', type: 'none' },
 		{ name: 'created_at', label: 'Created At', type: 'asc' },
 	];
+	let filterGroups: FilterGroup[] = [
+		{
+			name: 'status',
+			label: 'Status',
+			items: [
+				{ label: 'Completed', match: 'Completed', active: true },
+				{ label: 'Open', match: 'Open', active: true },
+				{ label: 'Closed', match: 'Closed', active: true },
+			],
+		},
+	];
 	$: rowItems = items.map((item) => {
 		let score = '?';
-		data.criteria_grades.forEach((criteria_grade) => {
+		for (let criteria_grade of criteria_grades) {
 			if (
 				criteria_grade.criteria_item_id === item.id &&
 				criteria_grade.course_student.student_record.account_id === data.student.id
 			) {
 				score = criteria_grade.score.toString();
+				break;
 			}
-		});
+		}
 		const columnItems: ColumnItem[] = [
 			{ name: 'class_name', label: 'Class Name', value: item.criteria.course_class.name },
 			{
@@ -70,7 +84,7 @@
 			{
 				name: 'status',
 				label: 'Status',
-				value: score !== '?' ? 'Completed' : item.is_open ? 'Open' : 'Close',
+				value: score !== '?' ? 'Completed' : item.is_open ? 'Open' : 'Closed',
 			},
 			{
 				name: 'created_at',
@@ -98,13 +112,14 @@
 		// SAVE CHANGES TO LOCAL STORAGES
 		columns;
 		sortItems;
+		filterGroups;
 		saveData();
 	}
 
 	// UTILS
 	const saveData = () => {
 		if (typeof localStorage === 'undefined' || !initialized) return;
-		const data = JSON.stringify({ columns, sortItems });
+		const data = JSON.stringify({ columns, sortItems, filterGroups });
 		const encrypted = encrypt(data);
 		localStorage.setItem(localStorageKey, encrypted);
 	};
@@ -118,6 +133,7 @@
 			const data = JSON.parse(decrypted);
 			if (data.columns) columns = data.columns;
 			if (data.sortItems) sortItems = data.sortItems;
+			if (data.filterGroups) filterGroups = data.filterGroups;
 		} catch {}
 		initialized = true;
 	};
@@ -127,6 +143,16 @@
 		loading = true;
 		try {
 			items = await selectAssessmentsByStudentId(data.student.id);
+			let __criteria_grades: CriteriaGradeData[] = [];
+			await Promise.all(
+				items.map(async (assessment) => {
+					let _criteria_grades = await selectCriteriaGrades({
+						course_class_id: assessment.criteria.course_class_id,
+					});
+					__criteria_grades = [...__criteria_grades, ..._criteria_grades];
+				}),
+			);
+			criteria_grades = __criteria_grades;
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}
@@ -154,4 +180,10 @@
 	]}
 />
 
-<InteractiveTable bind:columns bind:sortItems bind:loading {...{ rowItems, handleRefresh }} />
+<InteractiveTable
+	bind:columns
+	bind:sortItems
+	bind:filterGroups
+	bind:loading
+	{...{ rowItems, handleRefresh }}
+/>

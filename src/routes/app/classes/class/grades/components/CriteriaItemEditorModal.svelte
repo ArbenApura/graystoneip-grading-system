@@ -43,6 +43,7 @@
 				is_open: criteria_item.is_open,
 				title: criteria_item.title || name,
 				description: criteria_item.description,
+				questions: criteria_item.questions,
 				created_at,
 			});
 			await handleSearch();
@@ -116,6 +117,7 @@
 						$page.data.courseClass.id +
 						'&assessment_id=' +
 						criteria_item.id}
+					on:click={handleClose}
 				>
 					View
 				</Button>

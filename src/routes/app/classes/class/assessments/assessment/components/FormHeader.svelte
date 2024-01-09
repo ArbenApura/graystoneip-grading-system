@@ -8,7 +8,7 @@
 	// CONSTANTS
 	const STATUS_OPTIONS = [
 		{ value: 'open', name: 'Open' },
-		{ value: 'close', name: 'Close' },
+		{ value: 'closed', name: 'Closed' },
 	];
 </script>
 

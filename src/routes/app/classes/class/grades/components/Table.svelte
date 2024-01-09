@@ -91,6 +91,7 @@
 		course_student_id: string,
 	) => {
 		let gradesPercentage: number[] = [];
+		let used_criteria_items_ids: string[] = [];
 		advance_criteria_items.map(({ criteria_item }) =>
 			criteria_grades
 				.filter(
@@ -101,8 +102,16 @@
 				.map((criteria_grade) => {
 					const percentage = (criteria_grade.score / criteria_item.total) * 100;
 					gradesPercentage.push(percentage);
+					used_criteria_items_ids.push(criteria_item.id);
 				}),
 		);
+		advance_criteria_items.map(({ criteria_item }) => {
+			if (!used_criteria_items_ids.includes(criteria_item.id)) {
+				const percentage = 0 * 100;
+				gradesPercentage.push(percentage);
+				used_criteria_items_ids.push(criteria_item.id);
+			}
+		});
 		const average = gradesPercentage.length
 			? gradesPercentage.reduce((a, b) => a + b) / gradesPercentage.length
 			: 0;
@@ -204,6 +213,7 @@
 	</Button>
 	<Tooltip class="text-xs whitespace-nowrap z-[100]" color="light" placement="top">Save</Tooltip>
 {/if}
+
 <Button
 	class={`w-[48px] h-[48px] shadow-md fixed bottom-[16px] right-[82px] z-20}`}
 	pill={true}
@@ -340,7 +350,6 @@
 													<ScoreItem
 														{criteria_grade}
 														criteria_id={advance_criteria.criteria.id}
-														criteria_item={advance_criteria_item.criteria_item}
 													/>
 												{/if}
 											{/each}

@@ -64,7 +64,7 @@
 			let index = 0;
 			let is_date = false;
 			searched[0].columnItems.map((columnItem, i) => name === columnItem.name && (index = i));
-			if (searched[0].columnItems[index].label === 'created_at') is_date = true;
+			if (searched[0].columnItems[index].name === 'created_at') is_date = true;
 			if (is_date) {
 				result = result.sort((a, b) =>
 					type === 'desc'

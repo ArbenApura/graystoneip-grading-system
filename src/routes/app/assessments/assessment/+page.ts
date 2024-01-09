@@ -3,7 +3,12 @@ import type { PageLoad } from './$types';
 // IMPORTED TYPES
 import type { Account, CourseStudentData, CriteriaGradeData, CriteriaItemData } from '$types/index';
 // IMPORTED UTILS
-import { selectAccount, selectAssessment, selectCriteriaGrades } from '$utils/supabase';
+import {
+	selectAccount,
+	selectAssessment,
+	selectCourseStudents,
+	selectCriteriaGrades,
+} from '$utils/supabase';
 import { redirect } from '@sveltejs/kit';
 
 export const load = (async ({ url }) => {
@@ -19,15 +24,16 @@ export const load = (async ({ url }) => {
 			(student = await selectAccount(student_id)),
 			(assessment = await selectAssessment(assessment_id)),
 		]);
+		const result = await selectCourseStudents({
+			student_id,
+			course_class_id: assessment.criteria.course_class_id,
+		});
+		if (!result.length) throw new Error();
+		course_student = result[0];
+		if (!assessment.is_open || !course_student) throw new Error();
 		criteria_grades = await selectCriteriaGrades({
 			course_class_id: assessment.criteria.course_class_id,
 		});
-		criteria_grades.forEach((criteria_grade) => {
-			if (criteria_grade.course_student.student_record.account_id === student_id) {
-				course_student = criteria_grade.course_student;
-			}
-		});
-		if (!assessment.is_open || !course_student) throw new Error();
 		criteria_grades.forEach((criteria_grade) => {
 			if (
 				criteria_grade.criteria_item_id === assessment.id &&

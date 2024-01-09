@@ -143,6 +143,9 @@
 				{/if}
 			</div>
 		{/each}
+		{#if !selected.length}
+			<small class="text-red-600">There should be one or more answers!</small>
+		{/if}
 		{#if question.choices.length !== 26}
 			<Button class="sm:w-fit ml-auto" on:click={handleAdd}>Add Choice</Button>
 		{/if}

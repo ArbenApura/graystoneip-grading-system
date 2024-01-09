@@ -64,7 +64,7 @@
 				const { error } = await supabase.from('criteria_grades').insert({
 					id: generateId(),
 					criteria_item_id: assessment.id,
-					course_class_id: course_student.course_class_id,
+					course_class_id: assessment.criteria.course_class.id,
 					course_student_id: course_student.id,
 					score,
 					created_at: Date.now(),
@@ -102,10 +102,10 @@
 			<h3 class="order-2 md:order-1">{assessment.title}</h3>
 			<div class="order-1 md:order-2 flex justify-end w-full md:w-fit gap-2">
 				<Badge class="whitespace-nowrap">
-					{assessment.total} Point{assessment.total !== 1 && 's'}
+					{assessment.total} Point{assessment.total !== 1 ? 's' : ''}
 				</Badge>
 				<Badge class="whitespace-nowrap" color="yellow">
-					{assessment.questions.length} Item{assessment.questions.length !== 1 && 's'}
+					{assessment.questions.length} Item{assessment.questions.length !== 1 ? 's' : ''}
 				</Badge>
 			</div>
 		</div>

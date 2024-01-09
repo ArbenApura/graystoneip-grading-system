@@ -27,7 +27,7 @@
 	let assessment = data.assessment;
 	let title = assessment.title;
 	let description = assessment.description || '';
-	let status = assessment.is_open ? 'open' : 'close';
+	let status = assessment.is_open ? 'open' : 'closed';
 	let questions: AssessmentQuestion[] = _.orderBy(data.assessment.questions || [], ['order']);
 	let isLoading = false;
 
@@ -38,7 +38,7 @@
 	const handleReset = () => {
 		title = assessment.title;
 		description = assessment.description || '';
-		status = assessment.is_open ? 'open' : 'close';
+		status = assessment.is_open ? 'open' : 'closed';
 		questions = assessment.questions;
 	};
 	const handleRefresh = async () => {

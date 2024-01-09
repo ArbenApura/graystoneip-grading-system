@@ -37,7 +37,8 @@ export const selectAssessmentsByStudentId = async (student_id: string) => {
 	let assessments: CriteriaItemData[] = [];
 	await Promise.all(
 		course_students.map(async ({ course_class_id }) => {
-			assessments = [...assessments, ...(await selectAssessments(course_class_id))];
+			const _assessments = await selectAssessments(course_class_id);
+			assessments = [...assessments, ..._assessments];
 		}),
 	);
 	return assessments;
