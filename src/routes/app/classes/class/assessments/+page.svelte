@@ -25,6 +25,7 @@
 		deleteCriteriaItem,
 		openAssessment,
 		selectAssessments,
+		updateAssessment,
 	} from '$utils/supabase';
 	import { encrypt, decrypt } from '$utils';
 	// IMPORTED COMPONENTS
@@ -38,7 +39,7 @@
 	let items: CriteriaItemData[] = [];
 	let loading = false;
 	let initialized = false;
-	let localStorageKey = 'config.classes.class.assessments_v1';
+	let localStorageKey = 'config.classes.class.assessments_v4';
 
 	// TABLE STATES
 	let columns: Column[] = [
@@ -46,6 +47,7 @@
 		{ name: 'name', label: 'Name', visible: true },
 		{ name: 'total', label: 'Total', visible: true },
 		{ name: 'status', label: 'Status', visible: true },
+		{ name: 'is_score_released', label: 'Is Score Released', visible: true },
 		{ name: 'created_at', label: 'Created At', visible: true },
 	];
 	let sortItems: SortItem[] = [
@@ -71,6 +73,11 @@
 			{ name: 'name', label: 'Name', value: item.name },
 			{ name: 'total', label: 'Total', value: item.total.toString() },
 			{ name: 'status', label: 'Status', value: item.is_open ? 'Open' : 'Closed' },
+			{
+				name: 'is_score_released',
+				label: 'Is Score Released',
+				value: item.is_score_released ? 'Yes' : 'No',
+			},
 			{
 				name: 'created_at',
 				label: 'Created At',
@@ -106,6 +113,25 @@
 							createConfirmationModal({
 								message: 'Are you sure you want to open this assessment?',
 								handleProceed: () => handleOpen(item.id),
+							}),
+				  },
+			item.is_score_released
+				? {
+						label: 'Unrelease Scores',
+						icon: 'ph-bold ph-exam',
+						handleClick: () =>
+							createConfirmationModal({
+								message: 'Are you sure you want to unrelease the scores?',
+								handleProceed: () => handleUnrelease(item.id),
+							}),
+				  }
+				: {
+						label: 'Release Scores',
+						icon: 'ph-bold ph-exam',
+						handleClick: () =>
+							createConfirmationModal({
+								message: 'Are you sure you want to release the scores?',
+								handleProceed: () => handleRelease(item.id),
 							}),
 				  },
 			{
@@ -182,6 +208,32 @@
 			await closeAssessment(id);
 			await handleRefresh();
 			createSuccessModal({ message: 'Assessment was closed successfully!' });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		removeModal(modalId);
+		loading = false;
+	};
+	const handleRelease = async (id: string) => {
+		loading = true;
+		const modalId = createLoadingModal({ message: 'Releasing scores...' });
+		try {
+			await updateAssessment(id, { is_score_released: true });
+			await handleRefresh();
+			createSuccessModal({ message: 'Scores has been released successfully!' });
+		} catch (error: any) {
+			createErrorModal({ message: error.message });
+		}
+		removeModal(modalId);
+		loading = false;
+	};
+	const handleUnrelease = async (id: string) => {
+		loading = true;
+		const modalId = createLoadingModal({ message: 'Unreleasing scores...' });
+		try {
+			await updateAssessment(id, { is_score_released: false });
+			await handleRefresh();
+			createSuccessModal({ message: 'Scores has been unreleased successfully!' });
 		} catch (error: any) {
 			createErrorModal({ message: error.message });
 		}

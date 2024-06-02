@@ -1,20 +1,20 @@
 <script lang="ts">
 	// IMPORTED UTILS
 	import {
+		createConfirmationModal,
 		createErrorModal,
 		createSuccessModal,
-		createConfirmationModal,
 	} from '$stores/modalStates';
 	import { generateId, validateEmail } from '$utils/helpers';
-	import { insertAccount, uploadAvatar } from '$utils/supabase';
+	import { insertAccount } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
-		Button,
-		Modal,
-		FloatingLabelInput,
 		Badge,
-		Select,
+		Button,
+		FloatingLabelInput,
 		Label,
+		Modal,
+		Select,
 		Spinner,
 	} from 'flowbite-svelte';
 
@@ -22,7 +22,8 @@
 	export let handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
-	let last_name: string,
+	let id: string,
+		last_name: string,
 		first_name: string,
 		middle_name: string,
 		gender: string,
@@ -37,6 +38,7 @@
 
 	// UTILS
 	const handleReset = () => {
+		id = '';
 		last_name = '';
 		first_name = '';
 		middle_name = '';
@@ -49,7 +51,6 @@
 	const handleSave = async () => {
 		isLoading = true;
 		try {
-			const id = generateId();
 			const created_at = Date.now();
 			await insertAccount({
 				id,
@@ -77,6 +78,7 @@
 		try {
 			if (
 				[
+					id,
 					last_name,
 					first_name,
 					middle_name,
@@ -114,6 +116,13 @@
 	<form class="grid grid-cols-1 gap-4" on:submit|preventDefault={handleProceed}>
 		<div class="flex flex-col gap-4">
 			<Label>Basic Info</Label>
+			<FloatingLabelInput
+				bind:value={id}
+				style="outlined"
+				type="text"
+				label="ID No."
+				required
+			/>
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 				<FloatingLabelInput
 					bind:value={last_name}

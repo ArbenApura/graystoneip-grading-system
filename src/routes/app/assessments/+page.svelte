@@ -79,7 +79,11 @@
 				value: item.criteria.course_class.instructor.full_name,
 			},
 			{ name: 'name', label: 'Name', value: item.name },
-			{ name: 'score', label: 'Score', value: score },
+			{
+				name: 'score',
+				label: 'Score',
+				value: item.is_score_released ? score : 'Not Yet Released',
+			},
 			{ name: 'total', label: 'Total', value: item.total.toString() },
 			{
 				name: 'status',

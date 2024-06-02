@@ -33,6 +33,8 @@
 	import Header from '$components/layouts/Header';
 	import InteractiveTable from '$components/modules/InteractiveTable/InteractiveTable.svelte';
 	import StudentRecordEditorModal from './components/StudentRecordEditorModal.svelte';
+	import { getDefaultFilter } from '$utils/config';
+	import { filter } from 'lodash';
 
 	// PROPS
 	export let data: any;
@@ -95,19 +97,19 @@
 			label: 'Semester',
 			name: 'semester',
 			items: [
-				{ label: '1st', match: '1st', active: true },
-				{ label: '2nd', match: '2nd', active: true },
+				{ label: '1st', match: '1st', active: false },
+				{ label: '2nd', match: '2nd', active: false },
 			],
 		},
 		{
 			label: 'School Year',
 			name: 'school_year',
 			items: [
-				{ label: '2023-2024', match: '2023-2024', active: true },
-				{ label: '2024-2025', match: '2024-2025', active: true },
-				{ label: '2025-2026', match: '2025-2026', active: true },
-				{ label: '2026-2027', match: '2026-2027', active: true },
-				{ label: '2027-2028', match: '2027-2028', active: true },
+				{ label: '2023-2024', match: '2023-2024', active: false },
+				{ label: '2024-2025', match: '2024-2025', active: false },
+				{ label: '2025-2026', match: '2025-2026', active: false },
+				{ label: '2026-2027', match: '2026-2027', active: false },
+				{ label: '2027-2028', match: '2027-2028', active: false },
 			],
 		},
 	];
@@ -155,14 +157,13 @@
 		// SAVE CHANGES TO LOCAL STORAGES
 		columns;
 		sortItems;
-		filterGroups;
 		saveData();
 	}
 
 	// UTILS
 	const saveData = () => {
 		if (typeof localStorage === 'undefined' || !initialized) return;
-		const data = JSON.stringify({ columns, sortItems, filterGroups });
+		const data = JSON.stringify({ columns, sortItems });
 		const encrypted = encrypt(data);
 		localStorage.setItem(localStorageKey, encrypted);
 	};
@@ -176,7 +177,6 @@
 			const data = JSON.parse(decrypted);
 			if (data.columns) columns = data.columns;
 			if (data.sortItems) sortItems = data.sortItems;
-			if (data.filterGroups) filterGroups = data.filterGroups;
 		} catch {}
 		initialized = true;
 	};
@@ -231,7 +231,28 @@
 	// LIFECYCLES
 	onMount(() => {
 		if (data.studentRecords) items = data.studentRecords;
+
 		loadData();
+
+		const defaultFilter = getDefaultFilter();
+
+		filterGroups = filterGroups.map((filterGroup) => {
+			if (filterGroup.name === 'semester') {
+				filterGroup.items = filterGroup.items.map((item) => {
+					item.active = item.match === defaultFilter.semester;
+					return item;
+				});
+			}
+
+			if (filterGroup.name === 'school_year') {
+				filterGroup.items = filterGroup.items.map((item) => {
+					item.active = item.match === defaultFilter.school_year;
+					return item;
+				});
+			}
+
+			return filterGroup;
+		});
 	});
 </script>
 

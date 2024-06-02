@@ -34,6 +34,7 @@ export type RowTool = {
 export type RowItem = {
 	columnItems: ColumnItem[];
 	tools: RowTool[];
+	href?: string;
 };
 export type TableTool = {
 	icon: string;

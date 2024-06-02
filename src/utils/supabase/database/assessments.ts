@@ -61,6 +61,7 @@ export const updateAssessment = async (
 		title?: string;
 		description?: string;
 		is_open?: boolean;
+		is_score_released?: boolean;
 		questions?: AssessmentQuestion[] | string;
 	},
 ) => {

@@ -6,6 +6,7 @@ import { supabase } from '..';
 
 // UTILS
 export const insertAccount = async (account: Account) => {
+	if (await isIdTaken(account.id)) throw new Error('Id is not available!');
 	if (await isEmailTaken(account.email)) throw new Error('Email is already taken!');
 	const { error } = await supabase.from('accounts').insert(account);
 	if (error) throw new Error(error.message);
@@ -46,6 +47,7 @@ export const unarchiveAccount = async (id: string) => {
 };
 export const updateAccount = async (id: string, account: Account) => {
 	try {
+		if (await isIdOverwrite(id, account.id)) throw new Error('Id is not available!');
 		if (await isEmailOverwrite(id, account.email)) throw new Error('Email is already taken!');
 		const { error } = await supabase.from('accounts').update(account).eq('id', id);
 		if (error) throw new Error(error.message);
@@ -54,6 +56,21 @@ export const updateAccount = async (id: string, account: Account) => {
 			throw new Error('Id is already taken!');
 		else throw error;
 	}
+};
+export const isIdTaken = async (id: string) => {
+	const { count } = await supabase
+		.from('accounts')
+		.select('*', { count: 'exact', head: true })
+		.eq('id', id);
+	return !!count;
+};
+export const isIdOverwrite = async (id: string, newId: string) => {
+	const { count } = await supabase
+		.from('accounts')
+		.select('*', { count: 'exact', head: true })
+		.neq('id', id)
+		.eq('id', newId);
+	return !!count;
 };
 export const isEmailTaken = async (email: string) => {
 	const { count } = await supabase

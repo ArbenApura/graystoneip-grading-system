@@ -22,6 +22,7 @@ export type CourseClass = {
 	id: string;
 	instructor_id: string;
 	course_id: string;
+	thumbnail: string;
 	name: string;
 	semester: string;
 	school_year: string;
@@ -68,6 +69,7 @@ export type CriteriaItem = {
 	title: string;
 	description: string;
 	created_at: number;
+	is_score_released: boolean;
 };
 export type CriteriaItemData = CriteriaItem & {
 	criteria: CriteriaData;

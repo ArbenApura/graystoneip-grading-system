@@ -5,22 +5,25 @@
 	import type { BreadcrumbItem } from '$components/layouts/Header';
 	// IMPORTED STATES
 	import { account, login } from '$stores/authStates';
+	// IMPORTED LIB-UTILS
+	import { onMount } from 'svelte';
 	// IMPORTED UTILS
-	import { validateEmail } from '$utils/helpers';
 	import {
 		createConfirmationModal,
 		createErrorModal,
 		createSuccessModal,
 		createVerificationModal,
 	} from '$stores/modalStates';
+	import { getDefaultFilter, setDefaultFilter } from '$utils/config';
+	import { validateEmail } from '$utils/helpers';
 	import { deleteAvatar, updateAccount, uploadAvatar } from '$utils/supabase';
 	// IMPORTED LIB-COMPONENTS
 	import {
 		Button,
-		FloatingLabelInput,
 		Fileupload,
-		Select,
+		FloatingLabelInput,
 		Label,
+		Select,
 		Spinner,
 	} from 'flowbite-svelte';
 	// IMPORTED COMPONENTS
@@ -42,6 +45,7 @@
 		password = $account.password,
 		repassword = $account.password;
 	let selectedImage: string | ArrayBuffer | null = $account.avatar || NoImagePNG;
+	let defaultFilter = { semester: '', school_year: '' };
 	let isLoading = false;
 
 	// REACTIVE STATES
@@ -77,6 +81,7 @@
 				await deleteAvatar(avatar);
 				avatar = await uploadAvatar(files[0]);
 			}
+			setDefaultFilter(defaultFilter);
 			await updateAccount($account.id, {
 				id: $account.id,
 				last_name,
@@ -126,6 +131,10 @@
 			isLoading = false;
 		}
 	};
+
+	// -- LIFECYCLES -- //
+
+	onMount(() => (defaultFilter = getDefaultFilter()));
 </script>
 
 <Header {breadcrumbItems} />
@@ -232,6 +241,39 @@
 						label="Repeat Password"
 						required
 					/>
+				</div>
+
+				<Label>Default Filter</Label>
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					<div>
+						<Label class="mb-2">Semester</Label>
+						<Select
+							placeholder="Select Semester"
+							required
+							items={[
+								{ name: '1st', value: '1st' },
+								{ name: '2nd', value: '2nd' },
+							]}
+							bind:value={defaultFilter.semester}
+						/>
+					</div>
+					<div>
+						<Label class="mb-2">School Year</Label>
+						<Select
+							placeholder="Select School Year"
+							required
+							items={[
+								{ name: '2023-2024', value: '2023-2024' },
+								{ name: '2024-2025', value: '2024-2025' },
+								{ name: '2025-2026', value: '2025-2026' },
+								{ name: '2026-2027', value: '2026-2027' },
+								{ name: '2027-2028', value: '2027-2028' },
+								{ name: '2028-2029', value: '2028-2029' },
+								{ name: '2029-2030', value: '2029-2030' },
+							]}
+							bind:value={defaultFilter.school_year}
+						/>
+					</div>
 				</div>
 			</div>
 		</div>

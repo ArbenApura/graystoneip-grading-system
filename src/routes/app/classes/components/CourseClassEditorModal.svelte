@@ -1,4 +1,6 @@
 <script lang="ts">
+	// IMPORTED ASSETS
+	import DefaultThumbnailPNG from '$assets/images/default-thumbnail.png';
 	// IMPORTED TYPES
 	import type { Course, CourseClassData } from '$types/curriculum';
 	// IMPORTED LIB-UTILS
@@ -10,8 +12,17 @@
 		createConfirmationModal,
 	} from '$stores/modalStates';
 	// IMPORTED LIB-COMPONENTS
-	import { Button, Modal, Input, Badge, Select, Label, Spinner } from 'flowbite-svelte';
-	import { updateCourseClass } from '$utils/supabase';
+	import {
+		Button,
+		Modal,
+		Input,
+		Badge,
+		Select,
+		Label,
+		Spinner,
+		Fileupload,
+	} from 'flowbite-svelte';
+	import { deleteThumbnail, updateCourseClass, uploadThumbnail } from '$utils/supabase';
 
 	// PROPS
 	export let courseClass: CourseClassData,
@@ -28,8 +39,22 @@
 		name: course.code + ' - ' + course.description,
 		value: course.id,
 	}));
+	let thumbnail = courseClass.thumbnail;
+	let files: FileList;
+	let selectedImage: string | ArrayBuffer | null = courseClass.thumbnail || DefaultThumbnailPNG;
 
 	// UTILS
+	const handleFileChange = (event: Event) => {
+		const target = event.target as HTMLInputElement;
+		const file = target.files && target.files[0];
+		if (file && file.type.startsWith('image/')) {
+			const reader = new FileReader();
+			reader.onload = () => {
+				selectedImage = reader.result;
+			};
+			reader.readAsDataURL(file);
+		}
+	};
 	const handleReset = () => {
 		name = courseClass.name;
 		semester = courseClass.semester;
@@ -39,10 +64,16 @@
 	const handleSave = async () => {
 		isLoading = true;
 		try {
+			if (files && files.length) {
+				if (thumbnail !== DefaultThumbnailPNG) await deleteThumbnail(thumbnail);
+				thumbnail = await uploadThumbnail(files[0]);
+			}
+
 			await updateCourseClass({
 				id: courseClass.id,
 				instructor_id: courseClass.instructor_id,
 				course_id,
+				thumbnail,
 				name,
 				semester,
 				school_year,
@@ -82,6 +113,16 @@
 		</div>
 	</svelte:fragment>
 	<form class="flex flex-col gap-4" on:submit|preventDefault={handleProceed}>
+		<div class="flex flex-col gap-2">
+			<Label>Thumbnail</Label>
+			<Fileupload
+				bind:files
+				on:change={handleFileChange}
+				inputClass="h-[48px] p-0 flex-center rounded-none border-b bg-transparent"
+				accept="image/*"
+				required
+			/>
+		</div>
 		<div>
 			<Label class="mb-2">Class Name</Label>
 			<Input type="text" placeholder="Input Class Name" required bind:value={name} />

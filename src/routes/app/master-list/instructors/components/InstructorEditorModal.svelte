@@ -20,7 +20,8 @@
 	export let account: Account, handleClose: () => void, handleRefresh: () => Promise<void>;
 
 	// STATES
-	let first_name = account.first_name,
+	let id = account.id,
+		first_name = account.first_name,
 		last_name = account.last_name,
 		middle_name = account.middle_name,
 		gender = account.gender,
@@ -35,6 +36,7 @@
 
 	// UTILS
 	const handleReset = () => {
+		id = account.id;
 		first_name = account.first_name;
 		last_name = account.last_name;
 		middle_name = account.middle_name;
@@ -48,7 +50,7 @@
 		isLoading = true;
 		try {
 			await updateAccount(account.id, {
-				id: account.id,
+				id,
 				last_name,
 				first_name,
 				middle_name,
@@ -109,6 +111,13 @@
 	<form class="grid grid-cols-1 gap-4" on:submit|preventDefault={handleProceed}>
 		<div class="flex flex-col gap-4">
 			<Label>Basic Info</Label>
+			<FloatingLabelInput
+				bind:value={id}
+				style="outlined"
+				type="text"
+				label="ID No."
+				required
+			/>
 			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 				<FloatingLabelInput
 					bind:value={last_name}

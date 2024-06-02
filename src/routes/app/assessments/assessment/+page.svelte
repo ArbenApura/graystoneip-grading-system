@@ -73,7 +73,7 @@
 			}
 			goto('/app/assessments?student_id=' + data.student.id);
 			createSuccessModal({
-				message: `Hooray! Your assessment has been submitted successfully and your score is: ${score}!`,
+				message: 'Hooray! Your assessment has been submitted successfully!',
 			});
 		} catch (error: any) {
 			createErrorModal({ message: error.message });

@@ -2,12 +2,13 @@
 	// IMPORTED TYPES
 	import type { Column, FilterGroup, RowItem, SortItem, TableTool } from './types';
 	// IMPORTED LIB-COMPONENTS
-	import { Input, Button } from '$lib';
+	import { Button, Input } from '$lib';
 	// IMPORTED COMPONENTS
-	import Table from './Table.svelte';
 	import ColumnVisibility from './ColumnVisibility.svelte';
-	import RowSort from './RowSort.svelte';
 	import RowFilter from './RowFilter.svelte';
+	import RowSort from './RowSort.svelte';
+	import Table from './Table.svelte';
+	import Thumbnails from './Thumbnails.svelte';
 
 	// PROPS
 	export let columns: Column[],
@@ -17,6 +18,7 @@
 		tableTools: TableTool[] = [],
 		loading: boolean,
 		toolPosition: 'front' | 'end' = 'end',
+		type: 'table' | 'thumbnail' = 'table',
 		handleRefresh: () => Promise<void>;
 
 	// STATES
@@ -58,8 +60,14 @@
 			{/if}
 			<RowSort bind:sortItems />
 			<span class="flex-grow md:hidden" />
-			<ColumnVisibility bind:columns />
+			{#if type === 'table'}
+				<ColumnVisibility bind:columns />
+			{/if}
 		</div>
 	</div>
-	<Table bind:sortItems bind:filterGroups {...{ search, columns, rowItems, toolPosition }} />
+	{#if type === 'table'}
+		<Table bind:sortItems bind:filterGroups {...{ search, columns, rowItems, toolPosition }} />
+	{:else if type === 'thumbnail'}
+		<Thumbnails bind:sortItems bind:filterGroups {...{ search, rowItems }} />
+	{/if}
 </div>

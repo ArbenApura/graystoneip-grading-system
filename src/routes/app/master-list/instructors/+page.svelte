@@ -62,10 +62,11 @@
 	let search = '';
 	let loading = false;
 	let initialized = false;
-	let localStorageKey = 'config.master-list.instructors';
+	let localStorageKey = 'config.master-list.instructors_v2';
 
 	// TABLE STATES
 	let columns: Column[] = [
+		{ name: 'id', label: 'ID No.', visible: true },
 		{ name: 'last_name', label: 'Last Name', visible: true },
 		{ name: 'first_name', label: 'First Name', visible: true },
 		{ name: 'middle_name', label: 'Middle Name', visible: true },
@@ -75,12 +76,14 @@
 		{ name: 'created_at', label: 'Created At', visible: true },
 	];
 	let sortItems: SortItem[] = [
+		{ name: 'id', label: 'ID No.', type: 'none' },
 		{ name: 'last_name', label: 'Last Name', type: 'asc' },
 		{ name: 'email', label: 'Email', type: 'none' },
 		{ name: 'created_at', label: 'Created At', type: 'none' },
 	];
 	$: rowItems = items.map((item) => {
 		const columnItems: ColumnItem[] = [
+			{ name: 'id', label: 'ID No.', value: item.id },
 			{ name: 'last_name', label: 'Last Name', value: item.last_name },
 			{ name: 'first_name', label: 'First Name', value: item.first_name },
 			{ name: 'middle_name', label: 'Middle Name', value: item.middle_name },

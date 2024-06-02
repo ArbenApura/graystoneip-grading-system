@@ -37,8 +37,10 @@
 
 	// TABLE STATES
 	let columns: Column[] = [
+		{ name: 'thumbnail', label: 'Thumbnail', visible: true },
 		{ name: 'name', label: 'Class Name', visible: true },
 		{ name: 'instructor', label: 'Instructor', visible: true },
+		{ name: 'instructor_avatar', label: 'Instructor Avatar', visible: true },
 		{ name: 'course_code', label: 'Course Code', visible: true },
 		{ name: 'course_description', label: 'Course Description', visible: true },
 		{ name: 'grade', label: 'Grade', visible: true },
@@ -76,11 +78,17 @@
 	];
 	$: rowItems = items.map((item) => {
 		const columnItems: ColumnItem[] = [
+			{ name: 'thumbnail', label: 'Thumbnail', value: item.course_class.thumbnail },
 			{ name: 'name', label: 'Class Name', value: item.course_class.name },
 			{
 				name: 'instructor',
 				label: 'Instructor',
 				value: item.course_class.instructor.full_name,
+			},
+			{
+				name: 'instructor_avatar',
+				label: 'Instructor Avatar',
+				value: item.course_class.instructor.avatar,
 			},
 			{ name: 'course_code', label: 'Course Code', value: item.course_class.course.code },
 			{
@@ -168,5 +176,6 @@
 	bind:sortItems
 	bind:filterGroups
 	bind:loading
+	type="thumbnail"
 	{...{ rowItems, handleRefresh }}
 />
